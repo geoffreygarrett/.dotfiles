@@ -36,8 +36,8 @@ function RunCommand {
         return $output
     }
     catch {
-        Log "ERROR" $_.Exception.Message
-        exit 1
+        Log "WARNING" $_.Exception.Message
+        return $null
     }
 }
 
@@ -48,35 +48,48 @@ function ShowUsage {
     Log "INFO" "Use the -Local switch to use the local repository instead of cloning from GitHub."
 }
 
-function InstallDependencies {
-    Log "INFO" "Installing dependencies..."
-    
-    # Check if Chocolatey is installed
+function EnsureChocolatey {
     if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
-        # Check if Chocolatey is installed but not in PATH
         if (Test-Path "C:\ProgramData\chocolatey\bin\choco.exe") {
             $env:Path += ";C:\ProgramData\chocolatey\bin"
             Log "INFO" "Added Chocolatey to PATH for this session."
         }
         else {
-            # Install Chocolatey
+            Log "INFO" "Installing Chocolatey..."
             Set-ExecutionPolicy Bypass -Scope Process -Force
             [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-            
-            # Refresh environment variables
+            try {
+                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+            }
+            catch {
+                Log "ERROR" "Failed to install Chocolatey: $_"
+                exit 1
+            }
             $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
         }
     }
-
-    # Verify Chocolatey installation
-    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
-        Log "ERROR" "Failed to install or locate Chocolatey. Please install it manually and try again."
+    
+    if (Get-Command choco -ErrorAction SilentlyContinue) {
+        Log "INFO" "Upgrading Chocolatey..."
+        RunCommand "choco upgrade chocolatey -y"
+    }
+    else {
+        Log "ERROR" "Chocolatey is not available. Please install it manually and try again."
         exit 1
     }
+}
 
+function InstallDependencies {
+    Log "INFO" "Installing and updating dependencies..."
+    EnsureChocolatey
+    
     foreach ($pkg in @("git", "ansible")) {
-        if (-not (Get-Command $pkg -ErrorAction SilentlyContinue)) {
+        if (Get-Command $pkg -ErrorAction SilentlyContinue) {
+            Log "INFO" "Upgrading $pkg..."
+            RunCommand "choco upgrade $pkg -y"
+        }
+        else {
+            Log "INFO" "Installing $pkg..."
             RunCommand "choco install $pkg -y"
         }
     }
