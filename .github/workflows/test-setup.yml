@@ -66,16 +66,20 @@ jobs:
         run: |
           set -euo pipefail
           curl -sSL "https://raw.githubusercontent.com/${{ needs.prepare.outputs.repo_url }}/${{ needs.prepare.outputs.branch }}/setup.sh" | bash -s -- --ci
+
       - name: Verify installation
+        shell: pwsh
         run: |
-          for cmd in nvim zellij alacritty; do
-            if command -v $cmd &> /dev/null; then
-              echo "$cmd is installed"
-            else
-              echo "$cmd is not installed"
+          $commands = @("nvim", "zellij", "alacritty")
+          foreach ($cmd in $commands) {
+            if (Get-Command $cmd -ErrorAction SilentlyContinue) {
+              Write-Output "$cmd is installed"
+            } else {
+              Write-Output "$cmd is not installed"
               exit 1
-            fi
-          done
+            }
+          }
+
       - name: Upload logs on failure
         if: failure()
         uses: actions/upload-artifact@v4.3.1
