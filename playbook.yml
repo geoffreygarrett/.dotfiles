@@ -90,7 +90,7 @@
     - name: Install common packages (Debian/Ubuntu)
       become: yes
       apt:
-        name: "{{ packages_common + packages_build }}"
+        name: "{{ packages_common + packages_ubuntu }}"
         state: latest
         update_cache: yes
       when: ansible_os_family == "Debian"
