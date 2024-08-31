@@ -7,13 +7,15 @@
     install_log: "{{ gg_dir }}/install_log.txt"
     backup_dir: "{{ gg_dir }}/backup_{{ ansible_date_time.iso8601 }}"
     repo_dir: "{{ playbook_dir }}"
-    packages_linux:
-      - alacritty
+    packages_common:
       - neovim
       - curl
-      - build-essential
       - unzip
       - wmctrl
+    packages_build:
+      - build-essential  # Debian/Ubuntu
+      - gcc              # Fedora/CentOS
+      - base-devel       # Arch
     packages_macos:
       - alacritty
       - neovim
@@ -38,14 +40,14 @@
         path: "{{ gg_dir }}"
         state: directory
         mode: '0755'
-      tags: [ setup, update ]
+      tags: [setup, update]
 
     - name: Ensure backup directory exists
       file:
         path: "{{ backup_dir }}"
         state: directory
         mode: '0755'
-      tags: [ setup, update ]
+      tags: [setup, update]
 
     - name: Ensure log file exists
       file:
@@ -53,42 +55,98 @@
         state: touch
         mode: '0644'
       when: ansible_os_family != 'Windows'
-      tags: [ setup, update ]
+      tags: [setup, update]
 
     - name: Backup existing configuration
       copy:
         src: "{{ ansible_env.HOME }}/.config/{{ item }}"
         dest: "{{ backup_dir }}/{{ item }}"
         remote_src: yes
-      loop: [ alacritty, zellij, nvim, nushell ]
+      loop: [alacritty, zellij, nvim, nushell]
       ignore_errors: yes
       when: ansible_os_family != 'Windows'
-      tags: [ update ]
+      tags: [update]
 
     - name: Update repository
       git:
         repo: "{{ repo_dir }}"
         dest: "{{ repo_dir }}"
         update: yes
-      tags: [ update ]
+      tags: [update]
 
     - name: Update configurations
       copy:
         src: "{{ repo_dir }}/config/{{ item }}"
         dest: "{{ ansible_env.HOME }}/.config/{{ item }}"
         remote_src: yes
-      loop: [ alacritty, zellij, nvim, nushell ]
+      loop: [alacritty, zellij, nvim, nushell]
       when: ansible_os_family != 'Windows'
-      tags: [ update ]
+      tags: [update]
 
-    - name: Install or Update packages (Linux)
+    - name: Install common packages (Debian/Ubuntu)
       become: yes
       apt:
-        name: "{{ packages_linux }}"
+        name: "{{ packages_common + packages_build }}"
         state: latest
         update_cache: yes
       when: ansible_os_family == "Debian"
-      tags: [ setup, update ]
+      tags: [setup, update]
+
+    - name: Add Alacritty PPA (Ubuntu)
+      become: yes
+      apt_repository:
+        repo: ppa:aslatter/ppa
+      when: ansible_distribution == "Ubuntu"
+      tags: [setup, update]
+
+    - name: Install Alacritty (Ubuntu)
+      become: yes
+      apt:
+        name: alacritty
+        state: latest
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+      tags: [setup, update]
+
+    - name: Install common packages (Fedora)
+      become: yes
+      dnf:
+        name: "{{ packages_common + packages_build + ['alacritty'] }}"
+        state: latest
+      when: ansible_distribution == "Fedora"
+      tags: [setup, update]
+
+    - name: Install common packages (CentOS)
+      become: yes
+      yum:
+        name: "{{ packages_common + packages_build }}"
+        state: latest
+      when: ansible_distribution == "CentOS"
+      tags: [setup, update]
+
+    - name: Install Alacritty from source (CentOS)
+      become: yes
+      block:
+        - name: Install Rust
+          shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        - name: Install Alacritty dependencies
+          yum:
+            name:
+              - cmake
+              - freetype-devel
+              - fontconfig-devel
+              - libxcb-devel
+        - name: Clone Alacritty repository
+          git:
+            repo: 'https://github.com/alacritty/alacritty.git'
+            dest: /tmp/alacritty
+        - name: Build and install Alacritty
+          shell: |
+            cd /tmp/alacritty
+            cargo build --release
+            cp target/release/alacritty /usr/local/bin/
+      when: ansible_distribution == "CentOS"
+      tags: [setup, update]
 
     - name: Install or Update packages (macOS)
       homebrew:
@@ -96,22 +154,22 @@
         state: latest
         update_homebrew: yes
       when: ansible_os_family == "Darwin"
-      tags: [ setup, update ]
+      tags: [setup, update]
 
     - name: Install or Update packages (Windows)
       win_chocolatey:
         name: "{{ packages_windows }}"
         state: latest
       when: ansible_os_family == "Windows"
-      tags: [ setup, update ]
+      tags: [setup, update]
 
     - name: Update Rust
       shell: rustup update
-      tags: [ update ]
+      tags: [update]
 
     - name: Update Zellij
       shell: cargo install zellij
-      tags: [ update ]
+      tags: [update]
 
     - name: Update Neovim plugins
       shell: |
@@ -119,7 +177,7 @@
         nvim --headless +"if exists(':PlugUpgrade') | PlugUpgrade | else | echo 'vim-plug not installed' | endif" +qall
         nvim --headless +"if exists(':TSUpdate') | TSUpdate | else | echo 'Treesitter not installed' | endif" +qall
       when: ansible_os_family != 'Windows'
-      tags: [ update ]
+      tags: [update]
 
     - name: Setup keybinding (Linux)
       shell: |
@@ -136,7 +194,7 @@
         gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[$(printf "'%s', " "${keybinding_paths[@]}")]"
       loop: "{{ keybindings_linux }}"
       when: ansible_os_family == "Linux"
-      tags: [ setup ]
+      tags: [setup]
 
     - name: Setup keybinding (macOS)
       shell: |
@@ -145,7 +203,7 @@
         defaults write -g NSUserKeyEquivalents -dict-add "$name" "$binding"
       loop: "{{ keybindings_macos }}"
       when: ansible_os_family == "Darwin"
-      tags: [ setup ]
+      tags: [setup]
 
     - name: Confirm installation complete
       debug:
@@ -153,4 +211,4 @@
           Installation completed successfully! Please restart your terminal for changes to take effect.
           On Linux/macOS, use 'source ~/.bashrc' or 'source ~/.zshrc'.
           On Windows, use 'refreshenv' in Command Prompt or '& $PROFILE' in PowerShell.
-      tags: [ setup, update ]
+      tags: [setup, update]
