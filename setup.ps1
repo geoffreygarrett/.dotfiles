@@ -1,12 +1,18 @@
 # PowerShell Script for Cross-Platform Terminal Setup including WSL2
 
+# Ensure the script is running with administrator privileges
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    Write-Host "This script needs to be run as Administrator. Please restart PowerShell as an Administrator and try again."
+    exit 1
+}
+
 # Global Variables
 $GITHUB_USERNAME = if ($env:GITHUB_USERNAME) { $env:GITHUB_USERNAME } else { "geoffreygarrett" }
 $REPO_NAME = "cross-platform-terminal-setup"
 $REPO_URL = "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
 $SETUP_TAG = "setup"
 $USE_LOCAL_REPO = $false
-$WSL_DISTRO = "Ubuntu-20.04"
+$WSL_DISTRO = "Ubuntu"
 
 # Utility Functions
 function Log {
@@ -34,26 +40,25 @@ function RunCommand {
     try {
         Log "DEBUG" "Executing: $command"
         $output = Invoke-Expression $command
-        if ($LASTEXITCODE -ne 0) { throw "Command failed: $command" }
+        if ($LASTEXITCODE -ne 0) { throw "Command failed with exit code $LASTEXITCODE" }
         if ($output) {
             Write-Host $output -ForegroundColor DarkGray
         }
         return $output
     }
     catch {
+        Log "WARNING" "Command failed: $command"
         Log "WARNING" $_.Exception.Message
-        if ($_.Exception.Message) {
-            Write-Host $_.Exception.Message -ForegroundColor DarkGray
-        }
         return $null
     }
 }
 
 # Main Functions
 function ShowUsage {
-    Log "INFO" "Usage: .\setup.ps1 [-Local]"
+    Log "INFO" "Usage: .\setup.ps1 [-Local] [-Distro <DistributionName>]"
     Log "INFO" "You can override the default GitHub username by setting the GITHUB_USERNAME environment variable."
     Log "INFO" "Use the -Local switch to use the local repository instead of cloning from GitHub."
+    Log "INFO" "Use the -Distro parameter to specify a different Linux distribution (default is Ubuntu)."
 }
 
 function EnsureChocolatey {
@@ -97,48 +102,83 @@ function InstallOrUpgradePackage {
         Log "INFO" "Installing $packageName..."
         RunCommand "choco install $packageName -y"
     }
+    
+    if (-not (Get-Command $packageName -ErrorAction SilentlyContinue)) {
+        Log "WARNING" "Failed to install or upgrade $packageName. Please install it manually."
+    }
 }
 
 function InstallDependencies {
     Log "INFO" "Installing and updating dependencies..."
     EnsureChocolatey
     
-    foreach ($pkg in @("git", "ansible")) {
+    foreach ($pkg in @("git")) {
         InstallOrUpgradePackage $pkg
+    }
+    
+    # Special handling for Ansible
+    if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
+        Log "INFO" "Installing Ansible via pip..."
+        RunCommand "pip install ansible"
+        if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
+            Log "WARNING" "Failed to install Ansible. Please install it manually."
+        }
     }
 }
 
-function EnableWindowsFeatures {
-    Log "INFO" "Enabling necessary Windows features..."
-    RunCommand "dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart"
-    RunCommand "dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart"
+function CheckWindowsVersion {
+    $osInfo = Get-WmiObject -Class Win32_OperatingSystem
+    $buildNumber = [int]($osInfo.BuildNumber)
+    
+    if ($buildNumber -lt 19041) {
+        Log "ERROR" "Your Windows version is not compatible with WSL2. Please update to Windows 10 version 2004 (Build 19041) or higher."
+        exit 1
+    }
 }
 
-function InstallWSL2Kernel {
+function EnableWindowsFeature {
+    param (
+        [string]$featureName
+    )
+    
+    $feature = Get-WindowsOptionalFeature -Online -FeatureName $featureName
+    if ($feature.State -eq "Enabled") {
+        Log "INFO" "Windows feature $featureName is already enabled."
+    } else {
+        Log "INFO" "Enabling Windows feature: $featureName"
+        $result = Enable-WindowsOptionalFeature -Online -FeatureName $featureName -NoRestart
+        if ($result.RestartNeeded) {
+            Log "WARNING" "A system restart is required to complete the installation of $featureName."
+        }
+    }
+}
+
+function InstallWSL {
+    Log "INFO" "Installing WSL..."
+    
+    EnableWindowsFeature "Microsoft-Windows-Subsystem-Linux"
+    EnableWindowsFeature "VirtualMachinePlatform"
+    
     Log "INFO" "Downloading and installing WSL2 kernel update..."
     $url = "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi"
     $outPath = "$env:TEMP\wsl_update_x64.msi"
     Invoke-WebRequest -Uri $url -OutFile $outPath
     RunCommand "msiexec /i $outPath /qn"
     Remove-Item $outPath
-}
-
-function SetWSL2AsDefault {
+    
     Log "INFO" "Setting WSL2 as the default version..."
     RunCommand "wsl --set-default-version 2"
-}
-
-function InstallWSLDistro {
-    Log "INFO" "Installing WSL distribution: $WSL_DISTRO..."
+    
+    Log "INFO" "Installing WSL distribution: $WSL_DISTRO"
     RunCommand "wsl --install -d $WSL_DISTRO"
 }
 
 function SetupWSL2 {
-    EnableWindowsFeatures
-    InstallWSL2Kernel
-    SetWSL2AsDefault
-    InstallWSLDistro
-    Log "SUCCESS" "WSL2 setup completed successfully!"
+    CheckWindowsVersion
+    InstallWSL
+    Log "SUCCESS" "WSL2 installation initiated successfully!"
+    Log "INFO" "After the installation completes, please restart your computer to finish the WSL setup."
+    Log "INFO" "After restarting, the first launch of your Linux distribution may take a few minutes to complete the setup."
 }
 
 function CloneRepository {
@@ -160,10 +200,15 @@ function CloneRepository {
 
 function RunPlaybook {
     Log "INFO" "Running the Ansible playbook..."
+    if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
+        Log "ERROR" "Ansible is not installed or not in PATH. Skipping playbook execution."
+        return
+    }
+    
     if ($USE_LOCAL_REPO) {
         if (-not (Test-Path "playbook.yml")) {
             Log "ERROR" "Error: playbook.yml not found in the current directory."
-            exit 1
+            return
         }
         RunCommand "ansible-playbook playbook.yml --tags '$SETUP_TAG'"
     }
@@ -171,7 +216,8 @@ function RunPlaybook {
         Push-Location $REPO_NAME
         if (-not (Test-Path "playbook.yml")) {
             Log "ERROR" "Error: playbook.yml not found in the repository."
-            exit 1
+            Pop-Location
+            return
         }
         RunCommand "ansible-playbook playbook.yml --tags '$SETUP_TAG'"
         Pop-Location
@@ -194,6 +240,7 @@ function Main {
     Cleanup
     Log "SUCCESS" "Setup completed successfully!"
     Log "INFO" "Please restart your computer to complete the WSL2 installation."
+    Log "INFO" "After restarting, run 'wsl' in a new PowerShell window to complete the Linux distribution setup."
 }
 
 # Script Execution
@@ -204,6 +251,13 @@ if ($args -contains "-help" -or $args -contains "--help") {
 
 if ($args -contains "-Local" -or $args -contains "--local") {
     $USE_LOCAL_REPO = $true
+}
+
+for ($i = 0; $i -lt $args.Count; $i++) {
+    if ($args[$i] -eq "-Distro" -and $i+1 -lt $args.Count) {
+        $WSL_DISTRO = $args[$i+1]
+        $i++
+    }
 }
 
 try {
