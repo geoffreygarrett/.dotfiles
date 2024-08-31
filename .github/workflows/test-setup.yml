@@ -2,9 +2,9 @@ name: 🛠️ Cross-Platform Setup Testing
 
 on:
   push:
-    branches: ['*']
+    branches: [ '*' ]
   pull_request:
-    branches: ['*']
+    branches: [ '*' ]
 
 jobs:
   test-setup:
@@ -75,16 +75,22 @@ jobs:
       - name: Verify installation
         shell: bash
         run: |
-          for cmd in alacritty nvim zellij; do
+          for cmd in nvim zellij; do
             if command -v $cmd &> /dev/null; then
               echo "$cmd is installed"
             else
               echo "$cmd is not installed"
-              if [[ "${{ runner.os }}" != "Windows" || "$cmd" != "alacritty" ]]; then
-                exit 1
-              fi
+              exit 1
             fi
           done
+          if [[ "${{ runner.os }}" != "Windows" ]]; then
+            if command -v alacritty &> /dev/null; then
+              echo "alacritty is installed"
+            else
+              echo "alacritty is not installed"
+              exit 1
+            fi
+          fi
 
       - name: Upload logs on failure
         if: failure()
