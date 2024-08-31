@@ -50,10 +50,29 @@ function ShowUsage {
 
 function InstallDependencies {
     Log "INFO" "Installing dependencies..."
+    
+    # Check if Chocolatey is installed
     if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
-        Set-ExecutionPolicy Bypass -Scope Process -Force
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        # Check if Chocolatey is installed but not in PATH
+        if (Test-Path "C:\ProgramData\chocolatey\bin\choco.exe") {
+            $env:Path += ";C:\ProgramData\chocolatey\bin"
+            Log "INFO" "Added Chocolatey to PATH for this session."
+        }
+        else {
+            # Install Chocolatey
+            Set-ExecutionPolicy Bypass -Scope Process -Force
+            [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
+            Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+            
+            # Refresh environment variables
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+        }
+    }
+
+    # Verify Chocolatey installation
+    if (-not (Get-Command choco -ErrorAction SilentlyContinue)) {
+        Log "ERROR" "Failed to install or locate Chocolatey. Please install it manually and try again."
+        exit 1
     }
 
     foreach ($pkg in @("git", "ansible")) {
