@@ -20,7 +20,7 @@ RESET='\033[0m'
 
 GITHUB_USERNAME="${GITHUB_USERNAME:-geoffreygarrett}"
 REPO_NAME="${REPO_NAME:-cross-platform-terminal-setup}"
-REPO_URL="git@github.com:${GITHUB_USERNAME}/${REPO_NAME}.git"
+REPO_URL="https://github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
 SETUP_TAG="${SETUP_TAG:-setup}"
 USE_LOCAL_REPO=false
 
