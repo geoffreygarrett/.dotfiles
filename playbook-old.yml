@@ -1,16 +1,25 @@
 ---
 - name: Terminal setup and updates for Linux, macOS, and Windows
   hosts: localhost
-  become: no  # Changed to 'no' to avoid running as root by default
+  become: no
+
   vars_files:
     - vars/main.yml
 
   pre_tasks:
+    - name: Set OS family fact
+      set_fact:
+        os_family_lower: "{{ ansible_os_family | lower }}"
+
     - name: Include OS-specific variables
       include_vars: "{{ item }}"
       with_first_found:
-        - "vars/{{ ansible_os_family | lower }}.yml"
-        - "vars/default.yml"
+        - files:
+            - "{{ os_family_lower }}.yml"
+            - "default.yml"
+          paths:
+            - "{{ playbook_dir }}/vars"
+      ignore_errors: yes
 
   tasks:
     - name: Setup directory structure and backups
