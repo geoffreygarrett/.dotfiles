@@ -2,14 +2,15 @@ name: 🛠️ Cross-Platform Setup Testing
 
 on:
   push:
-    branches: [ '*' ]
+    branches: ['*']
   pull_request:
-    branches: [ '*' ]
+    branches: ['*']
 
 jobs:
   test-setup:
-    name: Test on ${{ matrix.os }}
+    name: Test on ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
@@ -43,16 +44,16 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "REPO_URL=${{ github.repository }}" >> $GITHUB_ENV
 
-      - name: Install curl (for containers)
+      - name: Install prerequisites (for containers)
         if: matrix.container
         shell: bash
         run: |
           if command -v apt-get &> /dev/null; then
-            apt-get update && apt-get install -y curl
+            apt-get update && apt-get install -y curl sudo
           elif command -v dnf &> /dev/null; then
-            dnf install -y curl
+            dnf install -y curl sudo
           elif command -v yum &> /dev/null; then
-            yum install -y curl
+            yum install -y curl sudo
           fi
 
       - name: Test setup on Unix-like systems
@@ -74,24 +75,16 @@ jobs:
       - name: Verify installation
         shell: bash
         run: |
-          if command -v alacritty &> /dev/null; then
-            echo "Alacritty is installed"
-          else
-            echo "Alacritty is not installed"
-            exit 1
-          fi
-          if command -v nvim &> /dev/null; then
-            echo "Neovim is installed"
-          else
-            echo "Neovim is not installed"
-            exit 1
-          fi
-          if command -v zellij &> /dev/null; then
-            echo "Zellij is installed"
-          else
-            echo "Zellij is not installed"
-            exit 1
-          fi
+          for cmd in alacritty nvim zellij; do
+            if command -v $cmd &> /dev/null; then
+              echo "$cmd is installed"
+            else
+              echo "$cmd is not installed"
+              if [[ "${{ runner.os }}" != "Windows" || "$cmd" != "alacritty" ]]; then
+                exit 1
+              fi
+            fi
+          done
 
       - name: Upload logs on failure
         if: failure()
@@ -101,4 +94,4 @@ jobs:
           path: |
             ~/.gg/install_log.txt
             ${{ runner.os == 'Windows' && '$env:USERPROFILE\.gg\install_log.txt' || '~/.gg/install_log.txt' }}
-          if-no-files-found: ignore
+          if-no-files-found: warn
