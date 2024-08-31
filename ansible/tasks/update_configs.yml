@@ -24,3 +24,4 @@
   loop: [ alacritty, zellij, nvim, nushell ]
   when: ansible_os_family != 'Windows'
 
+

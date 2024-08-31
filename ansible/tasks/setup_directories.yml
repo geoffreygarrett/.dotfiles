@@ -32,4 +32,4 @@
     remote_src: yes
   loop: [ alacritty, zellij, nvim, nushell ]
   ignore_errors: yes
-  when: ansible_os_family != 'Windows'
+
