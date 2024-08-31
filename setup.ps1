@@ -22,8 +22,8 @@ function Log {
         "DEBUG" { "Gray" }
         default { "White" }
     }
-    Write-Host "[$timestamp] $level`:" -NoNewline
-    Write-Host " $message" -ForegroundColor $color
+    Write-Host "[$timestamp] $level`: " -NoNewline
+    Write-Host "$message" -ForegroundColor $color
 }
 
 function RunCommand {
