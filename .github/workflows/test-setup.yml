@@ -94,7 +94,7 @@ jobs:
         run: |
           $ErrorActionPreference = "Stop"
           $ProgressPreference = "SilentlyContinue"
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{ needs.prepare.outputs.repo_url }}/${{ needs.prepare.outputs.branch }}/setup.ps1" -OutFile setup.ps1
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{ needs.prepare.outputs.repo_url }}/${{ needs.prepare.outputs.branch }}/setup.bat" -OutFile setup.ps1
           if (Test-Path setup.ps1) {
             .\setup.ps1 -CI
           } else {
