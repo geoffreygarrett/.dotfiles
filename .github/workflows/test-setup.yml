@@ -13,7 +13,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        include:
+          - os: ubuntu-latest
+            name: Ubuntu
+          - os: ubuntu-20.04
+            name: Ubuntu 20.04
+          - os: macos-latest
+            name: macOS
+          - os: windows-latest
+            name: Windows
+          # Test on other Linux distributions using containers
+          - os: ubuntu-latest
+            name: Fedora
+            container: fedora:latest
+          - os: ubuntu-latest
+            name: CentOS
+            container: centos:latest
+          - os: ubuntu-latest
+            name: Debian
+            container: debian:stable
+
+    container: ${{ matrix.container }}
 
     steps:
       - name: Checkout repository
@@ -26,30 +46,64 @@ jobs:
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
           echo "REPO_URL=${{ github.repository }}" >> $GITHUB_ENV
 
-      - name: Test setup on Unix-like systems (Ubuntu/macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Install curl (for containers)
+        if: matrix.container
         shell: bash
-        #language=sh
+        run: |
+          if command -v apt-get &> /dev/null; then
+            apt-get update && apt-get install -y curl
+          elif command -v dnf &> /dev/null; then
+            dnf install -y curl
+          elif command -v yum &> /dev/null; then
+            yum install -y curl
+          fi
+
+      - name: Test setup on Unix-like systems
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           set -euo pipefail
           curl -sSL "https://raw.githubusercontent.com/${{ env.REPO_URL }}/${{ env.BRANCH }}/setup.sh" | bash -s -- --ci
 
       - name: Test setup on Windows
-        if: matrix.os == 'windows-latest'
+        if: runner.os == 'Windows'
         shell: pwsh
-        #language=sh
+        #language=pwsh
         run: |
           $ErrorActionPreference = "Stop"
           $ProgressPreference = "SilentlyContinue"
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{ env.REPO_URL }}/${{ env.BRANCH }}/setup.ps1" -OutFile setup.ps1
           .\setup.ps1 -CI
 
+      - name: Verify installation
+        shell: bash
+        #language=sh
+        run: |
+          if command -v alacritty &> /dev/null; then
+            echo "Alacritty is installed"
+          else
+            echo "Alacritty is not installed"
+            exit 1
+          fi
+          if command -v nvim &> /dev/null; then
+            echo "Neovim is installed"
+          else
+            echo "Neovim is not installed"
+            exit 1
+          fi
+          if command -v zellij &> /dev/null; then
+            echo "Zellij is installed"
+          else
+            echo "Zellij is not installed"
+            exit 1
+          fi
+
       - name: Upload logs on failure
         if: failure()
-        uses: actions/upload-artifact@v4.4.0
+        uses: actions/upload-artifact@v4.3.1
         with:
-          name: setup-logs-${{ matrix.os }}
+          name: setup-logs-${{ matrix.name }}
           path: |
             ~/.gg/install_log.txt
-            $env:USERPROFILE\.gg\install_log.txt
+            ${{ runner.os == 'Windows' && '$env:USERPROFILE\.gg\install_log.txt' || '~/.gg/install_log.txt' }}
           if-no-files-found: ignore
