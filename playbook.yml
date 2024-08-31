@@ -188,3 +188,4 @@
       tags:
         - setup
         - update
+    - debug: msg = "{{ out.stdout }}"
