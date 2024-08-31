@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
 REM Default GitHub username (can be overridden by environment variable)
 if "%GITHUB_USERNAME%"=="" set "GITHUB_USERNAME=geoffreygarrett"
@@ -7,53 +7,48 @@ set "REPO_NAME=cross-platform-terminal-setup"
 set "REPO_URL=https://github.com/%GITHUB_USERNAME%/%REPO_NAME%.git"
 set "SETUP_TAG=setup"
 
-REM Install Chocolatey if not installed
 echo Installing dependencies...
-if not exist "%ProgramData%\chocolatey\bin\choco.exe" (
-    echo Chocolatey is not installed. Installing Chocolatey...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypass -Scope Process; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+    "if (-not (Get-Command choco -ErrorAction SilentlyContinue)) { ^
+        Set-ExecutionPolicy Bypass -Scope Process -Force; ^
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; ^
+        iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) ^
+    }"
+if %ERRORLEVEL% neq 0 goto :error
+
+REM Install Git and Ansible if not installed
+for %%p in (git ansible) do (
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+        "if (-not (Get-Command %%p -ErrorAction SilentlyContinue)) { choco install %%p -y }"
+    if !ERRORLEVEL! neq 0 goto :error
 )
 
-REM Install Git if not installed
-if not exist "%ProgramFiles%\Git" (
-    echo Git is not installed. Installing Git...
-    choco install git -y
-)
-
-REM Install Ansible if not installed
-if not exist "%ProgramFiles%\Ansible" (
-    echo Ansible is not installed. Installing Ansible...
-    choco install ansible -y
-)
-
-REM Clone the playbook repository if it does not exist, otherwise update it
+echo Cloning or updating the repository...
 if not exist "%REPO_NAME%" (
-    echo Cloning the repository...
     git clone "%REPO_URL%"
 ) else (
-    echo Updating the repository...
-    cd "%REPO_NAME%"
+    pushd "%REPO_NAME%"
     git pull --rebase
-    cd ..
+    popd
 )
+if %ERRORLEVEL% neq 0 goto :error
 
-REM Run the Ansible playbook
 echo Running the Ansible playbook...
-cd "%REPO_NAME%"
-ansible-playbook playbook.yml --tags "%SETUP_TAG%"
-
-REM Capture the exit code from the last command
-set "exit_code=%errorlevel%"
-
-REM Check if the playbook execution failed
-if "%exit_code%" neq "0" (
-    echo Setup failed. Please check the output above.
-    exit /b %exit_code%
+pushd "%REPO_NAME%"
+if not exist "playbook.yml" (
+    echo Error: playbook.yml not found in the repository.
+    goto :error
 )
+ansible-playbook playbook.yml --tags "%SETUP_TAG%"
+if %ERRORLEVEL% neq 0 goto :error
+popd
 
-REM Clean up the repository folder
-cd ..
-rd /s /q "%REPO_NAME%"
+echo Cleaning up...
+rmdir /s /q "%REPO_NAME%"
 
 echo Setup completed successfully!
-pause
+exit /b 0
+
+:error
+echo An error occurred. Setup failed.
+exit /b 1
