@@ -1,7 +1,7 @@
 ---
 - name: Install common packages (Debian/Ubuntu)
   apt:
-    name: "{{ packages_common + packages_ubuntu }}"
+    name: "{{ packages_common + packages_specific }}"
     state: latest
     update_cache: yes
   become: yes
@@ -23,14 +23,14 @@
 
 - name: Install common packages (Fedora)
   dnf:
-    name: "{{ packages_common + packages_ubuntu + ['alacritty'] }}"
+    name: "{{ packages_common + packages_specific + ['alacritty'] }}"
     state: latest
   become: yes
   when: ansible_distribution == "Fedora"
 
 - name: Install common packages (CentOS)
   yum:
-    name: "{{ packages_common + packages_ubuntu }}"
+    name: "{{ packages_common + packages_specific }}"
     state: latest
   become: yes
   when: ansible_distribution == "CentOS"

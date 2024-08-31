@@ -1,5 +1,5 @@
 ---
-packages_ubuntu:
+packages_specific:
   - build-essential
   - cmake
   - pkg-config
