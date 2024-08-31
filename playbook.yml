@@ -12,10 +12,14 @@
       - curl
       - unzip
       - wmctrl
-    packages_build:
-      - build-essential  # Debian/Ubuntu
-      - gcc              # Fedora/CentOS
-      - base-devel       # Arch
+    packages_ubuntu:
+      - build-essential
+      - cmake
+      - pkg-config
+      - libfreetype6-dev
+      - libfontconfig1-dev
+      - libxcb-xfixes0-dev
+      - libxkbcommon-dev
     packages_macos:
       - alacritty
       - neovim
