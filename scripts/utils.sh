@@ -79,50 +79,98 @@ cleanup_spinner() {
 # ==========================================================================
 
 # Runs a command with a spinner and logs the output
+#run_with_spinner() {
+#    local command="$1"
+#    local log_file=$(mktemp)
+#    local output=""
+#
+#    # Start the command and spinner in the background
+#    eval "$command" > "$log_file" 2>&1 &
+#    local pid=$!
+#    spinner $pid &
+#    local spinner_pid=$!
+#
+#    # Wait for the command to finish
+#    wait $pid
+#    local exit_code=$?
+#
+#    # Cleanup the spinner
+#    cleanup_spinner $spinner_pid
+#
+#    # Read and possibly display the output
+#    output=$(cat "$log_file")
+#    local max_lines=${MAX_VERBOSE_LINES:-10}  # Default to 10 if not set
+#
+#    if [ "$VERBOSE" = true ]; then
+#        local lines=0
+#        while IFS= read -r line; do
+#            if [ $lines -lt "$max_lines" ]; then
+#                echo -e "${GRAY}$line${RESET}"
+#            elif [ $lines -eq "$max_lines" ]; then
+#                echo -e "${GRAY}...${RESET}"
+#            fi
+#            lines=$((lines+1))
+#        done <<< "$output"
+#    fi
+#
+#    if [ $exit_code -ne 0 ]; then
+#        log "ERROR" "Command failed: $command"
+#    elif [ "$VERBOSE" = true ]; then
+#        echo -e "${GREEN}Command completed successfully${RESET}"
+#    fi
+#
+#    rm "$log_file"
+#    return $exit_code
+#}
 run_with_spinner() {
     local command="$1"
+    # shellcheck disable=SC2155
     local log_file=$(mktemp)
     local output=""
 
-    # Start the command and spinner in the background
-    eval "$command" > "$log_file" 2>&1 &
-    local pid=$!
-    spinner $pid &
-    local spinner_pid=$!
+    if [[ "$command" == *"sudo"* ]]; then
+        # Run the command without the spinner if it requires sudo
+        eval "$command" | tee "$log_file"
+    else
+        # Start the command and spinner in the background
+        eval "$command" > "$log_file" 2>&1 &
+        local pid=$!
+        spinner $pid &
+        local spinner_pid=$!
 
-    # Wait for the command to finish
-    wait $pid
-    local exit_code=$?
+        # Wait for the command to finish
+        wait $pid
+        local exit_code=$?
 
-    # Cleanup the spinner
-    cleanup_spinner $spinner_pid
+        # Cleanup the spinner
+        cleanup_spinner $spinner_pid
 
-    # Read and possibly display the output
-    output=$(cat "$log_file")
-    local max_lines=${MAX_VERBOSE_LINES:-10}  # Default to 10 if not set
+        # Read and possibly display the output
+        output=$(cat "$log_file")
+        local max_lines=${MAX_VERBOSE_LINES:-10}  # Default to 10 if not set
 
-    if [ "$VERBOSE" = true ]; then
-        local lines=0
-        while IFS= read -r line; do
-            if [ $lines -lt "$max_lines" ]; then
-                echo -e "${GRAY}$line${RESET}"
-            elif [ $lines -eq "$max_lines" ]; then
-                echo -e "${GRAY}...${RESET}"
-            fi
-            lines=$((lines+1))
-        done <<< "$output"
+        if [ "$VERBOSE" = true ]; then
+            local lines=0
+            while IFS= read -r line; do
+                if [ $lines -lt "$max_lines" ]; then
+                    echo -e "${GRAY}$line${RESET}"
+                elif [ $lines -eq "$max_lines" ]; then
+                    echo -e "${GRAY}...${RESET}"
+                fi
+                lines=$((lines+1))
+            done <<< "$output"
+        fi
+
+        if [ $exit_code -ne 0 ]; then
+            log "ERROR" "Command failed: $command"
+        elif [ "$VERBOSE" = true ]; then
+            echo -e "${GREEN}Command completed successfully${RESET}"
+        fi
+
+        rm "$log_file"
+        return $exit_code
     fi
-
-    if [ $exit_code -ne 0 ]; then
-        log "ERROR" "Command failed: $command"
-    elif [ "$VERBOSE" = true ]; then
-        echo -e "${GREEN}Command completed successfully${RESET}"
-    fi
-
-    rm "$log_file"
-    return $exit_code
 }
-
 # Retries a command up to a maximum number of attempts
 run_with_retry() {
     local max_attempts=3

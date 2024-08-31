@@ -170,6 +170,17 @@ require('lazy').setup({
         },
     },
 
+    {
+        'topaxi/gh-actions.nvim',
+        keys = {
+            { '<leader>gh', '<cmd>GhActions<cr>', desc = 'Open Github Actions' },
+        },
+        -- optional, you can also install and use `yq` instead.
+        build = 'make',
+        ---@type GhActionsConfig
+        opts = {},
+    },
+
     -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
     --
     -- This is often very useful to both group configuration, as well as handle
