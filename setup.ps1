@@ -8,7 +8,11 @@ $SETUP_TAG = "setup"
 $USE_LOCAL_REPO = $false
 
 # Utility Functions
-function Log($level, $message) {
+function Log {
+    param (
+        [string]$level,
+        [string]$message
+    )
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
     $color = switch ($level) {
         "INFO" { "Blue" }
@@ -18,14 +22,18 @@ function Log($level, $message) {
         "DEBUG" { "Gray" }
         default { "White" }
     }
-    Write-Host "[$timestamp] $level:" -NoNewline
+    Write-Host "[$timestamp] $level`:" -NoNewline
     Write-Host " $message" -ForegroundColor $color
 }
 
-function RunCommand($command) {
+function RunCommand {
+    param (
+        [string]$command
+    )
     try {
-        Invoke-Expression $command
+        $output = Invoke-Expression $command
         if ($LASTEXITCODE -ne 0) { throw "Command failed: $command" }
+        return $output
     }
     catch {
         Log "ERROR" $_.Exception.Message
@@ -95,7 +103,7 @@ function RunPlaybook {
 function Cleanup {
     if (-not $USE_LOCAL_REPO) {
         Log "INFO" "Cleaning up..."
-        Remove-Item -Recurse -Force $REPO_NAME
+        Remove-Item -Recurse -Force $REPO_NAME -ErrorAction SilentlyContinue
     }
 }
 
@@ -122,6 +130,6 @@ try {
     Main
 }
 catch {
-    Log "ERROR" "An error occurred. Setup failed."
+    Log "ERROR" "An error occurred. Setup failed: $_"
     exit 1
 }
