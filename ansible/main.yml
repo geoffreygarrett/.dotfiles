@@ -1,0 +1,42 @@
+---
+- name: Terminal setup and updates for Linux, macOS, and Windows
+  hosts: localhost
+  become: no  # Changed to 'no' to avoid running as root by default
+  vars_files:
+    - vars/main.yml
+
+  pre_tasks:
+    - name: Include OS-specific variables
+      include_vars: "{{ item }}"
+      with_first_found:
+        - "vars/{{ ansible_os_family | lower }}.yml"
+        - "vars/default.yml"
+
+  tasks:
+    - name: Setup directory structure and backups
+      import_tasks: tasks/setup_directories.yml
+      tags: [ setup, update ]
+
+    - name: Update configurations
+      import_tasks: tasks/update_configs.yml
+      tags: [ update ]
+
+    - name: Install and update packages
+      import_tasks: tasks/packages.yml
+      tags: [ setup, update ]
+
+    - name: Update development tools
+      import_tasks: tasks/dev_tools.yml
+      tags: [ update ]
+
+    - name: Setup keybindings
+      import_tasks: tasks/keybindings.yml
+      tags: [ setup ]
+
+    - name: Confirm installation complete
+      debug:
+        msg: |
+          Installation completed successfully! Please restart your terminal for changes to take effect.
+          On Linux/macOS, use 'source ~/.bashrc' or 'source ~/.zshrc'.
+          On Windows, use 'refreshenv' in Command Prompt or '& $PROFILE' in PowerShell.
+      tags: [ setup, update ]

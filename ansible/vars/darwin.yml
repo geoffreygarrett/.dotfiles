@@ -1,0 +1,6 @@
+---
+packages_macos:
+  - alacritty
+  - neovim
+  - unzip
+  - wmctrl

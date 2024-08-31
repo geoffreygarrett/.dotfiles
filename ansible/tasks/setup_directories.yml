@@ -1,0 +1,35 @@
+---
+- name: Ensure .gg directory exists with correct permissions
+  file:
+    path: "{{ gg_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure backup directory exists
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure log file exists
+  file:
+    path: "{{ install_log }}"
+    state: touch
+    mode: '0644'
+  when: ansible_os_family != 'Windows'
+
+- name: Ensure .config directory exists
+  file:
+    path: "{{ ansible_env.HOME }}/.config"
+    state: directory
+    mode: '0755'
+  when: ansible_os_family != 'Windows'
+
+- name: Backup existing configuration
+  copy:
+    src: "{{ ansible_env.HOME }}/.config/{{ item }}"
+    dest: "{{ backup_dir }}/{{ item }}"
+    remote_src: yes
+  loop: [ alacritty, zellij, nvim, nushell ]
+  ignore_errors: yes
+  when: ansible_os_family != 'Windows'

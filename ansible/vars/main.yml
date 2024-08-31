@@ -1,0 +1,21 @@
+---
+gg_dir: "{{ ansible_env.HOME }}/.gg"
+install_log: "{{ gg_dir }}/install_log.txt"
+backup_dir: "{{ gg_dir }}/backup_{{ ansible_date_time.iso8601 }}"
+repo_dir: "{{ playbook_dir }}"
+font_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip"
+font_dir: "{{ (ansible_os_family == 'Windows') | ternary('C:/Windows/Fonts', ansible_env.HOME ~ '/.local/share/fonts') }}"
+
+packages_common:
+  - neovim
+  - curl
+  - unzip
+  - wmctrl
+
+keybindings_linux:
+  - "<Super>Return:Alacritty:alacritty"
+  - "<Super>F:Alacritty Fullscreen:wmctrl -r :ACTIVE: -b toggle,fullscreen"
+
+keybindings_macos:
+  - "⌘⌥T:Alacritty:open -a Alacritty"
+  - "⌘⌥F:Alacritty Fullscreen:osascript -e 'tell application \"System Events\" to keystroke \"f\" using {command down, control down}'"
