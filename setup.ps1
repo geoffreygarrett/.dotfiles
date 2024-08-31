@@ -1,4 +1,4 @@
-# PowerShell Script for Cross-Platform Terminal Setup including WSL2
+# PowerShell Script for Cross-Platform Terminal Setup including WSL2 and Ansible
 
 # Ensure the script is running with administrator privileges
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
@@ -108,6 +108,45 @@ function InstallOrUpgradePackage {
     }
 }
 
+function InstallAnsible {
+    Log "INFO" "Installing Ansible..."
+    
+    # Ensure Python is installed
+    if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+        Log "INFO" "Python not found. Installing Python..."
+        RunCommand "choco install python -y"
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    }
+    
+    # Ensure pip is installed and up to date
+    RunCommand "python -m ensurepip --upgrade"
+    RunCommand "python -m pip install --upgrade pip"
+    
+    # Install Ansible using pip with --user flag
+    $result = RunCommand "python -m pip install --user ansible"
+    
+    if ($result -eq $null) {
+        Log "WARNING" "Failed to install Ansible using pip. Attempting alternative method..."
+        
+        # Alternative method: Use easy_install
+        RunCommand "python -m easy_install --user ansible"
+    }
+    
+    # Add user's Python scripts to PATH
+    $pythonUserBase = python -m site --user-site
+    $pythonScriptsPath = ($pythonUserBase -replace "site-packages","Scripts")
+    $env:Path += ";$pythonScriptsPath"
+    
+    # Verify Ansible installation
+    $ansibleVersion = RunCommand "ansible --version"
+    if ($ansibleVersion -ne $null) {
+        Log "SUCCESS" "Ansible installed successfully."
+        Log "INFO" "Ansible version: $ansibleVersion"
+    } else {
+        Log "ERROR" "Failed to install Ansible. Please install it manually."
+    }
+}
+
 function InstallDependencies {
     Log "INFO" "Installing and updating dependencies..."
     EnsureChocolatey
@@ -116,14 +155,7 @@ function InstallDependencies {
         InstallOrUpgradePackage $pkg
     }
     
-    # Special handling for Ansible
-    if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
-        Log "INFO" "Installing Ansible via pip..."
-        RunCommand "pip install --user ansible"
-        if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
-            Log "WARNING" "Failed to install Ansible. You may need to install it manually or add it to your PATH."
-        }
-    }
+    InstallAnsible
 }
 
 function CheckWindowsVersion {
@@ -159,7 +191,7 @@ function InstallWSL {
     $wslInstalled = Get-Command wsl -ErrorAction SilentlyContinue
     if ($wslInstalled) {
         Log "INFO" "WSL is already installed. Checking version..."
-        $wslVersion = wsl --status
+        $wslVersion = RunCommand "wsl --status"
         if ($wslVersion -match "Default Version: 2") {
             Log "INFO" "WSL2 is already set as the default version."
             return
