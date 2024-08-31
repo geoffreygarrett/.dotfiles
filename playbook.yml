@@ -1,19 +1,21 @@
 ---
 - name: Terminal setup and updates for Linux, macOS, and Windows
   hosts: localhost
-  become: no  # Change this to 'no' to run as the current user
+  become: no
   vars:
     gg_dir: "{{ ansible_env.HOME }}/.gg"
     install_log: "{{ gg_dir }}/install_log.txt"
     backup_dir: "{{ gg_dir }}/backup_{{ ansible_date_time.iso8601 }}"
     repo_dir: "{{ playbook_dir }}"
-    packages_linux:
-      - alacritty
+    packages_common:
       - neovim
       - curl
-      - build-essential
       - unzip
       - wmctrl
+    packages_build:
+      - build-essential  # Debian/Ubuntu
+      - "gcc"            # Fedora/CentOS
+      - "base-devel"     # Arch
     packages_macos:
       - alacritty
       - neovim
@@ -31,9 +33,9 @@
     keybindings_macos:
       - "⌘⌥T:Alacritty:open -a Alacritty"
       - "⌘⌥F:Alacritty Fullscreen:osascript -e 'tell application \"System Events\" to keystroke \"f\" using {command down, control down}'"
+    alacritty_ppa: "ppa:aslatter/ppa"
 
   tasks:
-
     - name: Ensure .gg directory exists with correct permissions
       file:
         path: "{{ gg_dir }}"
@@ -77,7 +79,6 @@
       tags:
         - update
 
-
     - name: Update repository
       git:
         repo: "{{ repo_dir }}"
@@ -100,13 +101,94 @@
       tags:
         - update
 
-    - name: Install or Update packages (Linux)
-      become: yes  # Use sudo for package installation
+    - name: Detect package manager
+      set_fact:
+        pkg_mgr: "{{ ansible_pkg_mgr }}"
+      when: ansible_os_family == "Linux"
+
+    - name: Install build essentials
+      become: yes
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items: "{{ packages_build }}"
+      when: ansible_os_family == "Linux" and pkg_mgr in ['apt', 'dnf', 'yum', 'pacman']
+      tags:
+        - setup
+        - update
+
+    - name: Install common packages
+      become: yes
+      package:
+        name: "{{ packages_common }}"
+        state: latest
+      when: ansible_os_family == "Linux" and pkg_mgr in ['apt', 'dnf', 'yum', 'pacman']
+      tags:
+        - setup
+        - update
+
+    - name: Add Alacritty PPA (Ubuntu)
+      become: yes
+      apt_repository:
+        repo: "{{ alacritty_ppa }}"
+      when: ansible_distribution == "Ubuntu"
+      tags:
+        - setup
+        - update
+
+    - name: Install Alacritty (Ubuntu/Debian)
+      become: yes
       apt:
-        name: "{{ packages_linux }}"
+        name: alacritty
         state: latest
         update_cache: yes
       when: ansible_os_family == "Debian"
+      tags:
+        - setup
+        - update
+
+    - name: Install Alacritty (Fedora)
+      become: yes
+      dnf:
+        name: alacritty
+        state: latest
+      when: ansible_distribution == "Fedora"
+      tags:
+        - setup
+        - update
+
+    - name: Install Alacritty (Arch)
+      become: yes
+      pacman:
+        name: alacritty
+        state: latest
+      when: ansible_distribution == "Archlinux"
+      tags:
+        - setup
+        - update
+
+    - name: Install Alacritty from source (CentOS/RHEL)
+      become: yes
+      block:
+        - name: Install Rust
+          shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        - name: Install Alacritty dependencies
+          yum:
+            name:
+              - cmake
+              - freetype-devel
+              - fontconfig-devel
+              - libxcb-devel
+        - name: Clone Alacritty repository
+          git:
+            repo: 'https://github.com/alacritty/alacritty.git'
+            dest: /tmp/alacritty
+        - name: Build and install Alacritty
+          shell: |
+            cd /tmp/alacritty
+            cargo build --release
+            cp target/release/alacritty /usr/local/bin/
+      when: ansible_distribution in ["CentOS", "RedHat"]
       tags:
         - setup
         - update
@@ -141,7 +223,6 @@
         - update
 
     - name: Update Neovim plugins
-      #language=sh
       shell: |
         nvim --headless +"if exists(':PlugUpdate') | PlugUpdate | else | echo 'vim-plug not installed' | endif" +qall
         nvim --headless +"if exists(':PlugUpgrade') | PlugUpgrade | else | echo 'vim-plug not installed' | endif" +qall
@@ -151,7 +232,6 @@
         - update
 
     - name: Setup keybinding (Linux)
-      #language=sh
       shell: |
         for i in "${!KEYBINDINGS_LINUX[@]}"; do
           KEYBINDING="{{ item }}"
@@ -170,9 +250,8 @@
         - setup
 
     - name: Setup keybinding (macOS)
-      #language=sh
       shell: |
-        for keybinding in "{{ item }}"; do
+        for keybinding in {{ item | quote }}; do
           binding=$(echo $keybinding | cut -d':' -f1)
           name=$(echo $keybinding | cut -d':' -f2)
           defaults write -g NSUserKeyEquivalents -dict-add "$name" "$binding"
@@ -183,7 +262,6 @@
         - setup
 
     - name: Confirm installation complete
-      #language=sh
       debug:
         msg: |
           Installation completed successfully! Please restart your terminal for changes to take effect.
@@ -192,4 +270,3 @@
       tags:
         - setup
         - update
-    - debug: msg = "{{ out.stdout }}"

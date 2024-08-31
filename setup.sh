@@ -17,6 +17,8 @@ install_dependencies() {
 
   if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     sudo apt-get update
+    sudo apt-get install -y software-properties-common
+    sudo add-apt-repository --yes --update ppa:ansible/ansible
     sudo apt-get install -y ansible git curl
   elif [[ "$OSTYPE" == "darwin"* ]]; then
     if ! command -v brew &> /dev/null; then
