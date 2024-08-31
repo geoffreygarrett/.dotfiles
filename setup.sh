@@ -12,7 +12,7 @@ set -euo pipefail
 
 GITHUB_USERNAME="${GITHUB_USERNAME:-geoffreygarrett}"
 REPO_NAME="${REPO_NAME:-cross-platform-terminal-setup}"
-REPO_URL="https://github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
+REPO_URL="git@github.com:${GITHUB_USERNAME}/${REPO_NAME}.git"
 SETUP_TAG="${SETUP_TAG:-setup}"
 USE_LOCAL_REPO=false
 
@@ -64,15 +64,16 @@ run_playbook() {
     if [[ ! -f "$SCRIPT_DIR/playbook.yml" ]]; then
       error "Error: playbook.yml not found in the current directory."
     fi
-    ansible-playbook -i "localhost," "$SCRIPT_DIR/playbook.yml" --tags "$SETUP_TAG"
+    ansible-playbook -i "localhost," --connection=local "$SCRIPT_DIR/playbook.yml" --tags "$SETUP_TAG"
   else
     cd "$REPO_NAME"
     if [[ ! -f "playbook.yml" ]]; then
       error "Error: playbook.yml not found in the repository."
     fi
-    ansible-playbook -i "localhost," playbook.yml --tags "$SETUP_TAG"
+    ansible-playbook -i "localhost," --connection=local playbook.yml --tags "$SETUP_TAG"
   fi
 }
+
 
 cleanup() {
   if [ "$USE_LOCAL_REPO" = false ]; then
