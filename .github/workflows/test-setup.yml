@@ -1,0 +1,55 @@
+name: 🛠️ Cross-Platform Setup Testing
+
+on:
+  push:
+    branches: [ '*' ]
+  pull_request:
+    branches: [ '*' ]
+
+jobs:
+  test-setup:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up environment variables
+        shell: bash
+        run: |
+          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
+          echo "REPO_URL=${{ github.repository }}" >> $GITHUB_ENV
+
+      - name: Test setup on Unix-like systems (Ubuntu/macOS)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        #language=sh
+        run: |
+          set -euo pipefail
+          curl -sSL "https://raw.githubusercontent.com/${{ env.REPO_URL }}/${{ env.BRANCH }}/setup.sh" | bash -s -- --ci
+
+      - name: Test setup on Windows
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        #language=sh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $ProgressPreference = "SilentlyContinue"
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{ env.REPO_URL }}/${{ env.BRANCH }}/setup.ps1" -OutFile setup.ps1
+          .\setup.ps1 -CI
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: setup-logs-${{ matrix.os }}
+          path: |
+            ~/.gg/install_log.txt
+            $env:USERPROFILE\.gg\install_log.txt
+          if-no-files-found: ignore

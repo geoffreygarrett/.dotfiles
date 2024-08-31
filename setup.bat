@@ -5,6 +5,7 @@ REM Default GitHub username (can be overridden by environment variable)
 if "%GITHUB_USERNAME%"=="" set "GITHUB_USERNAME=geoffreygarrett"
 set "REPO_NAME=cross-platform-terminal-setup"
 set "REPO_URL=https://github.com/%GITHUB_USERNAME%/%REPO_NAME%.git"
+set "SETUP_TAG=setup"
 
 REM Install Chocolatey if not installed
 echo Installing dependencies...
@@ -39,7 +40,7 @@ if not exist "%REPO_NAME%" (
 REM Run the Ansible playbook
 echo Running the Ansible playbook...
 cd "%REPO_NAME%"
-ansible-playbook playbook.yml --tags "setup"
+ansible-playbook playbook.yml --tags "%SETUP_TAG%"
 
 REM Capture the exit code from the last command
 set "exit_code=%errorlevel%"
@@ -49,6 +50,10 @@ if "%exit_code%" neq "0" (
     echo Setup failed. Please check the output above.
     exit /b %exit_code%
 )
+
+REM Clean up the repository folder
+cd ..
+rd /s /q "%REPO_NAME%"
 
 echo Setup completed successfully!
 pause

@@ -60,6 +60,13 @@ run_playbook() {
   ansible-playbook playbook.yml --tags "$SETUP_TAG"
 }
 
+# Clean up the repository folder
+cleanup() {
+  echo "Cleaning up..."
+  cd ..
+  rm -rf "$REPO_NAME"
+}
+
 # Main function
 main() {
   if [[ "$1" == "--help" || "$1" == "-h" ]]; then
@@ -70,6 +77,7 @@ main() {
   install_dependencies
   clone_repository
   run_playbook
+  cleanup
   echo "Setup completed successfully!"
 }
 
