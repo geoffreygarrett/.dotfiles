@@ -1,4 +1,4 @@
-# PowerShell Script for Cross-Platform Terminal Setup
+# PowerShell Script for Cross-Platform Terminal Setup including WSL2
 
 # Global Variables
 $GITHUB_USERNAME = if ($env:GITHUB_USERNAME) { $env:GITHUB_USERNAME } else { "geoffreygarrett" }
@@ -6,6 +6,7 @@ $REPO_NAME = "cross-platform-terminal-setup"
 $REPO_URL = "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
 $SETUP_TAG = "setup"
 $USE_LOCAL_REPO = $false
+$WSL_DISTRO = "Ubuntu-20.04"
 
 # Utility Functions
 function Log {
@@ -31,12 +32,19 @@ function RunCommand {
         [string]$command
     )
     try {
+        Log "DEBUG" "Executing: $command"
         $output = Invoke-Expression $command
         if ($LASTEXITCODE -ne 0) { throw "Command failed: $command" }
+        if ($output) {
+            Write-Host $output -ForegroundColor DarkGray
+        }
         return $output
     }
     catch {
         Log "WARNING" $_.Exception.Message
+        if ($_.Exception.Message) {
+            Write-Host $_.Exception.Message -ForegroundColor DarkGray
+        }
         return $null
     }
 }
@@ -100,6 +108,39 @@ function InstallDependencies {
     }
 }
 
+function EnableWindowsFeatures {
+    Log "INFO" "Enabling necessary Windows features..."
+    RunCommand "dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart"
+    RunCommand "dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart"
+}
+
+function InstallWSL2Kernel {
+    Log "INFO" "Downloading and installing WSL2 kernel update..."
+    $url = "https://wslstorestorage.blob.core.windows.net/wslblob/wsl_update_x64.msi"
+    $outPath = "$env:TEMP\wsl_update_x64.msi"
+    Invoke-WebRequest -Uri $url -OutFile $outPath
+    RunCommand "msiexec /i $outPath /qn"
+    Remove-Item $outPath
+}
+
+function SetWSL2AsDefault {
+    Log "INFO" "Setting WSL2 as the default version..."
+    RunCommand "wsl --set-default-version 2"
+}
+
+function InstallWSLDistro {
+    Log "INFO" "Installing WSL distribution: $WSL_DISTRO..."
+    RunCommand "wsl --install -d $WSL_DISTRO"
+}
+
+function SetupWSL2 {
+    EnableWindowsFeatures
+    InstallWSL2Kernel
+    SetWSL2AsDefault
+    InstallWSLDistro
+    Log "SUCCESS" "WSL2 setup completed successfully!"
+}
+
 function CloneRepository {
     if ($USE_LOCAL_REPO) {
         Log "INFO" "Using local repository..."
@@ -147,10 +188,12 @@ function Cleanup {
 function Main {
     Log "INFO" "Starting setup process..."
     InstallDependencies
+    SetupWSL2
     CloneRepository
     RunPlaybook
     Cleanup
     Log "SUCCESS" "Setup completed successfully!"
+    Log "INFO" "Please restart your computer to complete the WSL2 installation."
 }
 
 # Script Execution
