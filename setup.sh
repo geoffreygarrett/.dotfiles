@@ -50,44 +50,6 @@ error() {
     exit 1
 }
 
-spinner() {
-    local pid=$1
-    local delay=0.1
-    local spinstr='|/-\'
-    while kill -0 $pid 2>/dev/null; do
-        local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
-run_with_spinner() {
-    local command="$1"
-    local log_file=$(mktemp)
-
-    if [[ "$command" == *"sudo"* ]]; then
-        eval "$command"
-    else
-        eval "$command" > "$log_file" 2>&1 &
-        local pid=$!
-        spinner $pid
-
-        wait $pid
-        local exit_code=$?
-
-        if [ $exit_code -ne 0 ]; then
-            log "ERROR" "Command failed: $command"
-            cat "$log_file"
-        fi
-
-        rm "$log_file"
-        return $exit_code
-    fi
-}
-
 detect_os() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
         echo "linux"
@@ -102,12 +64,6 @@ detect_os() {
 # Main Functions
 # ==========================================================================
 
-usage() {
-    log "INFO" "Usage: bash <(curl -sL https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/main/setup.sh) [--local]"
-    log "INFO" "You can override the default GitHub username and repository name by setting the GITHUB_USERNAME and REPO_NAME environment variables."
-    log "INFO" "Use the --local flag to use the local repository instead of cloning from GitHub."
-}
-
 install_dependencies() {
     local os=$(detect_os)
 
@@ -119,14 +75,14 @@ install_dependencies() {
             export DEBIAN_FRONTEND=noninteractive
 
             # Update the package list and install required packages
-            run_with_spinner "sudo apt-get update -y"
-            run_with_spinner "sudo apt-get install -y software-properties-common"
+            sudo apt-get update -y
+            sudo apt-get install -y software-properties-common
 
             # Add the Ansible repository and update the package list again
-            run_with_spinner "sudo add-apt-repository --yes --update ppa:ansible/ansible"
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
 
             # Install Ansible, Git, and Curl
-            run_with_spinner "sudo apt-get install -y ansible git curl"
+            sudo apt-get install -y ansible git curl
 
             # Reset DEBIAN_FRONTEND to its original state
             unset DEBIAN_FRONTEND
@@ -137,11 +93,11 @@ install_dependencies() {
             # Check if Homebrew is installed, and install it if necessary
             if ! command -v brew &> /dev/null; then
                 log "INFO" "Homebrew not found. Installing Homebrew..."
-                run_with_spinner "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             fi
 
             # Install Ansible, Git, and Curl using Homebrew
-            run_with_spinner "brew install ansible git curl"
+            brew install ansible git curl
             ;;
         *)
             error "Unsupported OS: $OSTYPE"
@@ -154,9 +110,11 @@ clone_repository() {
         log "INFO" "Using local repository..."
     else
         if [[ ! -d "$REPO_NAME" ]]; then
-            run_with_spinner "git clone \"$REPO_URL\""
+            git clone "$REPO_URL"
         else
-            (cd "$REPO_NAME" && run_with_spinner "git pull --rebase")
+            cd "$REPO_NAME"
+            git pull --rebase
+            cd ..
         fi
     fi
 }
@@ -175,13 +133,13 @@ run_playbook() {
             error "Error: playbook.yml not found in the repository."
         fi
         ansible-playbook -i "localhost," --connection=local playbook.yml --tags "$SETUP_TAG"
+        cd ..
     fi
 }
 
 cleanup() {
     if [ "$USE_LOCAL_REPO" = false ]; then
         log "INFO" "Cleaning up..."
-        cd ..
         rm -rf "$REPO_NAME"
     fi
 }
