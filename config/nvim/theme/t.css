@@ -1,0 +1,52 @@
+:root {
+    --bg: #0F111A;
+    --fg: #8F93A2;
+    --text: #4B526D;
+    --selection-bg: #717CB480;
+    --selection-fg: #FFFFFF;
+    --disabled: #464B5D;
+    --contrast: #090B10;
+    --active: #1A1C25;
+    --border: #0F111A;
+    --highlight: #1F2233;
+    --tree: #717CB430;
+    --notifications: #090B10;
+    --accent: #84ffff;
+    --excluded: #292D3E;
+    --green: #c3e88d;
+    --yellow: #ffcb6b;
+    --blue: #82aaff;
+    --red: #f07178;
+    --purple: #c792ea;
+    --orange: #f78c6c;
+    --cyan: #89ddff;
+    --gray: #717CB4;
+    --white: #eeffff;
+    --error: #ff5370;
+    --comments: #717CB4;
+    --variables: #eeffff;
+    --links: #80cbc4;
+    --functions: #82aaff;
+    --keywords: #c792ea;
+    --tags: #f07178;
+    --strings: #c3e88d;
+    --operators: #89ddff;
+    --attributes: #ffcb6b;
+    --numbers: #f78c6c;
+    --parameters: #f78c6c;
+}
+
+/* Example usage:
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+.highlight {
+  background-color: var(--highlight);
+}
+
+.error-message {
+  color: var(--error);
+}
+*/

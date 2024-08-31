@@ -1,0 +1,150 @@
+# Alacritty Configuration
+
+# Import additional configuration files
+# import = [
+#   "~/.config/alacritty/themes/gruvbox_dark.toml"
+# ]
+
+[window]
+dimensions = { columns = 80, lines = 24 }
+padding = { x = 2, y = 2 }
+dynamic_padding = false
+decorations = "full"
+opacity = 1.0
+startup_mode = "Windowed"
+title = "Alacritty"
+dynamic_title = true
+
+[scrolling]
+history = 10000
+multiplier = 3
+
+[font]
+normal = { family = "JetBrains Mono", style = "Regular" }
+bold = { family = "JetBrains Mono", style = "Bold" }
+italic = { family = "JetBrains Mono", style = "Italic" }
+bold_italic = { family = "JetBrains Mono", style = "Bold Italic" }
+size = 12.0
+offset = { x = 0, y = 0 }
+glyph_offset = { x = 0, y = 0 }
+
+#[colors]
+# Default colors
+#primary = { background = "#1d1f21", foreground = "#c5c8c6" }
+
+## Normal colors
+#[colors.normal]
+#black = "#1d1f21"
+#red = "#cc6666"
+#green = "#b5bd68"
+#yellow = "#f0c674"
+#blue = "#81a2be"
+#magenta = "#b294bb"
+#cyan = "#8abeb7"
+#white = "#c5c8c6"
+#
+#
+## Bright colors
+#[colors.bright]
+#black = "#666666"
+#red = "#d54e53"
+#green = "#b9ca4a"
+#yellow = "#e7c547"
+#blue = "#7aa6da"
+#magenta = "#c397d8"
+#cyan = "#70c0b1"
+#white = "#eaeaea"
+
+# Default colors
+[colors.primary]
+background = "#0F111A"
+foreground = "#8F93A2"
+
+# Normal colors
+[colors.normal]
+black = "#090B10"
+red = "#F07178"
+green = "#C3E88D"
+yellow = "#FFCB6B"
+blue = "#82AAFF"
+magenta = "#C792EA"
+cyan = "#89DDFF"
+white = "#EEFFFF"
+
+# Bright colors
+[colors.bright]
+black = "#464B5D"
+red = "#FF5370"
+green = "#C3E88D"
+yellow = "#FFCB6B"
+blue = "#82AAFF"
+magenta = "#C792EA"
+cyan = "#89DDFF"
+white = "#FFFFFF"
+
+# Selection colors
+[colors.selection]
+text = "#FFFFFF"
+background = '#717CB4' # change
+
+# Cursor colors
+[colors.cursor]
+text = "#0F111A"
+cursor = "#FFFFFF"
+
+[bell]
+animation = "EaseOutExpo"
+duration = 0
+
+[selection]
+save_to_clipboard = false
+
+[cursor]
+style = { shape = "Block", blinking = "Off" }
+vi_mode_style = "None"
+blink_interval = 750
+unfocused_hollow = true
+thickness = 0.15
+
+[shell]
+program = "/bin/bash"
+args = ["-c", "if command -v zellij >/dev/null 2>&1; then zellij; else bash; fi"]
+
+[mouse]
+hide_when_typing = false
+
+[[keyboard.bindings]]
+key = "V"
+mods = "Control|Shift"
+action = "Paste"
+
+[[keyboard.bindings]]
+key = "C"
+mods = "Control|Shift"
+action = "Copy"
+
+[[keyboard.bindings]]
+key = "Insert"
+mods = "Shift"
+action = "PasteSelection"
+
+[[keyboard.bindings]]
+key = "Key0"
+mods = "Control"
+action = "ResetFontSize"
+
+[[keyboard.bindings]]
+key = "Equals"
+mods = "Control"
+action = "IncreaseFontSize"
+
+[[keyboard.bindings]]
+key = "Minus"
+mods = "Control"
+action = "DecreaseFontSize"
+
+[debug]
+render_timer = false
+persistent_logging = false
+log_level = "Warn"
+print_events = false

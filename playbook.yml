@@ -1,0 +1,190 @@
+---
+- name: Terminal setup and updates for Linux, macOS, and Windows
+  hosts: localhost
+  become: no  # Change this to 'no' to run as the current user
+  vars:
+    gg_dir: "{{ ansible_env.HOME }}/.gg"
+    install_log: "{{ gg_dir }}/install_log.txt"
+    backup_dir: "{{ gg_dir }}/backup_{{ ansible_date_time.iso8601 }}"
+    repo_dir: "{{ playbook_dir }}"
+    packages_linux:
+      - alacritty
+      - neovim
+      - curl
+      - build-essential
+      - unzip
+      - wmctrl
+    packages_macos:
+      - alacritty
+      - neovim
+      - unzip
+      - wmctrl
+    packages_windows:
+      - neovim
+      - curl
+      - 7zip
+    font_url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip"
+    font_dir: "{{ (ansible_os_family == 'Windows') | ternary('C:/Windows/Fonts', '/usr/local/share/fonts/JetBrainsMono') }}"
+    keybindings_linux:
+      - "<Super>Return:Alacritty:alacritty"
+      - "<Super>F:Alacritty Fullscreen:wmctrl -r :ACTIVE: -b toggle,fullscreen"
+    keybindings_macos:
+      - "⌘⌥T:Alacritty:open -a Alacritty"
+      - "⌘⌥F:Alacritty Fullscreen:osascript -e 'tell application \"System Events\" to keystroke \"f\" using {command down, control down}'"
+
+  tasks:
+
+    - name: Ensure .gg directory exists with correct permissions
+      file:
+        path: "{{ gg_dir }}"
+        state: directory
+        mode: '0755'
+      tags:
+        - setup
+        - update
+
+    - name: Ensure backup directory exists
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        mode: '0755'
+      tags:
+        - setup
+        - update
+
+    - name: Ensure log file exists
+      file:
+        path: "{{ install_log }}"
+        state: touch
+        mode: '0644'
+      when: ansible_os_family != 'Windows'
+      tags:
+        - setup
+        - update
+
+    - name: Backup existing configuration
+      copy:
+        src: "{{ ansible_env.HOME }}/.config/{{ item }}"
+        dest: "{{ backup_dir }}/{{ item }}"
+        remote_src: yes
+      loop:
+        - alacritty
+        - zellij
+        - nvim
+        - nushell
+      ignore_errors: yes
+      when: ansible_os_family != 'Windows'
+      tags:
+        - update
+
+
+    - name: Update repository
+      git:
+        repo: "{{ repo_dir }}"
+        dest: "{{ repo_dir }}"
+        update: yes
+      tags:
+        - update
+
+    - name: Update configurations
+      copy:
+        src: "{{ repo_dir }}/config/{{ item }}"
+        dest: "{{ ansible_env.HOME }}/.config/{{ item }}"
+        remote_src: yes
+      loop:
+        - alacritty
+        - zellij
+        - nvim
+        - nushell
+      when: ansible_os_family != 'Windows'
+      tags:
+        - update
+
+    - name: Install or Update packages (Linux)
+      become: yes  # Use sudo for package installation
+      apt:
+        name: "{{ packages_linux }}"
+        state: latest
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+      tags:
+        - setup
+        - update
+
+    - name: Install or Update packages (macOS)
+      homebrew:
+        name: "{{ packages_macos }}"
+        state: latest
+        update_homebrew: yes
+      when: ansible_os_family == "Darwin"
+      tags:
+        - setup
+        - update
+
+    - name: Install or Update packages (Windows)
+      win_chocolatey:
+        name: "{{ packages_windows }}"
+        state: latest
+      when: ansible_os_family == "Windows"
+      tags:
+        - setup
+        - update
+
+    - name: Update Rust
+      shell: rustup update
+      tags:
+        - update
+
+    - name: Update Zellij
+      shell: cargo install zellij
+      tags:
+        - update
+
+    - name: Update Neovim plugins
+      shell: |
+        nvim --headless +"if exists(':PlugUpdate') | PlugUpdate | else | echo 'vim-plug not installed' | endif" +qall
+        nvim --headless +"if exists(':PlugUpgrade') | PlugUpgrade | else | echo 'vim-plug not installed' | endif" +qall
+        nvim --headless +"if exists(':TSUpdate') | TSUpdate | else | echo 'Treesitter not installed' | endif" +qall
+      when: ansible_os_family != 'Windows'
+      tags:
+        - update
+
+    - name: Setup keybinding (Linux)
+      shell: |
+        for i in "${!KEYBINDINGS_LINUX[@]}"; do
+          KEYBINDING="{{ item }}"
+          binding=$(echo $KEYBINDING | cut -d':' -f1)
+          name=$(echo $KEYBINDING | cut -d':' -f2)
+          command=$(echo $KEYBINDING | cut -d':' -f3)
+          keybinding_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$i/"
+          gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path name "$name"
+          gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path command "$command"
+          gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$keybinding_path binding "$binding"
+        done
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[$(printf "'%s', " "${keybinding_paths[@]}")]"
+      loop: "{{ keybindings_linux }}"
+      when: ansible_os_family == "Linux"
+      tags:
+        - setup
+
+    - name: Setup keybinding (macOS)
+      shell: |
+        for keybinding in "{{ item }}"; do
+          binding=$(echo $keybinding | cut -d':' -f1)
+          name=$(echo $keybinding | cut -d':' -f2)
+          defaults write -g NSUserKeyEquivalents -dict-add "$name" "$binding"
+        done
+      loop: "{{ keybindings_macos }}"
+      when: ansible_os_family == "Darwin"
+      tags:
+        - setup
+
+    - name: Confirm installation complete
+      debug:
+        msg: |
+          Installation completed successfully! Please restart your terminal for changes to take effect.
+          On Linux/macOS, use 'source ~/.bashrc' or 'source ~/.zshrc'.
+          On Windows, use 'refreshenv' in Command Prompt or '& $PROFILE' in PowerShell.
+      tags:
+        - setup
+        - update

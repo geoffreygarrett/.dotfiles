@@ -1,0 +1,71 @@
+---
+- name: Update terminal setup for Linux, macOS, and Windows
+  hosts: localhost
+  become: yes
+  vars:
+    gg_dir: "{{ (ansible_os_family == 'Windows') | ternary(ansible_env.APPDATA ~ '/.gg', ansible_env.HOME ~ '/.gg') }}"
+    backup_dir: "{{ gg_dir }}/backup_{{ ansible_date_time.iso8601 }}"
+    repo_dir: "{{ playbook_dir }}/.."
+
+  tasks:
+    - name: Backup existing configuration
+      command: >
+        cp -r {{ item }} {{ backup_dir }}/{{ item | basename }}
+      loop:
+        - "{{ ansible_env.HOME }}/.config/alacritty"
+        - "{{ ansible_env.HOME }}/.config/zellij"
+        - "{{ ansible_env.HOME }}/.config/nvim"
+      ignore_errors: yes
+      when: ansible_os_family == 'Linux' or ansible_os_family == 'Darwin'
+
+    - name: Update repository
+      git:
+        repo: "{{ repo_dir }}"
+        dest: "{{ repo_dir }}"
+        update: yes
+
+    - name: Update packages (Linux)
+      apt:
+        upgrade: dist
+      when: ansible_os_family == "Debian"
+
+    - name: Update packages (macOS)
+      homebrew:
+        upgrade_all: yes
+      when: ansible_os_family == "Darwin"
+
+    - name: Update Rust
+      shell: rustup update
+      args:
+        creates: "{{ ansible_env.HOME }}/.cargo/bin/rustc"
+      when: ansible_os_family == "Darwin" or ansible_os_family == "Linux"
+
+    - name: Update Zellij
+      shell: "{{ ansible_env.HOME }}/.cargo/bin/cargo install --locked zellij"
+      args:
+        creates: "{{ ansible_env.HOME }}/.cargo/bin/zellij"
+
+    - name: Update Neovim plugins
+      shell: |
+        nvim --headless +PlugUpdate +qall
+        nvim --headless +TSUpdate +qall
+      args:
+        creates: "{{ ansible_env.HOME }}/.local/share/nvim/plugged"
+      when: ansible_os_family == "Darwin" or ansible_os_family == "Linux"
+
+    - name: Setup keybinding (Linux)
+      shell: |
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "[...]"
+      when: ansible_os_family == "Linux"
+
+    - name: Setup keybinding (macOS)
+      shell: |
+        defaults write -g NSUserKeyEquivalents -dict-add [...]
+      when: ansible_os_family == "Darwin"
+
+    - name: Confirm update complete
+      debug:
+        msg: |
+          Update completed successfully!
+          Please restart your terminal for changes to take effect.
+          If you encounter any issues, your previous configuration has been backed up to: {{ backup_dir }}
