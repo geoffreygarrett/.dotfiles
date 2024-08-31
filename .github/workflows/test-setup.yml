@@ -2,9 +2,9 @@ name: 🛠️ Cross-Platform Setup Testing
 
 on:
   push:
-    branches: ['*']
+    branches: [ '*' ]
   pull_request:
-    branches: ['*']
+    branches: [ '*' ]
 
 jobs:
   prepare:
@@ -121,7 +121,7 @@ jobs:
           if-no-files-found: warn
 
   all-tests-passed:
-    needs: [test-unix, test-windows]
+    needs: [ test-unix, test-windows ]
     runs-on: ubuntu-latest
     steps:
       - name: All tests passed
