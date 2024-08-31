@@ -10,10 +10,12 @@
     - name: Set OS family fact
       set_fact:
         os_family_lower: "{{ ansible_os_family | lower }}"
+      tags: [ setup, update ]
 
     - name: Print OS family
       debug:
         var: os_family_lower
+      tags: [ setup, update ]
 
     - name: Include OS-specific variables
       include_vars: "{{ item }}"
@@ -24,6 +26,7 @@
           paths:
             - "{{ playbook_dir }}"
       ignore_errors: yes
+      tags: [ setup, update ]
 
   tasks:
     - name: Setup directory structure and backups
