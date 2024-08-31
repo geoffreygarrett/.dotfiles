@@ -1,7 +1,7 @@
 ---
 - name: Terminal setup and updates for Linux, macOS, and Windows
   hosts: localhost
-  become: no  # Changed to 'no' to avoid running as root by default
+  become: no
 
   vars_files:
     - ansible/vars/main.yml
@@ -53,6 +53,6 @@
       debug:
         msg: |
           Installation completed successfully! Please restart your terminal for changes to take effect.
-          On Linux/macOS, use 'source ~/.bashrc' or 'source ~/.zshrc'.
+          On Linux/macOS, use 'source ~/.bashrc' or 'source ~/.zshrc', etc.
           On Windows, use 'refreshenv' in Command Prompt or '& $PROFILE' in PowerShell.
       tags: [ setup, update ]
