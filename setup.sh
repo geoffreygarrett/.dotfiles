@@ -64,16 +64,15 @@ run_playbook() {
     if [[ ! -f "$SCRIPT_DIR/playbook.yml" ]]; then
       error "Error: playbook.yml not found in the current directory."
     fi
-    ansible-playbook "$SCRIPT_DIR/playbook.yml" --tags "$SETUP_TAG"
+    ansible-playbook -i "localhost," "$SCRIPT_DIR/playbook.yml" --tags "$SETUP_TAG"
   else
     cd "$REPO_NAME"
     if [[ ! -f "playbook.yml" ]]; then
       error "Error: playbook.yml not found in the repository."
     fi
-    ansible-playbook playbook.yml --tags "$SETUP_TAG"
+    ansible-playbook -i "localhost," playbook.yml --tags "$SETUP_TAG"
   fi
 }
-
 
 cleanup() {
   if [ "$USE_LOCAL_REPO" = false ]; then
