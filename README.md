@@ -14,7 +14,7 @@ This repository provides configuration files and setup scripts for a unified ter
 ## Features
 
 - Cross-platform compatibility (Windows, macOS, and Linux)
-- One-command installation process
+- One-command installation and update process
 - Version-controlled configurations
 - Easy updates and synchronization across multiple machines
 - Automated setup via GitHub Actions
@@ -66,7 +66,23 @@ your terminal environment.
    ```
 3. Run the setup script:
     - On Unix-like systems: `./setup.sh`
-    - On Windows: `.\setup.bat`
+    - On Windows: `.\setup.ps1`
+
+### Update Existing Installation
+
+To update an existing installation, use the `--update` flag:
+
+#### On Unix-like systems (Linux and macOS):
+
+```bash
+bash <(curl -sL https://raw.githubusercontent.com/geoffreygarrett/cross-platform-terminal-setup/main/setup.sh) --update
+```
+
+#### On Windows (in PowerShell):
+
+```powershell
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/geoffreygarrett/cross-platform-terminal-setup/main/setup.ps1')) --update
+```
 
 ## Configuration
 
@@ -82,17 +98,8 @@ Configuration file: `config/zellij/config.yaml`
 
 Configuration file: `config/nvim/init.vim`
 
-Modify these files to customize your setup. After making changes, run the setup script again to apply them.
-
-## Updating
-
-To update your configuration:
-
-1. Navigate to the repository directory.
-2. Pull the latest changes: `git pull`
-3. Run the setup script again:
-    - On Unix-like systems: `./setup.sh`
-    - On Windows: `.\setup.bat`
+Modify these files to customize your setup. After making changes, run the setup script with the `--update` flag to apply
+them.
 
 ## Contributing
 
