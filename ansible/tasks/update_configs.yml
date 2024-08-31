@@ -1,4 +1,4 @@
----
+
 - name: Update repository
   git:
     repo: "{{ repo_dir }}"
@@ -23,3 +23,4 @@
     mode: '0755'
   loop: [ alacritty, zellij, nvim, nushell ]
   when: ansible_os_family != 'Windows'
+
