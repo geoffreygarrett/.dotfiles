@@ -119,9 +119,9 @@ function InstallDependencies {
     # Special handling for Ansible
     if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
         Log "INFO" "Installing Ansible via pip..."
-        RunCommand "pip install ansible"
+        RunCommand "pip install --user ansible"
         if (-not (Get-Command ansible -ErrorAction SilentlyContinue)) {
-            Log "WARNING" "Failed to install Ansible. Please install it manually."
+            Log "WARNING" "Failed to install Ansible. You may need to install it manually or add it to your PATH."
         }
     }
 }
@@ -154,7 +154,19 @@ function EnableWindowsFeature {
 }
 
 function InstallWSL {
-    Log "INFO" "Installing WSL..."
+    Log "INFO" "Checking WSL installation..."
+    
+    $wslInstalled = Get-Command wsl -ErrorAction SilentlyContinue
+    if ($wslInstalled) {
+        Log "INFO" "WSL is already installed. Checking version..."
+        $wslVersion = wsl --status
+        if ($wslVersion -match "Default Version: 2") {
+            Log "INFO" "WSL2 is already set as the default version."
+            return
+        }
+    }
+    
+    Log "INFO" "Installing or updating WSL..."
     
     EnableWindowsFeature "Microsoft-Windows-Subsystem-Linux"
     EnableWindowsFeature "VirtualMachinePlatform"
@@ -176,8 +188,8 @@ function InstallWSL {
 function SetupWSL2 {
     CheckWindowsVersion
     InstallWSL
-    Log "SUCCESS" "WSL2 installation initiated successfully!"
-    Log "INFO" "After the installation completes, please restart your computer to finish the WSL setup."
+    Log "SUCCESS" "WSL2 installation completed successfully!"
+    Log "INFO" "You may need to restart your computer to finish the WSL setup."
     Log "INFO" "After restarting, the first launch of your Linux distribution may take a few minutes to complete the setup."
 }
 
@@ -239,7 +251,7 @@ function Main {
     RunPlaybook
     Cleanup
     Log "SUCCESS" "Setup completed successfully!"
-    Log "INFO" "Please restart your computer to complete the WSL2 installation."
+    Log "INFO" "If you haven't already, please restart your computer to complete the WSL2 installation."
     Log "INFO" "After restarting, run 'wsl' in a new PowerShell window to complete the Linux distribution setup."
 }
 
