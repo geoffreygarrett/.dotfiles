@@ -141,6 +141,7 @@
         - update
 
     - name: Update Neovim plugins
+      #language=sh
       shell: |
         nvim --headless +"if exists(':PlugUpdate') | PlugUpdate | else | echo 'vim-plug not installed' | endif" +qall
         nvim --headless +"if exists(':PlugUpgrade') | PlugUpgrade | else | echo 'vim-plug not installed' | endif" +qall
@@ -150,6 +151,7 @@
         - update
 
     - name: Setup keybinding (Linux)
+      #language=sh
       shell: |
         for i in "${!KEYBINDINGS_LINUX[@]}"; do
           KEYBINDING="{{ item }}"
@@ -168,6 +170,7 @@
         - setup
 
     - name: Setup keybinding (macOS)
+      #language=sh
       shell: |
         for keybinding in "{{ item }}"; do
           binding=$(echo $keybinding | cut -d':' -f1)
@@ -180,6 +183,7 @@
         - setup
 
     - name: Confirm installation complete
+      #language=sh
       debug:
         msg: |
           Installation completed successfully! Please restart your terminal for changes to take effect.
