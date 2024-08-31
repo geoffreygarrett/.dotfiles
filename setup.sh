@@ -113,15 +113,34 @@ install_dependencies() {
 
     case "$os" in
         "linux")
-            run_with_spinner "sudo apt-get update && sudo apt-get install -y software-properties-common"
+            log "INFO" "Running on Linux, installing dependencies..."
+
+            # Disable interactive prompts
+            export DEBIAN_FRONTEND=noninteractive
+
+            # Update the package list and install required packages
+            run_with_spinner "sudo apt-get update -y"
+            run_with_spinner "sudo apt-get install -y software-properties-common"
+
+            # Add the Ansible repository and update the package list again
             run_with_spinner "sudo add-apt-repository --yes --update ppa:ansible/ansible"
+
+            # Install Ansible, Git, and Curl
             run_with_spinner "sudo apt-get install -y ansible git curl"
+
+            # Reset DEBIAN_FRONTEND to its original state
+            unset DEBIAN_FRONTEND
             ;;
         "macos")
+            log "INFO" "Running on macOS, installing dependencies..."
+
+            # Check if Homebrew is installed, and install it if necessary
             if ! command -v brew &> /dev/null; then
                 log "INFO" "Homebrew not found. Installing Homebrew..."
                 run_with_spinner "/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""
             fi
+
+            # Install Ansible, Git, and Curl using Homebrew
             run_with_spinner "brew install ansible git curl"
             ;;
         *)
