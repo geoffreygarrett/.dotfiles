@@ -110,7 +110,7 @@ clone_repository() {
         log "INFO" "Using local repository..."
     else
         if [[ ! -d "$REPO_NAME" ]]; then
-            git clone "$REPO_URL"
+            git clone "https://github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
         else
             cd "$REPO_NAME"
             git pull --rebase
