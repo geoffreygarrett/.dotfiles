@@ -450,18 +450,27 @@ themes {
         white 255 255 255
     }
     deep-ocean {
-        fg 143 147 162
-        bg 15 17 26
-        black 9 11 16
-        red 240 113 120
-        green 195 232 141
-        yellow 255 203 107
-        blue 130 170 255
-        magenta 199 146 234
-        cyan 137 221 255
-        white 238 255 255
-        orange 247 140 108
+        fg "#8F93A2"           // Foreground
+        bg "#1F2233"
+        black "#090B10"        // Black
+        red "#F07178"          // Red
+        green "#C3E88D"        // Green
+        yellow "#FFCB6B"       // Yellow
+        blue "#82AAFF"         // Blue
+        magenta "#C792EA"      // Purple/Magenta
+        cyan "#89DDFF"         // Cyan
+        white "#EEFFFF"        // White
+        orange "#F78C6C"       // Orange
+        gray "#717CB4"         // Gray
+        bright_red "#FF5370"   // Error/Highlight Red
+        bright_green "#C3E88D" // Bright Green (same as green)
+        bright_yellow "#FFCB6B"// Bright Yellow (same as yellow)
+        bright_blue "#82AAFF"  // Bright Blue (same as blue)
+        bright_magenta "#C792EA" // Bright Magenta (same as purple)
+        bright_cyan "#89DDFF"  // Bright Cyan (same as cyan)
+        bright_white "#EEFFFF" // Bright White (same as white)
     }
+
 }
 
 // Choose the theme that is specified in the themes section.
