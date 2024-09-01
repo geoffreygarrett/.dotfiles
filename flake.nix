@@ -1,58 +1,52 @@
 
 {
-  description = "Elyth's NeoVim configuration";
+  description = "Ahwx' Neovim configuration, declaratively written using Nix";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixvim.url = "github:nix-community/nixvim";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    pre-commit-hooks = {
-      url = "github:cachix/pre-commit-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { nixpkgs, nixvim, flake-parts, pre-commit-hooks, ... }@inputs:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+  outputs = {
+    nixvim,
+    flake-parts,
+    ...
+  } @ inputs:
+    flake-parts.lib.mkFlake {inherit inputs;} {
       systems = [
-        "aarch64-linux"
         "x86_64-linux"
-        "aarch64-darwin"
+        "aarch64-linux"
         "x86_64-darwin"
+        "aarch64-darwin"
       ];
 
-      perSystem = { system, pkgs, self', ... }:
-        let
-          nixvim' = nixvim.legacyPackages.${system};
-          nvim = nixvim'.makeNixvimWithModule {
-            inherit pkgs;
-            module = ./config;
-          };
-        in
-        {
-          checks = {
-            pre-commit-check = pre-commit-hooks.lib.${system}.run {
-              src = ./.;
-              hooks = {
-                statix.enable = true;
-                nixfmt = {
-                  enable = true;
-                  package = pkgs.nixfmt-rfc-style;
-                };
-              };
-            };
-          };
-
-          formatter = pkgs.nixfmt-rfc-style;
-
-          packages.default = nvim;
-
-          devShells.default = pkgs.mkShell {
-            inherit (self'.checks.pre-commit-check) shellHook;
+      perSystem = {
+        pkgs,
+        system,
+        ...
+      }: let
+        nixvimLib = nixvim.lib.${system};
+        nixvim' = nixvim.legacyPackages.${system};
+        nixvimModule = {
+          inherit pkgs;
+          module = import ./config; # import the module directly
+          # You can use `extraSpecialArgs` to pass additional arguments to your module files
+          extraSpecialArgs = {
+            # inherit (inputs) foo;
           };
         };
+        nvim = nixvim'.makeNixvimWithModule nixvimModule;
+      in {
+        checks = {
+          # Run `nix flake check .` to verify that your config is not broken
+          default = nixvimLib.check.mkTestDerivationFromNixvimModule nixvimModule;
+        };
+
+        packages = {
+          # Lets you run `nix run .` to start nixvim
+          default = nvim;
+        };
+      };
     };
 }

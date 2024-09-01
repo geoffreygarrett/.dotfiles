@@ -1,7 +1,7 @@
 { config, pkgs, lib, ... }: {
   home.stateVersion = "22.11";  # Define state version
   imports = [
-    ./nvim.nix   # Import the nvim.nix module here
+    ./alacritty.nix
   ];
   home.username = "geoffrey";
   home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/geoffreygarrett" else "/home/geoffrey";
