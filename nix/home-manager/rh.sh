@@ -38,4 +38,4 @@
   fi
 
   # Run the nix command with the determined flake directory
-  nix run "$FLARE_DIR#homeConfigurations.$(whoami)@$(hostname).activationPackage" && exec zsh
+  nix run "$FLARE_DIR#homeConfigurations.$(whoami)@$(echo $(hostname | cut -d '.' -f 1) | tr '[:upper:]' '[:lower:]').activationPackage" && exec zsh

@@ -8,10 +8,11 @@ in
 {
   home.stateVersion = "22.11";
   imports = [
-#    ./alacritty.nix
+    ./alacritty.nix
     ./zellij.nix
-#    ./git.nix
-#    ./packages.nix
+#    ./cargo.nix
+    ./git.nix
+    ./packages.nix
     ./zsh.nix
     ./nushell.nix
     ./nvim.nix

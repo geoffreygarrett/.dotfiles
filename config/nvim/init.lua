@@ -196,6 +196,17 @@ require("lazy").setup({
 	--    require('gitsigns').setup({ ... })
 	--
 	-- See `:help gitsigns` to understand what the configuration keys do
+
+	{
+		"google/vim-maktaba",
+		lazy = false, -- Load this plugin when Neovim starts
+	},
+	{
+		"bazelbuild/vim-bazel",
+		lazy = true, -- Load this plugin lazily when :Bazel command is invoked
+		cmd = { "Bazel" }, -- Specifies the command that triggers loading this plugin
+	},
+
 	{ -- Adds git related signs to the gutter, as well as utilities for managing changes
 		"lewis6991/gitsigns.nvim",
 		opts = {
@@ -219,6 +230,14 @@ require("lazy").setup({
 			-- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
 		},
 	},
+	{
+        'tamton-aquib/duck.nvim',
+        config = function()
+            vim.keymap.set('n', '<leader>dd', function() require("duck").hatch() end, {})
+            vim.keymap.set('n', '<leader>dk', function() require("duck").cook() end, {})
+            vim.keymap.set('n', '<leader>da', function() require("duck").cook_all() end, {})
+        end
+    },
 	{
 		"stevearc/oil.nvim",
 		config = function()

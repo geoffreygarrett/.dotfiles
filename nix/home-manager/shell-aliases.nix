@@ -10,6 +10,7 @@ let
   # Define the available dependencies with their paths
   dependencies = {
     eza             = mkPkg pkgs.eza            "eza";
+    feh             = mkPkg pkgs.feh            "feh";
     bat             = mkPkg pkgs.bat            "bat";
     neovim          = mkPkg pkgs.neovim         "nvim";
     fd              = mkPkg pkgs.fd             "fd";
@@ -21,9 +22,10 @@ let
     viddy           = mkPkg pkgs.viddy          "viddy";
     kubectl         = mkPkg pkgs.kubectl        "kubectl";
     podmanCompose   = mkPkg pkgs.podman-compose "podman-compose";
-    busybox         = mkPkg pkgs.busybox        "busybox";
+    viu             = mkPkg pkgs.viu            "viu";
+    # busybox         = mkPkg pkgs.busybox        "busybox";
   };
-
+#    dependencies.viddy.bin = "${dependencies.viddy.bin}/bin/viddy";
   # Define shells
   shells = {
     zsh = true;
@@ -59,10 +61,28 @@ let
     (mkAlias "dirsize"  null       "du -sh $PWD/*"                      "Show the size of directories in the current path." shells)
     (mkAlias "k"        "kubectl"  ""                                   "Alias for kubectl." shells)
     (mkAlias "pc"       "podmanCompose" ""                              "Alias for podman-compose." shells)
+    (mkAlias "viu"      "${dependencies.viu.bin}" ""                    "Alias for viu." shells)
     (mkAlias "kpods"    "kubectl"  "get pods --all-namespaces | grep -v 'kube-system'" "Get all Kubernetes pods excluding the kube-system namespace." shells)
-    (mkAlias "kbox"     "kubectl"  "run temp-pod --rm -i --tty --image=${dependencies.busybox.pkg}/bin/busybox -- /bin/sh" "Run a temporary pod in Kubernetes with a Busybox shell." shells)
+    #(mkAlias "kbox"     "kubectl"  "run temp-pod --rm -i --tty --image=${dependencies.busybox.pkg}/bin/busybox -- /bin/sh" "Run a temporary pod in Kubernetes with a Busybox shell." shells)
     (mkAlias "rh1"      null       "nix run .#homeConfigurations.$(whoami)@$(hostname).activationPackage && exec zsh" "Apply home configuration changes and restart shell." shells)
     (mkAlias "rh"       null       "${pkgs.bash}/bin/bash ${./rh.sh}"   "Apply home configuration changes and restart shell." { zsh = true; nu = true; bash = false; fish = false; })
+    (mkAlias "prb"       null     "cat ~/Downloads/out2.xlsx | from xlsx" "Show PRBs" { zsh = false; nu = true; bash = false; fish = false; })
+    (mkAlias "delete-images" null ''
+      alias delete-images='f() {
+        delete_image() {
+          if rm -i "$1"; then
+            echo "Deleted: $1"
+          else
+            echo "Deletion cancelled for: $1"
+          fi
+        }
+        export -f delete_image
+        fd --extension jpg --extension png --base-directory "$1" | \
+        fzf --preview "${dependencies.viu.bin} --width 80 \"$1/{}\""  \
+            --preview-window=right:81:wrap \
+            --bind "enter:execute(delete_image \"$1/{}\")+reload(fd --extension jpg --extension png --base-directory \"{}\")"
+      }; f'
+    '' "Delete images interactively." shells)
   ];
 
   # Helper function to generate the command for an alias
