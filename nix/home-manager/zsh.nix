@@ -40,6 +40,8 @@
       l = "exa -a --icons --group-directories-first";
       tree = "exa --tree --icons";
       cat = "bat --style=plain --paging=never";
+      nvim = "${pkgs.neovim}/bin/nvim";
+      holdnvim = "${pkgs.neovim}/bin/nvim";  # Alias for 'holdnvim' command
       less = "bat";
       grep = "rg";
       find = "fd";
@@ -71,7 +73,6 @@
       PAGER = "less -R";
       PATH = "$HOME/.local/bin:$HOME/.npm-packages/bin:$PATH";
       NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
-      RPROMPT = "%F{57}\${vcs_info_msg_0_}%f%b";
       DIRENV_LOG_FORMAT = "";
       READNULLCMD = "bat";
       BAT_THEME = "Solarized (dark)";
@@ -80,8 +81,8 @@
     };
 
     initExtra = ''
-      # Source the content from config.zsh.configContent
-      ${config.zsh.rc}
+      # Source the .zshrc from the config directory
+      source ~/.config/zsh/.zshrc
 
       # General options
       setopt extendedglob nomatch
@@ -118,11 +119,8 @@
       zle -N zle-line-finish
       zle -N zle-keymap-select
 
-      # Prompt
-      PS1='%T%F{33}|%n%{$reset_color%}@%F{13}%m|%f%{$fg[green]%}%~%{$reset_color%}%{$fg[white]%}''${vim_mode}%'
-
-      # Welcome message
-      echo -e "\e[1;35m$(${pkgs.figlet}/bin/figlet -f eftirobot 'H. & G.')\e[0m"
+      # Starship prompt
+      # eval "$(starship init zsh)"
 
       # Direnv hook
       eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
@@ -185,4 +183,10 @@
       }
     ];
   };
+
+#  # Install Starship prompt
+#  programs.starship = {
+#    enable = true;
+#    promptInit = ''eval "$(starship init zsh)"'';
+#  };
 }

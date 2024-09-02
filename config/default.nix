@@ -1,18 +1,27 @@
-# File: default.nix
-
 { pkgs, lib, ... }:
 
 let
-  alacrittyConfig = builtins.readFile ./alacritty/alacritty.toml;
-  zshrc = builtins.readFile ./zsh/.zshrc;
+  readConfigStructure = dir: builtins.listToAttrs (
+    map
+      (file: {
+        name = lib.removePrefix (toString dir + "/") file;
+        content = builtins.readFile file;
+      })
+      (pkgs.lib.filesystem.listFilesRecursive dir)
+  );
+
+  configs = {
+    nvim = readConfigStructure ./nvim;
+    zsh = readConfigStructure ./zsh;
+    alacritty = readConfigStructure ./alacritty;
+    zellij = readConfigStructure ./zellij;
+    nushell = readConfigStructure ./nushell;
+    obsidian = readConfigStructure ./obsidian;
+  };
+
+  debugConfig = pkgs.lib.trace "Configs: ${builtins.toJSON configs}" configs;
+
 in
 {
-  config = {
-    alacritty = {
-      configContent = alacrittyConfig;
-    };
-    zsh = {
-      rc = zshrc;
-    };
-  };
+  config = debugConfig;
 }
