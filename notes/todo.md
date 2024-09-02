@@ -2,3 +2,5 @@
   Currently it just inserts at a single line.
 
   https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip
+
+- [ ] Configure nvim such that it uses the same zsh from nix. Currently it looks like it's just using some arbitrary `zsh`.:w!:

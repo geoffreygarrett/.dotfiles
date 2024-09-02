@@ -13,6 +13,7 @@ in
 #    ./git.nix
 #    ./packages.nix
     ./zsh.nix
+    ./nushell.nix
     ./nvim.nix
     ./starship.nix
   ];

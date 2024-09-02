@@ -15,3 +15,4 @@ $env.config = ($env.config | upsert prompt_indicator "〉")
 $env.config = ($env.config | upsert prompt_multiline_indicator "::: ")
 
 # Any other customizations here
+$env.config = ($env.config | upsert show_banner false)

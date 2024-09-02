@@ -1,270 +1,182 @@
-##format = """
-##[╭─user───❯](bold blue) $username
-##[┣─system─❯](bold yellow) $hostname
-##[┣─project❯](bold red) $directory$rust$git_branch$git_status$package$golang$terraform$docker_context$python$docker_context$nodejs
-##[╰─cmd────❯](bold green)
-##"""
-#[username]
-#style_user = "green bold"
-#style_root = "red bold"
-#format = "[$user]($style) "
-#disabled = false
-#show_always = true
-#
-#[hostname]
-#ssh_only = false
-#format = 'on [$hostname](bold yellow) '
-#trim_at = "."
-#disabled = false
-#
-## Replace the "❯" symbol in the prompt with "➜"
-#[character]                            # The name of the module we are configuring is "character"
-#success_symbol = "[➜](bold green)"     # The "success_symbol" segment is being set to "➜" with the color "bold green"
-#error_symbol = "[✗](bold red)"
-##  
-## configure directory
-#[directory]
-#read_only = " "
-#truncation_length = 10
-#truncate_to_repo = true # truncates directory to root folder if in github repo
-#style = "bold italic blue"
-#
-#[cmd_duration]
-#min_time = 4
-#show_milliseconds = false
-#disabled = false
-#style = "bold italic red"
-#
-#[aws]
-#symbol = "  "
-#
-#[conda]
-#symbol = " "
-#
-#[dart]
-#symbol = " "
-#
-#[docker_context]
-#symbol = " "
-#format = "via [$symbol$context]($style) "
-#style = "blue bold"
-#only_with_files = true
-#detect_files = ["docker-compose.yml", "docker-compose.yaml", "Dockerfile"]
-#detect_folders = []
-#disabled = false
-#
-#[elixir]
-#symbol = " "
-#
-#[elm]
-#symbol = " "
-#
-#[git_branch]
-#symbol = " "
-#
-#[golang]
-#symbol = " "
-#
-#[hg_branch]
-#symbol = " "
-#
-#[java]
-#symbol = " "
-#
-#[julia]
-#symbol = " "
-#
-#[memory_usage]
-#symbol = "󰍛 "
-#
-#[nim]
-#symbol = " "
-#
-#[nix_shell]
-#symbol = " "
-#
-#[package]
-#symbol = "󰏗 "
-#
-#[perl]
-#symbol = " "
-#
-#[php]
-#symbol = " "
-#
-#[python]
-#symbol = " "
-##pyenv_version_name = true
-#format = 'via [${symbol}python (${version} )(\($virtualenv\) )]($style)'
-#style = "bold yellow"
-#pyenv_prefix = "venv "
-#python_binary = ["./venv/bin/python", "python", "python3", "python2"]
-#detect_extensions = ["py"]
-#version_format = "v${raw}"
-#
-#[ruby]
-#symbol = " "
-#
-#[rust]
-#symbol = " "
-#
-#[scala]
-#symbol = " "
-#
-#[shlvl]
-#symbol = " "
-#
-#[swift]
-#symbol = "ﯣ "
-#
-#[nodejs]
-#format = "via [ Node.js $version](bold green) "
-#detect_files = ["package.json", ".node-version"]
-#detect_folders = ["node_modules"]
+## Use custom format
+#format = '''
+#[┌───────────────────>](bold green)
+#[│](bold green)$directory
+#[└─>](bold green) '''
 
+[aws]
+symbol = "  "
 
-format = """
-[](#c3e88d)\
-$os\
-$username\
-[](bg:#82aaff fg:#c3e88d)\
-$directory\
-[](fg:#82aaff bg:#ffcb6b)\
-$git_branch\
-$git_status\
-[](fg:#ffcb6b bg:#86BBD8)\
-$c\
-$elixir\
-$elm\
-$golang\
-$gradle\
-$haskell\
-$java\
-$julia\
-$nodejs\
-$nim\
-$rust\
-$scala\
-[](fg:#86BBD8 bg:#06969A)\
-$docker_context\
-[](fg:#06969A bg:#33658A)\
-$time\
-[ ](fg:#33658A)\
-"""
-
-# Disable the blank line at the start of the prompt
-# add_newline = false
-
-# You can also replace your username with a neat symbol like   or disable this
-# and use the os module below
-[username]
-show_always = true
-style_user = "bg:#c3e88d fg:#0F111A bold"
-style_root = "bg:#c3e88d fg:#0F111A bold"
-format = '[$user ]($style)'
-disabled = false
-#format = "[$user]($style) "
-
-# An alternative to the username module which displays a symbol that
-# represents the current operating system
-[os]
-style = "bg:#9A348E"
-disabled = true # Disabled by default
-
-[directory]
-style = "bg:#82aaff fg:#0F111A bold"
-format = "[ $path ]($style)"
-truncation_length = 3
-truncation_symbol = " "
-
-# Here is how you can shorten some long paths by text replacement
-# similar to mapped_locations in Oh My Posh:
-[directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
-# Keep in mind that the order matters. For example:
-# "Important Documents" = " 󰈙 "
-# will not be replaced, because "Documents" was already substituted before.
-# So either put "Important Documents" before "Documents" or use the substituted version:
-# "Important 󰈙 " = " 󰈙 "
+[buf]
+symbol = " "
 
 [c]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+
+[conda]
+symbol = " "
+
+[crystal]
+symbol = " "
+
+[dart]
+symbol = " "
+
+[directory]
+read_only = " 󰌾"
 
 [docker_context]
 symbol = " "
-style = "bg:#06969A"
-format = '[ $symbol $context ]($style)'
 
 [elixir]
-symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+symbol = " "
 
 [elm]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+
+[fennel]
+symbol = " "
+
+[fossil_branch]
+symbol = " "
 
 [git_branch]
-symbol = ""
-style = "bg:#ffcb6b fg:#0F111A bold"
-format = '[ $symbol $branch ]($style)'
-
-[git_status]
-style = "bg:#ffcb6b fg:#0F111A bold"
-format = '[$all_status$ahead_behind ]($style)'
+symbol = " "
 
 [golang]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
 
-[gradle]
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+[guix_shell]
+symbol = " "
 
 [haskell]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+
+[haxe]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[hostname]
+ssh_symbol = " "
 
 [java]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
 
 [julia]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
 
-[nodejs]
-symbol = ""
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+[kotlin]
+symbol = " "
+
+[lua]
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[meson]
+symbol = "󰔷 "
 
 [nim]
 symbol = "󰆥 "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+
+[nix_shell]
+symbol = " "
+
+[nodejs]
+symbol = " "
+
+[ocaml]
+symbol = " "
+
+[shell]
+cmd_indicator = 'a'
+fish_indicator = 'fish'
+powershell_indicator = 'PS'
+unknown_indicator = '?'
+nu_indicator = 'nu'
+zsh_indicator = 'zsh'
+bash_indicator = 'bash'
+style = 'bold fg:#84ffff'
+disabled = false
+format = '[$indicator$version]($style) '
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+
+[package]
+symbol = "󰏗 "
+
+[perl]
+symbol = " "
+
+[php]
+symbol = " "
+
+[pijul_channel]
+symbol = " "
+
+[python]
+symbol = " "
+
+[rlang]
+symbol = "󰟔 "
+
+[ruby]
+symbol = " "
 
 [rust]
-symbol = ""
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
+symbol = "󱘗 "
 
 [scala]
 symbol = " "
-style = "bg:#86BBD8"
-format = '[ $symbol ($version) ]($style)'
 
-[time]
-disabled = false
-time_format = "%R" # Hour:Minute Format
-style = "bg:#33658A"
-format = '[ ♥ $time ]($style)'
+[swift]
+symbol = " "
+
+[zig]
+symbol = " "

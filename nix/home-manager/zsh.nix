@@ -39,7 +39,7 @@ in
       compinit
     '';
 
-    shellAliases = shellAliasesConfig.shellAliases;
+    shellAliases = shellAliasesConfig.shellAliases.zsh;
 
     sessionVariables = {
       LANG = "en_US.UTF-8";
