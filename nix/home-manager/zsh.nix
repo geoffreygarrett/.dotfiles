@@ -1,4 +1,9 @@
-{ pkgs, config, ... }: {
+{ pkgs, config, lib, ... }:
+
+let
+  shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
+in
+{
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;
@@ -10,8 +15,8 @@
     autocd = true;
     dotDir = ".config/zsh";
     enableCompletion = true;
-    enableAutosuggestions = true;
-    enableSyntaxHighlighting = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
 
     history = {
       path = "$HOME/.zsh_history";
@@ -34,36 +39,7 @@
       compinit
     '';
 
-    shellAliases = {
-      ls = "exa --icons --group-directories-first";
-      ll = "exa -alF --icons --group-directories-first";
-      l = "exa -a --icons --group-directories-first";
-      tree = "exa --tree --icons";
-      cat = "bat --style=plain --paging=never";
-      nvim = "${pkgs.neovim}/bin/nvim";
-      holdnvim = "${pkgs.neovim}/bin/nvim";  # Alias for 'holdnvim' command
-      less = "bat";
-      grep = "rg";
-      find = "fd";
-      top = "htop";
-      df = "duf";
-      du = "ncdu";
-      ping = "prettyping";
-      watch = "viddy";
-      sudoe = "sudo -E -s";
-      tb = "nc termbin.com 9999";
-      pingt = "ping -c 5 google.com";
-      pingd = "ping -c 5 8.8.8.8";
-      gitlog = "git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
-      gitlines = "git ls-files | xargs wc -l";
-      dirsize = "du -sh $PWD/*";
-      nixbuild = "sudo nixos-rebuild switch --flake \"/home/senoraraton/bins/nixosconf/#\"";
-      n = "nvim";
-      k = "kubectl";
-      pc = "podman-compose";
-      kpods = "kubectl get pods --all-namespaces | grep -v 'kube-system'";
-      kbox = "kubectl run temp-pod --rm -i --tty --image=busybox -- /bin/sh";
-    };
+    shellAliases = shellAliasesConfig.shellAliases;
 
     sessionVariables = {
       LANG = "en_US.UTF-8";
@@ -82,7 +58,13 @@
 
     initExtra = ''
       # Source the .zshrc from the config directory
-      source ~/.config/zsh/.zshrc
+        #      source ~/.config/zsh/.zshrc
+      # if starship is installed, load it
+      # if starship is installed, load it
+      if command -v starship &> /dev/null; then
+        eval "$(starship init zsh)"
+      fi
+
 
       # General options
       setopt extendedglob nomatch

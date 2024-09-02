@@ -7,7 +7,7 @@ bindkey -v
 REPORTTIME=20
 setopt +o nomatch
 
-zstyle :compinstall filename '/home/senoraraton/.zshrc'
+zstyle :compinstall filename '/home/geoffrey/.zshrc'
 zstyle ':vcs_info:git:*' formats '[%b]'
 autoload -Uz compinit
 autoload -U colors && colors
