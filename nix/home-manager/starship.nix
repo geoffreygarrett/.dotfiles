@@ -1,12 +1,8 @@
 { config, pkgs, lib, ... }:
-
-let
-  tomlConfig = builtins.fromTOML (builtins.readFile ../../config/starship/starship.toml);
-in
 {
   programs.starship = {
     enable = true;
-    settings = tomlConfig;
+    settings = builtins.fromTOML (builtins.readFile ../../dotfiles/starship/starship.toml);
   };
   home.packages = [ pkgs.starship ];
   programs.bash.initExtra = lib.mkIf config.programs.bash.enable ''

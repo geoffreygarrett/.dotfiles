@@ -15,109 +15,57 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    dotfiles = {
+      url = "./dotfiles";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, darwin, ... } @ inputs:
+  outputs = { self, nixpkgs, home-manager, dotfiles, ... }@inputs:
     let
-      supportedSystems = [ "x86_64-linux" "aarch64-darwin" ];
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
-
-      mkHomeConfiguration = { system, username, hostname, extraModules ? [ ] }:
-        home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgsFor.${system};
-          modules = [
-            ./nix/home-manager/default.nix
-            {
-              home = {
-                inherit username;
-                homeDirectory =
-                  if system == "aarch64-darwin"
-                  then "/Users/${username}"
-                  else "/home/${username}";
-                stateVersion = "22.11";
-              };
-            }
-          ] ++ extraModules;
-          extraSpecialArgs = {
-            inherit inputs;
-            currentSystem = system;
-            currentHostname = hostname;
-          };
-        };
-
+      utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
     in
     {
+
       homeConfigurations = {
-        "geoffrey@geoffrey-linux-pc" = mkHomeConfiguration {
+        "geoffrey@geoffrey-linux-pc" = utils.mkHomeConfiguration {
           system = "x86_64-linux";
           username = "geoffrey";
           hostname = "geoffrey-linux-pc";
           extraModules = [
-            #            ./nix/hosts/geoffrey-linux-pc.nix
+            ({ config, pkgs, lib, ... }:
+              let
+                dotfilesConfig = dotfiles.mkDotfilesConfig {
+                  configDir = "."; # Adjust this path as needed
+                  xdgConfigHome = "$HOME/.nix-config"; # This will now take precedence
+                };
+              in
+              builtins.trace "Applying dotfiles configuration" {
+                home.file = dotfilesConfig.home.file;
+                home.sessionVariables = lib.mkForce dotfilesConfig.home.sessionVariables;
+              })
           ];
         };
-        "geoffreygarrett@geoffreys-macbook-air" = mkHomeConfiguration {
+
+        "geoffreygarrett@geoffreys-macbook-air" = utils.mkHomeConfiguration {
           system = "aarch64-darwin";
           username = "geoffreygarrett";
           hostname = "geoffreys-macbook-air";
           extraModules = [
-            #            ./nix/hosts/geoffreys-macbook-air.nix
+            ({ config, pkgs, lib, ... }:
+              let
+                dotfilesConfig = dotfiles.mkDotfilesConfig {
+                  configDir = "."; # Adjust this path as needed
+                  xdgConfigHome = "$XDG_CONFIG_HOME"; # This will now take precedence
+                };
+              in
+              {
+                home.file = dotfilesConfig.home.file;
+                home.sessionVariables = lib.mkForce dotfilesConfig.home.sessionVariables;
+              })
           ];
         };
       };
-
-      shellConfigurations = {
-        "full" = {
-          system = "x86_64-linux";
-          username = "geoffrey";
-          hostname = "geoffrey-linux-pc";
-          extraModules = [
-            ./nix/shells/full.nix
-          ];
-        };
-        "base" = {
-          system = "x86_64-linux";
-          username = "geoffrey";
-          hostname = "geoffrey-linux-pc";
-          extraModules = [
-            ./nix/shells/base.nix
-          ];
-        };
-        "dev" = {
-          system = "x86_64-linux";
-          username = "geoffrey";
-          hostname = "geoffrey-linux-pc";
-          extraModules = [
-            ./nix/shells/dev.nix
-          ];
-        };
-      };
-
-      packages = forAllSystems (system:
-        let pkgs = nixpkgsFor.${system};
-        in
-        {
-          default = pkgs.writeShellScriptBin "default-script" ''
-            echo "This is the default package for the flake."
-          '';
-        }
-      );
-
-      defaultPackage = forAllSystems (system: self.packages.${system}.default);
-
-      apps = forAllSystems (system: {
-        default = {
-          type = "app";
-          program = "${self.packages.${system}.default}/bin/default-script";
-        };
-      });
-
-      devShells = forAllSystems (system: {
-        default = import ./nix/shells/default.nix { pkgs = nixpkgsFor.${system}; inherit home-manager system; };
-        base = import ./nix/shells/base.nix { pkgs = nixpkgsFor.${system}; inherit home-manager system; };
-        full = import ./nix/shells/full.nix { pkgs = nixpkgsFor.${system}; inherit home-manager system; };
-      });
 
       checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations;
     };
