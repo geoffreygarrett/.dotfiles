@@ -52,5 +52,11 @@ in
 
   # Ensure the Alacritty package is installed
   # home.packages = [ pkgs.alacritty ];
+    # Optional: If you want to ensure all X11 related packages are installed
+#    home.packages = with pkgs; [
+#      pkgs.xorg.xorgserver
+#      pkgs.xorg.xauth
+#       pkgs.xorg.xinit
+#    ];
 }
 

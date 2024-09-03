@@ -15,19 +15,28 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixgl = {
+        url = "github:nix-community/nixGL";
+        inputs.nixpkgs.follows = "nixpkgs";
+    };
+
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, nixgl, ... }@inputs:
     let
+     pkgs = import nixpkgs {
+            system = "x86_64-linux";
+            overlays = [ nixgl.overlay ];
+          };
       utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
     in
     {
 
       homeConfigurations = {
-        "geoffrey@geoffrey-linux-pc" = utils.mkHomeConfiguration {
+        "geoffrey@apollo" = utils.mkHomeConfiguration {
           system = "x86_64-linux";
           username = "geoffrey";
-          hostname = "geoffrey-linux-pc";
+          hostname = "apollo";
         };
 
         "geoffreygarrett@geoffreys-macbook-air" = utils.mkHomeConfiguration {
