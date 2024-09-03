@@ -1,0 +1,32 @@
+# Material Deep Ocean: https://material-theme.com/docs/reference/color-palette/
+[colors.primary]
+background = "#0F111A"
+foreground = "#8F93A2"
+
+[colors.normal]
+black = "#090B10"
+red = "#F07178"
+green = "#C3E88D"
+yellow = "#FFCB6B"
+blue = "#82AAFF"
+magenta = "#C792EA"
+cyan = "#89DDFF"
+white = "#EEFFFF"
+
+[colors.bright]
+black = "#464B5D"
+red = "#FF5370"
+green = "#C3E88D"
+yellow = "#FFCB6B"
+blue = "#82AAFF"
+magenta = "#C792EA"
+cyan = "#89DDFF"
+white = "#FFFFFF"
+
+[colors.selection]
+text = "#FFFFFF"
+background = '#717CB4'
+
+[colors.cursor]
+text = "#0F111A"
+cursor = "#FFFFFF"
