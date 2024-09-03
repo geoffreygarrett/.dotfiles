@@ -35,9 +35,13 @@
           system = "aarch64-darwin";
           username = "geoffreygarrett";
           hostname = "geoffreys-macbook-air";
-          home.packages = [
-            localPkgs.hammerspoon
-          ];
+          extraModules = [
+                    {
+                      home.packages = [
+                        localPkgs.hammerspoon
+                      ];
+                    }
+                  ];
         };
       };
 
