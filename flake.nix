@@ -15,19 +15,10 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nixgl = {
-        url = "github:nix-community/nixGL";
-        inputs.nixpkgs.follows = "nixpkgs";
-    };
-
   };
 
-  outputs = { self, nixpkgs, home-manager, nixgl, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
-     pkgs = import nixpkgs {
-            system = "x86_64-linux";
-            overlays = [ nixgl.overlay ];
-          };
       utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
     in
     {
