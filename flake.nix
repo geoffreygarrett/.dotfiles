@@ -20,7 +20,7 @@
   outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
-      localPkgs = import ./nix/nixpkgs {}; # Import your local nixpkgs definitions
+      localPkgs = import ./nix/nixpkgs { inherit nixpkgs; };
     in
     {
 
@@ -36,12 +36,18 @@
           username = "geoffreygarrett";
           hostname = "geoffreys-macbook-air";
           extraModules = [
-                    {
-                      home.packages = [
-                        localPkgs.hammerspoon
-                      ];
-                    }
-                  ];
+            ({ pkgs, ... }:
+              let
+                localPkgs = import ./nix/nixpkgs {
+                  inherit (pkgs) lib stdenv stdenvNoCC fetchurl unzip;
+                };
+              in
+              {
+                home.packages = [
+                  localPkgs.hammerspoon
+                ];
+              })
+          ];
         };
       };
 

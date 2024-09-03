@@ -16,6 +16,7 @@ readonly REPO_NAME="${REPO_NAME:-celestial-blueprint}"
 readonly REPO_URL="https://github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
 VERBOSE=false
 LOG_LEVEL="INFO"
+LOCAL_DEV=false
 
 # Define keybinding constants as arrays
 KEYBINDINGS_LINUX=(
@@ -76,18 +77,22 @@ vlog() {
 
 # Get the appropriate dotfiles directory based on OS
 get_dotfiles_dir() {
-    case "$(uname)" in
-        Darwin|Linux)
-            echo "$HOME/.dotfiles"
-            ;;
-        MINGW*|MSYS*|CYGWIN*)
-            echo "${USERPROFILE:?}/.dotfiles"
-            ;;
-        *)
-            log "ERROR" "Unsupported operating system"
-            exit 1
-            ;;
-    esac
+    if [ "$LOCAL_DEV" = true ]; then
+        echo "$PWD"
+    else
+        case "$(uname)" in
+            Darwin|Linux)
+                echo "$HOME/.dotfiles"
+                ;;
+            MINGW*|MSYS*|CYGWIN*)
+                echo "${USERPROFILE:?}/.dotfiles"
+                ;;
+            *)
+                log "ERROR" "Unsupported operating system"
+                exit 1
+                ;;
+        esac
+    fi
 }
 
 # Process hostname
@@ -112,6 +117,11 @@ ensure_nix() {
 
 # Clone the repository or update if it already exists
 clone_or_update_repo() {
+    if [ "$LOCAL_DEV" = true ]; then
+        log "INFO" "Running in local development mode. Skipping repository clone/update."
+        return
+    fi
+
     local dotfiles_dir
     dotfiles_dir=$(get_dotfiles_dir)
     if [ ! -d "$dotfiles_dir" ]; then
@@ -239,7 +249,7 @@ setup_shortcuts() {
 
 main() {
     # Parse command line arguments
-    while getopts ":vl:" opt; do
+    while getopts ":vl:d" opt; do
         case ${opt} in
             v )
                 VERBOSE=true
@@ -247,6 +257,9 @@ main() {
                 ;;
             l )
                 LOG_LEVEL="$OPTARG"
+                ;;
+            d )
+                LOCAL_DEV=true
                 ;;
             \? )
                 log "ERROR" "Invalid Option: -$OPTARG" 1>&2
@@ -257,6 +270,9 @@ main() {
     shift $((OPTIND -1))
 
     log "INFO" "Starting setup process..."
+    if [ "$LOCAL_DEV" = true ]; then
+        log "INFO" "Running in local development mode"
+    fi
     ensure_nix
     clone_or_update_repo
     run_flake
