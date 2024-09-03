@@ -66,9 +66,39 @@ remove_nix_lines() {
     fi
 }
 
+# Function to fix nix.sh file
+fix_nix_sh() {
+    local nix_sh="/etc/profile.d/nix.sh"
+    if [[ -f "$nix_sh" ]]; then
+        log INFO "Fixing $nix_sh"
+        # Remove any stray 'fi' at the beginning of the file
+        sed -i '/^fi/d' "$nix_sh"
+        # Ensure the file has proper if-then-fi structure
+        if ! grep -q "^if" "$nix_sh"; then
+            sed -i '1s/^/if [ -n "$HOME" ] && [ -n "$USER" ]; then\n/' "$nix_sh"
+            echo "fi" >> "$nix_sh"
+        fi
+        log INFO "Fixed $nix_sh"
+    fi
+}
+
+# Function to remove Fish shell configurations
+remove_fish_config() {
+    local fish_dirs=("/etc/fish" "/usr/local/etc/fish" "/opt/homebrew/etc/fish" "/opt/local/etc/fish")
+    for dir in "${fish_dirs[@]}"; do
+        if [[ -d "$dir/conf.d" ]]; then
+            safe_remove "$dir/conf.d/nix.fish"
+        fi
+    done
+    log INFO "Removed Nix-related Fish shell configurations"
+}
+
 # Function to uninstall Nix
 uninstall_nix() {
     log INFO "Starting Nix uninstallation process..."
+
+    # Fix nix.sh if needed
+    fix_nix_sh
 
     # Stop Nix-related services
     if command -v systemctl >/dev/null 2>&1; then
@@ -103,6 +133,9 @@ uninstall_nix() {
         revert_file "$file"
         remove_nix_lines "$file"
     done
+
+    # Remove Fish shell configurations
+    remove_fish_config
 
     # Remove Nix-related users and groups
     if command -v userdel >/dev/null 2>&1; then
