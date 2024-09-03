@@ -100,3 +100,6 @@ export PATH=~/.npm-packages/bin:$PATH
 export NODE_PATH=~/.npm-packages/lib/node_modules
 
 echo -e "\e[1;35m$(figlet 'Hack the Planet')\e[0m"
+
+
+if command -v zellij >/dev/null 2>&1; then zellij; else zsh; fi

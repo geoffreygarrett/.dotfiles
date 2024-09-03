@@ -57,14 +57,11 @@ in
     };
 
     initExtra = ''
-      # Source the .zshrc from the config directory
-        #      source ~/.config/zsh/.zshrc
       # if starship is installed, load it
       # if starship is installed, load it
       if command -v starship &> /dev/null; then
         eval "$(starship init zsh)"
       fi
-
 
       # General options
       setopt extendedglob nomatch
@@ -83,6 +80,7 @@ in
       setopt +o nomatch
       setopt PROMPT_SUBST
       export KEYTIMEOUT=1
+      export ZELLIJ=1
 
       # Vi mode indicator
       vim_ins_mode="%{$fg[green]%}|%{$reset_color%}"
@@ -100,9 +98,6 @@ in
 
       zle -N zle-line-finish
       zle -N zle-keymap-select
-
-      # Starship prompt
-      # eval "$(starship init zsh)"
 
       # Direnv hook
       eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
@@ -134,6 +129,7 @@ in
       if [ -f $HOME/.zshrc.local ]; then
         source $HOME/.zshrc.local
       fi
+
     '';
 
     dirHashes = {
@@ -166,9 +162,4 @@ in
     ];
   };
 
-#  # Install Starship prompt
-#  programs.starship = {
-#    enable = true;
-#    promptInit = ''eval "$(starship init zsh)"'';
-#  };
 }
