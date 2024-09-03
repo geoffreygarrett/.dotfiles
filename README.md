@@ -42,13 +42,13 @@ Run the following command in your terminal:
 #### On Unix-like systems (Linux and macOS):
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/geoffreygarrett/cross-platform-terminal-setup/main/setup.sh)
+bash <(curl -sL https://raw.githubusercontent.com/geoffreygarrett/celestial-blueprint/main/setup.sh)
 ```
 
 #### On Windows (in PowerShell):
 
 ```powershell
-iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/geoffreygarrett/cross-platform-terminal-setup/main/setup.ps1'))
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/geoffreygarrett/celestial-blueprint/main/setup.ps1'))
 ```
 
 This command will download the setup script, which will then clone the repository, install dependencies, and configure
@@ -58,11 +58,11 @@ your terminal environment.
 
 1. Clone this repository:
    ```
-   git clone https://github.com/geoffreygarrett/cross-platform-terminal-setup.git
+   git clone https://github.com/geoffreygarrett/celestial-blueprint.git
    ```
 2. Navigate to the repository directory:
    ```
-   cd cross-platform-terminal-setup
+   cd celestial-blueprint
    ```
 3. Run the setup script:
     - On Unix-like systems: `./setup.sh`
@@ -75,13 +75,13 @@ To update an existing installation, use the `--update` flag:
 #### On Unix-like systems (Linux and macOS):
 
 ```bash
-bash <(curl -sL https://raw.githubusercontent.com/geoffreygarrett/cross-platform-terminal-setup/main/setup.sh) --update
+bash <(curl -sL https://raw.githubusercontent.com/geoffreygarrett/celestial-blueprint/main/setup.sh) --update
 ```
 
 #### On Windows (in PowerShell):
 
 ```powershell
-iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/geoffreygarrett/cross-platform-terminal-setup/main/setup.ps1')) --update
+iex ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/geoffreygarrett/celestial-blueprint/main/setup.ps1')) --update
 ```
 
 ## Configuration
@@ -112,7 +112,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Support
 
 If you encounter any issues or have questions,
-please [open an issue](https://github.com/geoffreygarrett/cross-platform-terminal-setup/issues) in this repository.
+please [open an issue](https://github.com/geoffreygarrett/celestial-blueprint/issues) in this repository.
 
 ## Continuous Integration
 
