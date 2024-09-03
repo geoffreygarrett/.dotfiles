@@ -25,8 +25,5 @@
     (pkgs.nerdfonts.override {
       fonts = [ "JetBrainsMono" ];
     })
-    pkgs.mesa # OpenGL library
-    pkgs.glxinfo # Utility to check GLX information
-    pkgs.xorg.xrandr # Utility to set the screen size, orientation, etc.
   ];
 }
