@@ -1,9 +1,9 @@
 # Alacritty Configuration
 
 # Import additional configuration files
-#import = [
-#    "~/.config/alacritty/themes/gruvbox_dark.toml"
-#]
+import = [
+    "~/.config/alacritty/themes/gruvbox_dark.toml"
+]
 
 [window]
 dimensions = { columns = 80, lines = 24 }

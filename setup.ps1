@@ -1,5 +1,12 @@
 # PowerShell Script for WSL2 Installation and Setup
 
+# Parameters (can be overridden when calling the script)
+param (
+    [string]$WSL_DISTRO = "Ubuntu-20.04",
+    [string]$GITHUB_USERNAME = "geoffreygarrett",
+    [string]$REPO_NAME = "celestial-blueprint"
+)
+
 # Ensure the script is running with administrator privileges
 if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     Write-Host "This script needs to be run as Administrator. Please restart PowerShell as an Administrator and try again."
@@ -7,8 +14,7 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 # Variables
-$WSL_DISTRO = "Ubuntu"  # Default distribution
-$REPO_URL = "https://github.com/geoffreygarrett/cross-platform-terminal-setup.git"
+$REPO_URL = "https://github.com/$GITHUB_USERNAME/$REPO_NAME.git"
 
 # Utility Functions
 function Log {
@@ -41,6 +47,9 @@ function InstallWSL {
     # Install the specified Linux distribution
     Log "Installing $WSL_DISTRO..."
     wsl --install -d $WSL_DISTRO
+
+    # Wait for WSL to finish setting up
+    Start-Sleep -Seconds 30
 }
 
 function CloneAndRunSetup {
@@ -48,13 +57,9 @@ function CloneAndRunSetup {
     Log "Cloning the repository..."
     git clone $REPO_URL
 
-    # Extract repository name from URL
-    $repoName = Split-Path $REPO_URL -Leaf
-    $repoName = $repoName.Replace('.git', '')
-
     # Run setup.sh within WSL
     Log "Running setup.sh within WSL..."
-    wsl -- bash -c "cd /mnt/c/Users/$env:USERNAME/$repoName; ./setup.sh"
+    wsl -d $WSL_DISTRO -- bash -c "cd /mnt/c/Users/$env:USERNAME/$REPO_NAME && bash setup.sh"
 }
 
 # Script Execution
@@ -65,4 +70,10 @@ try {
 } catch {
     Log "An error occurred: $_"
     exit 1
+}
+
+# Prompt user to restart
+$restart = Read-Host "A system restart is recommended. Would you like to restart now? (y/n)"
+if ($restart -eq 'y') {
+    Restart-Computer
 }

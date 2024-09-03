@@ -9,9 +9,9 @@
     '';
   };
     home.packages = [ pkgs.lazygit ];
-  xdg.configFile."nvim" = {
-    source = ../../dotfiles/nvim;
-    recursive = true;
-  };
+    xdg.configFile."nvim" = {
+      source = ../../dotfiles/nvim;
+      recursive = true;
+    };
 }
 
