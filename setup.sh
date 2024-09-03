@@ -20,10 +20,9 @@ LOCAL_DEV=false
 
 # Define keybinding constants as arrays
 KEYBINDINGS_LINUX=(
-    "<Super>Return:Alacritty:alacritty"
+    "<Super>Return:Alacritty:$HOME/.nix-profile/bin/alacritty-gl"
     "<Super>F:Alacritty Fullscreen:wmctrl -r :ACTIVE: -b toggle,fullscreen"
 )
-
 KEYBINDINGS_MACOS=(
     "cmd+alt+t:Alacritty:open -a Alacritty"
     "cmd+alt+f:Alacritty Fullscreen:Alacritty:toggleFullScreen"
@@ -109,7 +108,7 @@ ensure_nix() {
             exit 1
         fi
         # Source nix
-#        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
+        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
     else
         log "SUCCESS" "Nix is already installed."
     fi
@@ -146,7 +145,7 @@ run_flake() {
     local dotfiles_dir
     dotfiles_dir=$(get_dotfiles_dir)
     log "INFO" "Running Nix flake in: $dotfiles_dir"
-    if ! nix run "${dotfiles_dir}#homeConfigurations.$(whoami)@$(process_hostname).activationPackage" 2>&1 | while IFS= read -r line; do
+    if ! nix run --impure "${dotfiles_dir}#homeConfigurations.$(whoami)@$(process_hostname).activationPackage" 2>&1 | while IFS= read -r line; do
         vlog "$line"
     done; then
         log "ERROR" "Failed to run Nix flake"

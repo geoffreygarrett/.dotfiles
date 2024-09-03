@@ -221,24 +221,24 @@ require("lazy").setup({
 	},
 
 	{
-      "kdheepak/lazygit.nvim",
-      cmd = {
-        "LazyGit",
-        "LazyGitConfig",
-        "LazyGitCurrentFile",
-        "LazyGitFilter",
-        "LazyGitFilterCurrentFile",
-      },
-      -- optional for floating window border decoration
-      dependencies = {
-        "nvim-lua/plenary.nvim",
-      },
-      -- setting the keybinding for LazyGit with 'keys' is recommended in
-      -- order to load the plugin when the command is run for the first time
-      keys = {
-        { "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
-      }
-    },
+		"kdheepak/lazygit.nvim",
+		cmd = {
+			"LazyGit",
+			"LazyGitConfig",
+			"LazyGitCurrentFile",
+			"LazyGitFilter",
+			"LazyGitFilterCurrentFile",
+		},
+		-- optional for floating window border decoration
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+		},
+		-- setting the keybinding for LazyGit with 'keys' is recommended in
+		-- order to load the plugin when the command is run for the first time
+		keys = {
+			{ "<leader>lg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
+		},
+	},
 
 	{
 		"nvim-neo-tree/neo-tree.nvim",
@@ -251,13 +251,19 @@ require("lazy").setup({
 		},
 	},
 	{
-        'tamton-aquib/duck.nvim',
-        config = function()
-            vim.keymap.set('n', '<leader>dd', function() require("duck").hatch() end, {})
-            vim.keymap.set('n', '<leader>dk', function() require("duck").cook() end, {})
-            vim.keymap.set('n', '<leader>da', function() require("duck").cook_all() end, {})
-        end
-    },
+		"tamton-aquib/duck.nvim",
+		config = function()
+			vim.keymap.set("n", "<leader>dd", function()
+				require("duck").hatch()
+			end, {})
+			vim.keymap.set("n", "<leader>dk", function()
+				require("duck").cook()
+			end, {})
+			vim.keymap.set("n", "<leader>da", function()
+				require("duck").cook_all()
+			end, {})
+		end,
+	},
 	{
 		"stevearc/oil.nvim",
 		config = function()
@@ -880,10 +886,9 @@ require("lazy").setup({
 				"stylua", -- Used to format Lua code
 				"lua_ls",
 				"rnix-lsp",
-				"nixfmt",
 				"bash-language-server",
 				"beautysh",
-				"bash-debug-adapter"
+				"bash-debug-adapter",
 			})
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
