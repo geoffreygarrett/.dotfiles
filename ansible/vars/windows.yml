@@ -1,5 +1,0 @@
----
-packages_windows:
-  - neovim
-  - curl
-  - 7zip

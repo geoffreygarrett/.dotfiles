@@ -15,13 +15,9 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    dotfiles = {
-      url = "./dotfiles";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, home-manager, dotfiles, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
     in
@@ -32,38 +28,12 @@
           system = "x86_64-linux";
           username = "geoffrey";
           hostname = "geoffrey-linux-pc";
-          extraModules = [
-            ({ config, pkgs, lib, ... }:
-              let
-                dotfilesConfig = dotfiles.mkDotfilesConfig {
-                  configDir = "."; # Adjust this path as needed
-                  xdgConfigHome = "$HOME/.nix-config"; # This will now take precedence
-                };
-              in
-              builtins.trace "Applying dotfiles configuration" {
-                home.file = dotfilesConfig.home.file;
-                home.sessionVariables = lib.mkForce dotfilesConfig.home.sessionVariables;
-              })
-          ];
         };
 
         "geoffreygarrett@geoffreys-macbook-air" = utils.mkHomeConfiguration {
           system = "aarch64-darwin";
           username = "geoffreygarrett";
           hostname = "geoffreys-macbook-air";
-          extraModules = [
-            ({ config, pkgs, lib, ... }:
-              let
-                dotfilesConfig = dotfiles.mkDotfilesConfig {
-                  configDir = "."; # Adjust this path as needed
-                  xdgConfigHome = "$XDG_CONFIG_HOME"; # This will now take precedence
-                };
-              in
-              {
-                home.file = dotfilesConfig.home.file;
-                home.sessionVariables = lib.mkForce dotfilesConfig.home.sessionVariables;
-              })
-          ];
         };
       };
 
