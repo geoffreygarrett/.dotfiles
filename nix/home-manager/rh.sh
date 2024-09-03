@@ -1,6 +1,5 @@
 #!/bin/bash
 
-  # Function to check if the current directory or specified path has a flake.nix
   check_flake() {
     local dir="$1"
     if [[ -f "$dir/flake.nix" ]]; then
@@ -10,7 +9,6 @@
     return 1
   }
 
-  # Function to check if a directory is a GitHub repository
   is_github_repo() {
     local dir="$1"
     (cd "$dir" && git remote get-url origin 2>/dev/null | grep -q 'github.com')
@@ -33,7 +31,7 @@
         fi
       fi
       echo "flake.nix not found"
-      exit 1e
+      exit 1
     fi
   fi
 
