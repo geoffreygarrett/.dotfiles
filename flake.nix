@@ -20,6 +20,7 @@
   outputs = { self, nixpkgs, home-manager, ... }@inputs:
     let
       utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
+      localPkgs = import ./nix/nixpkgs {}; # Import your local nixpkgs definitions
     in
     {
 
@@ -34,6 +35,9 @@
           system = "aarch64-darwin";
           username = "geoffreygarrett";
           hostname = "geoffreys-macbook-air";
+          home.packages = [
+            localPkgs.hammerspoon
+          ];
         };
       };
 
