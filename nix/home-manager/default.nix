@@ -13,13 +13,20 @@
   ];
 
   # Uncomment and adjust if you're using sops-nix for secret management
-  # sops = {
-  #   age.keyFile = "/home/senoraraton/.config/sops/age/keys.txt";
-  #   defaultSopsFile = ../secrets/secrets.yaml;
-  # };
-
+  #  sops = {
+  #    age.keyFile = "/home/senoraraton/.config/sops/age/keys.txt";
+  #    defaultSopsFile = ../secrets/secrets.yaml;
+  #  };
+  #
   fonts.fontconfig.enable = true;
-  home.packages = [
-    (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+
+  # Add these packages to ensure OpenGL and GLX are installed
+  home.packages = with pkgs; [
+    (pkgs.nerdfonts.override {
+      fonts = [ "JetBrainsMono" ];
+    })
+    pkgs.mesa # OpenGL library
+    pkgs.glxinfo # Utility to check GLX information
+    pkgs.xorg.xrandr # Utility to set the screen size, orientation, etc.
   ];
 }
