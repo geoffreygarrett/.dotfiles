@@ -52,6 +52,25 @@ function InstallWSL {
     Start-Sleep -Seconds 30
 }
 
+function SetupWindowsShortcuts {
+    Log "Setting up keyboard shortcuts for Windows..."
+
+    # Create a shortcut for Alacritty
+    $WshShell = New-Object -ComObject WScript.Shell
+    $Shortcut = $WshShell.CreateShortcut("$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Alacritty.lnk")
+    $Shortcut.TargetPath = "C:\Program Files\Alacritty\alacritty.exe"
+    $Shortcut.Save()
+
+    # Set up hotkey for Alacritty (Ctrl+Alt+T)
+    $bytes = [System.IO.File]::ReadAllBytes("$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Alacritty.lnk")
+    $bytes[0x15] = $bytes[0x15] -bor 0x80
+    $bytes[0x16] = $bytes[0x16] -bor 0x40
+    $bytes[0x17] = $bytes[0x17] -bor 0x20
+    [System.IO.File]::WriteAllBytes("$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Alacritty.lnk", $bytes)
+
+    Log "Windows keyboard shortcuts set up successfully."
+}
+
 function CloneAndRunSetup {
     # Clone the repository
     Log "Cloning the repository..."
@@ -66,6 +85,7 @@ function CloneAndRunSetup {
 try {
     InstallWSL
     CloneAndRunSetup
+    SetupWindowsShortcuts
     Log "Setup completed successfully!"
 } catch {
     Log "An error occurred: $_"
