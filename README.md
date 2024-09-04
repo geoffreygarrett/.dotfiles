@@ -1,4 +1,4 @@
-# Cross-Platform Terminal Setup
+# My Cross-Platform Terminal Setup
 
 A streamlined, one-command setup for a consistent terminal environment with Alacritty, Zellij, and Neovim across
 Windows, macOS, and Linux.
