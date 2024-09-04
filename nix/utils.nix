@@ -9,7 +9,7 @@ in
     home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgsFor.${system};
       modules = [
-        ./home-manager/default.nix
+        ./home/default.nix
         {
           home = {
             inherit username;

@@ -1,18 +1,18 @@
 { config, pkgs, ... }:
 
 {
-  # User and home directory information
-  home.username = "geoffreygarrett";
-  home.homeDirectory = "/Users/geoffreygarrett";
+  #  # User and home directory information
+  #  home.username = "geoffreygarrett";
+  #  home.homeDirectory = "/Users/geoffreygarrett";
 
-  # Home Manager state version
-  home.stateVersion = "24.05";
+  #  # Home Manager state version
+  #  home.stateVersion = "24.05";
 
-  # Enable Home Manager
-  programs.home-manager.enable = true;
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  #  # Enable Home Manager
+  #  programs.home-manager.enable = true;
+  #
+  #  # Allow unfree packages
+  #  nixpkgs.config.allowUnfree = true;
 
   # Packages specific to this MacBook
   #  home.packages = with pkgs; [
@@ -23,12 +23,12 @@
   #    # Add more packages as needed
   #  ];
 
-  # Environment variables specific to this MacBook
-  home.sessionVariables = {
-    EDITOR = "neovim";
-    BROWSER = "firefox";
-    PATH = "${config.home.homeDirectory}/bin:${pkgs.coreutils}/bin:${pkgs.zsh}/bin:$PATH";
-  };
+  #  # Environment variables specific to this MacBook
+  #  home.sessionVariables = {
+  #    EDITOR = "neovim";
+  #    BROWSER = "firefox";
+  #    PATH = "${config.home.homeDirectory}/bin:${pkgs.coreutils}/bin:${pkgs.zsh}/bin:$PATH";
+  #  };
 
   #  # Zsh configuration
   #  programs.zsh = {
