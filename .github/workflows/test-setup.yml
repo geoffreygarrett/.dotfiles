@@ -17,6 +17,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install yq
+        run: |
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+      - name: Format YAML files
+        run: |
+          yq -i eval '.' .github/workflows/test-setup.yml
+          git diff --exit-code || (git add .github/workflows/test-setup.yml && git commit -m "Apply YAML formatting")
+
       - name: Install Nix
         uses: cachix/install-nix-action@v24
         with:
