@@ -39,9 +39,9 @@
     git.enable = true;
   };
   sops.defaultSopsFile = ./secrets.yaml;
-  sops.age.keyFile = "/home/geoffrey/.config/sops/age/keys.txt";
-  sops.defaultSymlinkPath = "/run/user/1000/secrets";
-  sops.defaultSecretsMountPoint = "/run/user/1000/secrets.d";
+  #sops.age.keyFile = "/home/geoffrey/.config/sops/age/keys.txt";
+  #sops.defaultSymlinkPath = "/run/user/1000/secrets";
+  #sops.defaultSecretsMountPoint = "/run/user/1000/secrets.d";
   sops.secrets.github_token = {
     sopsFile = ./secrets.yaml;
   };
