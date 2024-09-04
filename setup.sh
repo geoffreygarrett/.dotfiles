@@ -101,6 +101,7 @@ process_hostname() {
     hostname -s 2>/dev/null | tr '[:upper:]' '[:lower:]' || echo "default"
 }
 
+
 ensure_nix() {
     if ! command -v nix &>/dev/null; then
         log "WARNING" "Nix is not installed. Installing..."
@@ -122,8 +123,15 @@ ensure_nix() {
     for script in "${NIX_PROFILE_SCRIPTS[@]}"; do
         if [ -f "$script" ]; then
             log "INFO" "Sourcing Nix profile script: $script"
+            # Temporarily set ZSH_VERSION to avoid errors in Bash
+            ZSH_VERSION_BACKUP=$ZSH_VERSION
+            unset ZSH_VERSION
             # shellcheck disable=SC1090
             . "$script" || log "WARNING" "Failed to source $script"
+            # Restore ZSH_VERSION if it was set
+            if [ -n "${ZSH_VERSION_BACKUP+x}" ]; then
+                ZSH_VERSION=$ZSH_VERSION_BACKUP
+            fi
             break
         fi
     done
