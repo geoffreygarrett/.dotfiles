@@ -14,15 +14,15 @@
   # Filesystem configuration (assuming a simple setup)
   fileSystems = {
     "/" = {
-      device = "/dev/sda1";  # Adjust to your root partition
+      device = "/dev/sda1"; # Adjust to your root partition
       fsType = "ext4";
     };
     "/home" = {
-      device = "/dev/sda2";  # Adjust to your home partition
+      device = "/dev/sda2"; # Adjust to your home partition
       fsType = "ext4";
     };
     "/boot" = {
-      device = "/dev/sda3";  # Boot partition if separate
+      device = "/dev/sda3"; # Boot partition if separate
       fsType = "ext4";
     };
   };
@@ -40,19 +40,19 @@
   # Input devices configuration
   services.xserver = {
     enable = true;
-    layout = "us";  # Adjust keyboard layout if necessary
-    xkbOptions = "eurosign:e";  # Example XKB option
-    videoDrivers = [ "nvidia" ];  # Use the NVIDIA driver
+    layout = "us"; # Adjust keyboard layout if necessary
+    xkbOptions = "eurosign:e"; # Example XKB option
+    videoDrivers = [ "nvidia" ]; # Use the NVIDIA driver
   };
 
   # Network configuration (already in previous examples)
   networking = {
     hostName = "geoffrey-linux-pc";
     useDHCP = false;
-    interfaces.enp3s0.useDHCP = true;  # Adjust to your network interface
+    interfaces.enp3s0.useDHCP = true; # Adjust to your network interface
   };
 
   # Enable common hardware support
-  hardware.pulseaudio.enable = true;  # Enable audio
-  hardware.bluetooth.enable = true;  # Enable Bluetooth if necessary
+  hardware.pulseaudio.enable = true; # Enable audio
+  hardware.bluetooth.enable = true; # Enable Bluetooth if necessary
 }

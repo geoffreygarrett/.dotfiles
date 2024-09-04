@@ -105,6 +105,28 @@
             pre-commit run --all-files
           '');
         };
+        switch = {
+          type = "app";
+          program = toString (nixpkgs.legacyPackages.${system}.writeShellScript "auto-home-manager-switch" ''
+            #!/usr/bin/env bash
+            set -e
+
+            USERNAME="$(whoami)"
+            HOSTNAME="$(hostname | cut -d '.' -f 1 | tr '[:upper:]' '[:lower:]')"
+
+            echo "Detected user: $USERNAME"
+            echo "Detected hostname: $HOSTNAME"
+
+            FULL_CONFIG="$USERNAME@$HOSTNAME"
+            echo "Running Home Manager switch for configuration: $FULL_CONFIG"
+
+            nix run ".#homeConfigurations.$FULL_CONFIG.activationPackage"
+
+            echo "Home Manager switch completed successfully."
+            echo "Restarting shell..."
+            exec "$SHELL"
+          '');
+        };
       });
 
       devShells = forAllSystems (system: {

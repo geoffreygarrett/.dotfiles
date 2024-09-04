@@ -5,7 +5,7 @@ let
   nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; });
 in
 {
-  mkHomeConfiguration = { system, username, hostname, extraModules ? [] }:
+  mkHomeConfiguration = { system, username, hostname, extraModules ? [ ] }:
     home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgsFor.${system};
       modules = [
@@ -13,7 +13,8 @@ in
         {
           home = {
             inherit username;
-            homeDirectory = if system == "aarch64-darwin"
+            homeDirectory =
+              if system == "aarch64-darwin"
               then "/Users/${username}"
               else "/home/${username}";
             stateVersion = "22.11";

@@ -8,10 +8,10 @@
       " Any Vimscript configuration can go here
     '';
   };
-    home.packages = [ pkgs.lazygit ];
-    xdg.configFile."nvim" = {
-      source = ../../dotfiles/nvim;
-      recursive = true;
-    };
+  home.packages = [ pkgs.lazygit ];
+  xdg.configFile."nvim" = {
+    source = ../../dotfiles/nvim;
+    recursive = true;
+  };
 }
 

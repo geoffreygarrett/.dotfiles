@@ -29,11 +29,11 @@
 #   - Platforms: x86_64-darwin, aarch64-darwin
 # =============================================================================
 
-{
-  lib,
-  stdenvNoCC,
-  fetchurl,
-  unzip,
+{ lib
+, stdenvNoCC
+, fetchurl
+, unzip
+,
 }:
 
 stdenvNoCC.mkDerivation (self: {

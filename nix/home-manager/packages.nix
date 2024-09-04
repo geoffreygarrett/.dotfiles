@@ -6,6 +6,7 @@
     pkgs.cargo
     pkgs.rustc
     pkgs.rust-analyzer
+    pkgs.gh
     #     viu
     #    firefox
     #    vscode
