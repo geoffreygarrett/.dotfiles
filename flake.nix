@@ -2,7 +2,7 @@
   description = "Cross-platform terminal setup with Home Manager";
 
   inputs = {
-    systems.url = "github:nix-systems/default-linux";
+    # systems.url = "github:nix-systems/default-linux";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -25,18 +25,30 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, pre-commit-hooks, nixgl, systems, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, pre-commit-hooks, nixgl, ... }@inputs:
     let
       inherit (self) outputs;
       lib = nixpkgs.lib // home-manager.lib;
-      overlays = [ nixgl.overlay ];
-      pkgsFor = lib.genAttrs (import systems) (
-        system:
-        import nixpkgs {
-          inherit system overlays;
-          config.allowUnfree = true;
-        }
-      );
+
+      # Conditionally include nixgl overlay for Linux systems
+      overlays = system:
+        if lib.hasPrefix "x86_64-linux" system || lib.hasPrefix "aarch64-linux" system
+        then [ nixgl.overlay ]
+        else [ ];
+      #pkgsFor = lib.genAttrs (import systems) (
+      #  system:
+      #  import nixpkgs {
+      #    inherit system overlays;
+      #    config.allowUnfree = true;
+      #  }
+      #);
+
+      pkgsFor = system: import nixpkgs {
+        system = system;
+        overlays = overlays system;
+        config.allowUnfree = true;
+      };
+
       supportedSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -49,14 +61,14 @@
       home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
       homeConfigurations = {
         "geoffrey@apollo" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor.x86_64-linux;
+          pkgs = pkgsFor "x86_64-linux";
           modules = [ ./nix/home/geoffrey/apollo.nix ./nix/hosts/apollo.nix ];
           extraSpecialArgs = {
             inherit inputs outputs;
           };
         };
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor.aarch64-darwin;
+          pkgs = pkgsFor "aarch64-darwin";
           modules = [ ./nix/darwin ./nix/home/geoffrey/artemis.nix ./nix/hosts/artemis.nix ];
           extraSpecialArgs = {
             inherit inputs outputs;
@@ -77,7 +89,7 @@
 
       apps = forAllSystems (system:
         let
-          pkgs = pkgsFor.${system};
+          pkgs = pkgsFor system;
         in
         {
           check = {
