@@ -101,7 +101,6 @@ process_hostname() {
     hostname -s 2>/dev/null | tr '[:upper:]' '[:lower:]' || echo "default"
 }
 
-# Check if Nix is installed and install it if it isn't
 ensure_nix() {
     if ! command -v nix &>/dev/null; then
         log "WARNING" "Nix is not installed. Installing..."
@@ -109,11 +108,44 @@ ensure_nix() {
             log "ERROR" "Failed to install Nix"
             exit 1
         fi
-        # Source nix
-        . "$HOME/.nix-profile/etc/profile.d/nix.sh"
     else
         log "SUCCESS" "Nix is already installed."
     fi
+
+    # Try to find and source the nix profile script
+    NIX_PROFILE_SCRIPTS=(
+        "$HOME/.nix-profile/etc/profile.d/nix.sh"
+        "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
+        "/nix/var/nix/profiles/default/etc/profile.d/nix.sh"
+    )
+
+    for script in "${NIX_PROFILE_SCRIPTS[@]}"; do
+        if [ -f "$script" ]; then
+            log "INFO" "Sourcing Nix profile script: $script"
+            # shellcheck disable=SC1090
+            . "$script"
+            break
+        fi
+    done
+
+    # Verify Nix installation
+    if command -v nix &>/dev/null; then
+        log "SUCCESS" "Nix is now available in the current session."
+        nix --version
+    else
+        log "WARNING" "Nix command is not available. There might be an issue with the Nix installation or environment setup."
+    fi
+
+    # Add Nix-related directories to PATH if they're not already there
+    if [[ ":$PATH:" != *":/nix/var/nix/profiles/default/bin:"* ]]; then
+        export PATH="/nix/var/nix/profiles/default/bin:$PATH"
+    fi
+    if [[ ":$PATH:" != *":$HOME/.nix-profile/bin:"* ]]; then
+        export PATH="$HOME/.nix-profile/bin:$PATH"
+    fi
+
+    log "DEBUG" "Current PATH: $PATH"
+}
 }
 
 # Clone the repository or update if it already exists
