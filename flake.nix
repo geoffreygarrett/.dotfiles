@@ -28,7 +28,6 @@
     let
       utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
       overlays = [ nixgl.overlay ];
-      localPkgs = import ./nix/nixpkgs { inherit nixpkgs; };
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
       mkPkgs = system: import nixpkgs {
