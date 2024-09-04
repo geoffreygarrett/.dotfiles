@@ -32,6 +32,11 @@ jobs:
           ls -la /nix/var/nix/profiles/default/etc/profile.d || true
           env | grep NIX
 
+      - name: Print Nix profile script content
+        run: |
+          echo "Content of /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh:"
+          cat /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || echo "File not found"
+
       - name: Run setup script
         run: |
           bash setup.sh -c
@@ -64,6 +69,7 @@ jobs:
           bash tests/unix/test_install.sh
           bash tests/unix/test_env.sh
           bash tests/unix/test_config.sh
+
 
   test-windows:
     name: Test on Windows
