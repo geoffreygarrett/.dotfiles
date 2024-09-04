@@ -20,7 +20,7 @@ LOCAL_DEV=false
 
 # Define keybinding constants as arrays
 KEYBINDINGS_LINUX=(
-    "<Super>Return:Alacritty:$HOME/.nix-profile/bin/alacritty-gl"
+    "<Super>Return:Alacritty:$HOME/.local/bin/alacritty-gl"
     "<Super>F:Alacritty Fullscreen:wmctrl -r :ACTIVE: -b toggle,fullscreen"
 )
 KEYBINDINGS_MACOS=(
@@ -32,6 +32,7 @@ KEYBINDINGS_MACOS=(
 log() {
     local level="$1"
     local message="$2"
+    # shellcheck disable=SC2034
     local verbose_only="${3:-false}"
 
     local level_priority
