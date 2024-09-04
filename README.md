@@ -8,8 +8,9 @@ Windows, macOS, and Linux.
 This repository provides configuration files and setup scripts for a unified terminal experience. It configures:
 
 - [Alacritty](https://github.com/alacritty/alacritty): A fast, cross-platform, OpenGL terminal emulator
-- [Zellij](https://github.com/zellij-org/zellij): A terminal workspace with batteries included
+- [Zellij](https://github.com/zellij-org/zellij): A terminal workspace (multiplexer) with batteries included
 - [Neovim](https://neovim.io/): Hyper-extensible Vim-based text editor
+
 
 ## Features
 
@@ -27,11 +28,8 @@ This repository provides configuration files and setup scripts for a unified ter
 The setup script will automatically install:
 
 - Git
-- Ansible
-- Required package managers:
-    - apt (Linux)
-    - [Homebrew](https://brew.sh/) (macOS)
-    - [Chocolatey](https://chocolatey.org/) (Windows)
+- Required package manager:
+    - `nix`
 
 ## Installation
 
@@ -92,11 +90,11 @@ Configuration file: `config/alacritty/alacritty.yml`
 
 ### Zellij
 
-Configuration file: `config/zellij/config.yaml`
+Configuration file: `config/zellij/config.kdl`
 
 ### Neovim
 
-Configuration file: `config/nvim/init.vim`
+Configuration file: `config/nvim/init.lua`
 
 Modify these files to customize your setup. After making changes, run the setup script with the `--update` flag to apply
 them.

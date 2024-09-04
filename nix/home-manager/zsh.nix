@@ -80,7 +80,6 @@ in
       setopt +o nomatch
       setopt PROMPT_SUBST
       export KEYTIMEOUT=1
-      export ZELLIJ=1
 
       # Vi mode indicator
       vim_ins_mode="%{$fg[green]%}|%{$reset_color%}"
@@ -129,7 +128,6 @@ in
       if [ -f $HOME/.zshrc.local ]; then
         source $HOME/.zshrc.local
       fi
-
     '';
 
     dirHashes = {

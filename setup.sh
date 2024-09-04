@@ -235,7 +235,7 @@ setup_shortcuts() {
             setup_linux_shortcuts
             ;;
         Darwin)
-            setup_macos_shortcuts
+#            setup_macos_shortcuts
             ;;
         MINGW*|MSYS*|CYGWIN*)
             log "WARNING" "Keyboard shortcut setup for Windows is managed in the PowerShell script."

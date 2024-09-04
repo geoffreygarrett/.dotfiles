@@ -146,30 +146,32 @@
           username = "geoffrey";
           hostname = "apollo";
           extraModules = [
-            ({ pkgs, ... }: let
-              myPkgs = mkPkgs "x86_64-linux";
-            in {
-              home.packages = [
-                myPkgs.nixgl.auto.nixGLDefault
-              ];
-              home.file.".local/bin/alacritty-gl" = {
-                text = ''
-                  #!/bin/sh
-                  ${myPkgs.nixgl.auto.nixGLDefault}/bin/nixGL ${pkgs.alacritty}/bin/alacritty "$@"
-                '';
-                executable = true;
-              };
-              home.sessionVariables = {
-                NIXGL = "${myPkgs.nixgl.auto.nixGLDefault}/bin/nixGL";
-              };
-            })
+            ({ pkgs, ... }:
+              let
+                myPkgs = mkPkgs "x86_64-linux";
+              in
+              {
+                home.packages = [
+                  myPkgs.nixgl.auto.nixGLDefault
+                ];
+                home.file.".local/bin/alacritty-gl" = {
+                  text = ''
+                    #!/bin/sh
+                    ${myPkgs.nixgl.auto.nixGLDefault}/bin/nixGL ${pkgs.alacritty}/bin/alacritty "$@"
+                  '';
+                  executable = true;
+                };
+                home.sessionVariables = {
+                  NIXGL = "${myPkgs.nixgl.auto.nixGLDefault}/bin/nixGL";
+                };
+              })
           ];
         };
 
-        "geoffreygarrett@geoffreys-macbook-air" = utils.mkHomeConfiguration {
+        "geoffreygarrett@artemis" = utils.mkHomeConfiguration {
           system = "aarch64-darwin";
           username = "geoffreygarrett";
-          hostname = "geoffreys-macbook-air";
+          hostname = "artemis";
           extraModules = [
             ({ pkgs, ... }:
               let

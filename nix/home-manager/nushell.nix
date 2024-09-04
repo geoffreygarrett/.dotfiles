@@ -5,9 +5,17 @@ in
 {
   programs.nushell = {
     enable = true;
+    extraConfig = ''
+
+
+    '';
   };
 
   programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
+  xdg.configFile."nushell" = {
+    source = ../../dotfiles/nushell;
+    recursive = true;
+  };
 
   # Install additional tools that were used in the Zsh config
   home.packages = with pkgs; [
