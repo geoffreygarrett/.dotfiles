@@ -6,29 +6,18 @@ in
   programs.nushell = {
     enable = true;
     extraConfig = ''
-
-
+      $env.config = {
+             show_banner: false,
+             };
     '';
-  };
 
+    #    configFile.source = ../../dotfiles/nushell/config.nu;
+    #    envFile.source = ../../dotfiles/nushell/env.nu;
+
+  };
+  #  home.packages = with pkgs; [
+  #   cargo
+  #  ];
   programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
-  xdg.configFile."nushell" = {
-    source = ../../dotfiles/nushell;
-    recursive = true;
-  };
 
-  # Install additional tools that were used in the Zsh config
-  home.packages = with pkgs; [
-    fzf
-    bat
-    fd
-    direnv
-    starship
-  ];
-
-  # Configure Starship prompt for Nushell
-  programs.starship = {
-    enable = true;
-    enableNushellIntegration = true;
-  };
 }
