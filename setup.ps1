@@ -1,10 +1,11 @@
-# PowerShell Script for WSL2 Installation and Setup
+# PowerShell Script for WSL2 Installation and Nix Setup
 
 # Parameters (can be overridden when calling the script)
 param (
     [string]$WSL_DISTRO = "Ubuntu-20.04",
     [string]$GITHUB_USERNAME = "geoffreygarrett",
-    [string]$REPO_NAME = "celestial-blueprint"
+    [string]$REPO_NAME = "celestial-blueprint",
+    [switch]$CI_MODE = $false
 )
 
 # Ensure the script is running with administrator privileges
@@ -61,11 +62,11 @@ function SetupWindowsShortcuts {
     $Shortcut.TargetPath = "C:\Program Files\Alacritty\alacritty.exe"
     $Shortcut.Save()
 
-    # Set up hotkey for Alacritty (Ctrl+Alt+T)
+    # Set up hotkey for Alacritty (Win+Enter)
     $bytes = [System.IO.File]::ReadAllBytes("$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Alacritty.lnk")
     $bytes[0x15] = $bytes[0x15] -bor 0x80
-    $bytes[0x16] = $bytes[0x16] -bor 0x40
-    $bytes[0x17] = $bytes[0x17] -bor 0x20
+    $bytes[0x16] = $bytes[0x16] -bor 0x00
+    $bytes[0x17] = $bytes[0x17] -bor 0x0D
     [System.IO.File]::WriteAllBytes("$env:USERPROFILE\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Alacritty.lnk", $bytes)
 
     Log "Windows keyboard shortcuts set up successfully."
@@ -76,24 +77,31 @@ function CloneAndRunSetup {
     Log "Cloning the repository..."
     git clone $REPO_URL
 
+    # Determine setup script arguments
+    $setupArgs = if ($CI_MODE) { "-c" } else { "" }
+
     # Run setup.sh within WSL
     Log "Running setup.sh within WSL..."
-    wsl -d $WSL_DISTRO -- bash -c "cd /mnt/c/Users/$env:USERNAME/$REPO_NAME && bash setup.sh"
+    wsl -d $WSL_DISTRO -- bash -c "cd /mnt/c/Users/$env:USERNAME/$REPO_NAME && bash setup.sh $setupArgs"
 }
 
 # Script Execution
 try {
     InstallWSL
     CloneAndRunSetup
-    SetupWindowsShortcuts
+    if (-not $CI_MODE) {
+        SetupWindowsShortcuts
+    }
     Log "Setup completed successfully!"
 } catch {
     Log "An error occurred: $_"
     exit 1
 }
 
-# Prompt user to restart
-$restart = Read-Host "A system restart is recommended. Would you like to restart now? (y/n)"
-if ($restart -eq 'y') {
-    Restart-Computer
+# Prompt user to restart if not in CI mode
+if (-not $CI_MODE) {
+    $restart = Read-Host "A system restart is recommended. Would you like to restart now? (y/n)"
+    if ($restart -eq 'y') {
+        Restart-Computer
+    }
 }

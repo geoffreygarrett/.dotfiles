@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run setup script
         run: |
-          bash setup.sh --ci --update
+          bash setup.sh --c
       - name: Run tests
         run: |
           bash tests/unix/test_install.sh
@@ -33,7 +33,7 @@ jobs:
       - name: Run setup script
         shell: pwsh
         run: |
-          .\setup.ps1 -CI -Update
+          .\setup.ps1 -CI_MODE
       - name: Run tests
         shell: pwsh
         run: |

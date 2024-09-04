@@ -17,6 +17,7 @@ readonly REPO_URL="https://github.com/${GITHUB_USERNAME}/${REPO_NAME}.git"
 VERBOSE=false
 LOG_LEVEL="INFO"
 LOCAL_DEV=false
+CI_MODE=false
 
 # Define keybinding constants as arrays
 KEYBINDINGS_LINUX=(
@@ -247,9 +248,10 @@ setup_shortcuts() {
     esac
 }
 
+# Modify the main function
 main() {
     # Parse command line arguments
-    while getopts ":vl:d" opt; do
+    while getopts ":vl:dc" opt; do
         case ${opt} in
             v )
                 VERBOSE=true
@@ -260,6 +262,10 @@ main() {
                 ;;
             d )
                 LOCAL_DEV=true
+                ;;
+            c )
+                CI_MODE=true
+                LOG_LEVEL="DEBUG"
                 ;;
             \? )
                 log "ERROR" "Invalid Option: -$OPTARG" 1>&2
@@ -273,10 +279,25 @@ main() {
     if [ "$LOCAL_DEV" = true ]; then
         log "INFO" "Running in local development mode"
     fi
+    if [ "$CI_MODE" = true ]; then
+        log "INFO" "Running in CI mode"
+    fi
+
     ensure_nix
-    clone_or_update_repo
-    run_flake
-    setup_shortcuts
+
+    if [ "$CI_MODE" = false ]; then
+        clone_or_update_repo
+    fi
+
+    if ! run_flake; then
+        log "ERROR" "Failed to run Nix flake"
+        exit 1
+    fi
+
+    if [ "$CI_MODE" = false ]; then
+        setup_shortcuts
+    fi
+
     log "SUCCESS" "Setup completed successfully!"
 }
 

@@ -48,6 +48,7 @@ check_root() {
 # Function to safely remove a file or directory
 safe_remove() {
     if [[ -e "$1" ]]; then
+        # shellcheck disable=SC2015
         rm -rf "$1" && log INFO "Removed: $1" || log WARN "Failed to remove: $1"
     fi
 }
@@ -56,6 +57,7 @@ safe_remove() {
 remove_nix_lines() {
     local file="$1"
     if [[ -f "$file" ]]; then
+        # shellcheck disable=SC2155
         local temp_file=$(mktemp)
         sed '/^# Nix$/,/^# End Nix$/d' "$file" > "$temp_file"
         if ! diff "$file" "$temp_file" >/dev/null 2>&1; then
@@ -87,6 +89,7 @@ remove_fish_config() {
 handle_backup() {
     local file="$1"
     local backup="${file}.backup-before-nix"
+    # shellcheck disable=SC2155
     local timestamp=$(date +%Y%m%d%H%M%S)
 
     if [[ -f "$backup" ]]; then
@@ -145,7 +148,7 @@ uninstall_nix_linux() {
 
     # Remove build users and their group
     for i in $(seq 1 32); do
-        userdel nixbld$i 2>/dev/null || log WARN "Failed to remove user nixbld$i"
+        userdel nixbld"$i" 2>/dev/null || log WARN "Failed to remove user nixbld$i"
     done
     groupdel nixbld 2>/dev/null || log WARN "Failed to remove group nixbld"
     log INFO "Attempted to remove Nix build users and group"
@@ -173,7 +176,7 @@ uninstall_nix_macos() {
     # Remove nixbld group and users
     dscl . -delete /Groups/nixbld 2>/dev/null || log WARN "Failed to remove nixbld group"
     for u in $(dscl . -list /Users | grep _nixbld); do
-        dscl . -delete /Users/$u 2>/dev/null || log WARN "Failed to remove user $u"
+        dscl . -delete /Users/"$u" 2>/dev/null || log WARN "Failed to remove user $u"
     done
     log INFO "Attempted to remove Nix build users and group"
 
@@ -217,7 +220,8 @@ uninstall_nix() {
     fi
 
     # Remove Nix from PATH
-    export PATH=$(echo $PATH | tr ':' '\n' | grep -v '/nix/store' | tr '\n' ':' | sed 's/:$//')
+    # shellcheck disable=SC2155
+    export PATH=$(echo "$PATH" | tr ':' '\n' | grep -v '/nix/store' | tr '\n' ':' | sed 's/:$//')
 
     log INFO "Nix uninstallation process completed."
     log WARN "Please restart your system to ensure all changes take effect."
