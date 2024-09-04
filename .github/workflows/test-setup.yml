@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +41,7 @@ jobs:
           echo "PATH after setup: $PATH"
           which nix || true
           nix --version || true
+          ls -la $HOME/.dotfiles || true
 
       - name: Source Nix environment and run tests
         run: |
@@ -48,8 +49,8 @@ jobs:
           if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
             . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
           fi
-          if [ -e '$HOME/.nix-profile/etc/profile.d/nix.sh' ]; then
-            . '$HOME/.nix-profile/etc/profile.d/nix.sh'
+          if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
+            . "$HOME/.nix-profile/etc/profile.d/nix.sh"
           fi
           
           # Add Nix bin directories to PATH

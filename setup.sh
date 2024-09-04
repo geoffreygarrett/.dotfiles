@@ -123,7 +123,7 @@ ensure_nix() {
         if [ -f "$script" ]; then
             log "INFO" "Sourcing Nix profile script: $script"
             # shellcheck disable=SC1090
-            . "$script"
+            . "$script" || log "WARNING" "Failed to source $script"
             break
         fi
     done
@@ -314,7 +314,7 @@ main() {
         log "INFO" "Running in CI mode"
     fi
 
-    ensure_nix
+   ensure_nix
     log "DEBUG" "Nix version: $(nix --version)"
     log "DEBUG" "Nix store path: $(nix-store --version)"
     log "DEBUG" "Current user: $(whoami)"
@@ -324,10 +324,7 @@ main() {
         clone_or_update_repo
     fi
 
-    if ! run_flake; then
-        log "ERROR" "Failed to run Nix flake"
-        exit 1
-    fi
+    run_flake
 
     if [ "$CI_MODE" = false ]; then
         setup_shortcuts
