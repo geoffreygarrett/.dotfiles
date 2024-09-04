@@ -91,6 +91,8 @@
           src = ./.;
           hooks = {
             nixpkgs-fmt.enable = true;
+            beautysh.enable = true;
+            commitizen.enable = true;
           };
         };
       });
