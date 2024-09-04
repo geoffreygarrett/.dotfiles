@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run setup script
         run: |
-          bash setup.sh --c
+          bash setup.sh -c
       - name: Run tests
         run: |
           bash tests/unix/test_install.sh
