@@ -3,6 +3,8 @@
 A streamlined, one-command setup for a consistent terminal environment with Alacritty, Zellij, and Neovim across
 Windows, macOS, and Linux.
 
+![img.png](img.png)
+
 ## Overview
 
 This repository provides configuration files and setup scripts for a unified terminal experience. It configures:
