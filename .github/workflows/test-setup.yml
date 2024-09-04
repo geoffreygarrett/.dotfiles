@@ -1,4 +1,4 @@
-name: 🛠️ Cross-Platform Setup Testing
+name: Nix Setup Testing
 
 on:
   push:
@@ -7,133 +7,42 @@ on:
     branches: [ '*' ]
 
 jobs:
-  prepare:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up environment variables
-        run: |
-          BRANCH="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
-          echo "BRANCH=$BRANCH" >> $GITHUB_ENV
-          echo "REPO_URL=${{ github.repository }}" >> $GITHUB_ENV
-    outputs:
-      branch: ${{ env.BRANCH }}
-      repo_url: ${{ env.REPO_URL }}
-
   test-unix:
-    needs: prepare
-    name: Test on ${{ matrix.name }}
+    name: Test on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: ubuntu-latest
-            name: Ubuntu
-          - os: ubuntu-20.04
-            name: Ubuntu 20.04
-          - os: macos-latest
-            name: macOS
-          - os: ubuntu-latest
-            name: Fedora
-            container: fedora:latest
-          - os: ubuntu-latest
-            name: CentOS
-            container: centos:7
-          - os: ubuntu-latest
-            name: Debian
-            container: debian:stable
+        os: [ubuntu-latest, macos-latest]
     steps:
-      - name: Install prerequisites (for containers)
-        if: matrix.container
+      - uses: actions/checkout@v4
+      - name: Run setup script
         run: |
-          if command -v apt-get &> /dev/null; then
-            apt-get update && apt-get install -y curl sudo
-          elif command -v dnf &> /dev/null; then
-            dnf install -y curl sudo
-          elif command -v yum &> /dev/null; then
-            yum install -y curl sudo
-          fi
-      - name: Fix CentOS repositories
-        if: matrix.name == 'CentOS'
+          bash setup.sh --ci --update
+      - name: Run tests
         run: |
-          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-          yum update -y
-      - name: Test setup
-        run: |
-          set -euo pipefail
-          curl -sSL "https://raw.githubusercontent.com/${{ needs.prepare.outputs.repo_url }}/${{ needs.prepare.outputs.branch }}/setup.sh" | bash -s -- --ci
-
-      - name: Verify installation
-        shell: bash
-        run: |
-          # Source the profile to ensure all commands are available
-          source ~/.bashrc || source ~/.zshrc || true
-          
-          # Verify that the necessary tools are installed
-          commands=("nvim" "zellij" "alacritty")
-          for cmd in "${commands[@]}"; do
-            if command -v $cmd &> /dev/null; then
-              echo "$cmd is installed"
-            else
-              echo "$cmd is not installed"
-              exit 1
-            fi
-          done
-
-
-      - name: Upload logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: setup-logs-${{ matrix.name }}
-          path: ~/.gg/install_log.txt
-          if-no-files-found: warn
+          bash tests/unix/test_install.sh
+          bash tests/unix/test_env.sh
+          bash tests/unix/test_config.sh
 
   test-windows:
-    needs: prepare
     name: Test on Windows
     runs-on: windows-latest
     steps:
-      - name: Test setup
+      - uses: actions/checkout@v4
+      - name: Run setup script
         shell: pwsh
         run: |
-          $ErrorActionPreference = "Stop"
-          $ProgressPreference = "SilentlyContinue"
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/${{ needs.prepare.outputs.repo_url }}/${{ needs.prepare.outputs.branch }}/setup.bat" -OutFile setup.bat
-          if (Test-Path setup.bat) {
-            Write-Host "Running setup.bat with -CI argument"
-            & .\setup.bat -CI
-          } else {
-            Write-Error "setup.bat not found"
-            exit 1
-          }
-
-      - name: Verify installation
+          .\setup.ps1 -CI -Update
+      - name: Run tests
         shell: pwsh
         run: |
-          foreach ($cmd in @("nvim", "zellij")) {
-            if (Get-Command $cmd -ErrorAction SilentlyContinue) {
-              Write-Output "$cmd is installed"
-            } else {
-              Write-Error "$cmd is not installed"
-              exit 1
-            }
-          }
-      - name: Upload logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v4.3.1
-        with:
-          name: setup-logs-Windows
-          path: ${{ env.USERPROFILE }}\.gg\install_log.txt
-          if-no-files-found: warn
+          .\tests\windows\test_install.ps1
+          .\tests\windows\test_env.ps1
+          .\tests\windows\test_config.ps1
 
   all-tests-passed:
-    needs: [ test-unix, test-windows ]
+    needs: [test-unix, test-windows]
     runs-on: ubuntu-latest
     steps:
-      - name: All tests passed
-        run: echo "All setup tests passed successfully!"
+      - run: echo "All setup tests passed successfully!"
