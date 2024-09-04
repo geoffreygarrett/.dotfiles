@@ -316,6 +316,10 @@ main() {
     fi
 
     ensure_nix
+    log "DEBUG" "Nix version: $(nix --version)"
+    log "DEBUG" "Nix store path: $(nix-store --version)"
+    log "DEBUG" "Current user: $(whoami)"
+    log "DEBUG" "Home directory: $HOME"
 
     if [ "$CI_MODE" = false ]; then
         clone_or_update_repo
