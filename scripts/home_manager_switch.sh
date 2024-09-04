@@ -30,7 +30,7 @@ if nix run --quiet "$FLAKE_DIR#homeConfigurations.$FULL_CONFIG.activationPackage
     echo "Home Manager switch completed successfully."
 else
     echo "Error occurred during Home Manager switch. Full output:"
-    nix run "$FLAKE_DIR#homeConfigurations.$FULL_CONFIG.activationPackage"
+    nix run --impure "$FLAKE_DIR#homeConfigurations.$FULL_CONFIG.activationPackage"
     exit 1
 fi
 

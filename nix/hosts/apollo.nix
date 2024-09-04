@@ -1,18 +1,18 @@
 { config, pkgs, ... }:
 
 {
-  # User and home directory information
-  home.username = "geoffrey";
-  home.homeDirectory = "/home/geoffrey";
-
-  # Home Manager state version
-  home.stateVersion = "24.05";
-
-  # Enable Home Manager
-  programs.home-manager.enable = true;
-
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  #  # User and home directory information
+  #  home.username = "geoffrey";
+  #  home.homeDirectory = "/home/geoffrey";
+  #
+  #  # Home Manager state version
+  #  home.stateVersion = "24.05";
+  #
+  #  # Enable Home Manager
+  #  programs.home-manager.enable = true;
+  #
+  #  # Allow unfree packages
+  #  nixpkgs.config.allowUnfree = true;
 
   # Packages specific to this Linux machine
   #  home.packages = with pkgs; [
@@ -25,11 +25,11 @@
   #  ];
 
   # Environment variables specific to this Linux machine
-  home.sessionVariables = {
-    EDITOR = "neovim";
-    BROWSER = "firefox";
-    PATH = "${config.home.homeDirectory}/bin:${pkgs.coreutils}/bin:${pkgs.zsh}/bin:$PATH";
-  };
+  #  home.sessionVariables = {
+  #    EDITOR = "neovim";
+  #    BROWSER = "firefox";
+  #    PATH = "${config.home.homeDirectory}/bin:${pkgs.coreutils}/bin:${pkgs.zsh}/bin:$PATH";
+  #  };
 
   # Zsh configuration
   #  programs.zsh = {
