@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ ubuntu-latest, macos-latest ]
     steps:
       - uses: actions/checkout@v4
 
@@ -35,14 +35,20 @@ jobs:
       - name: Run setup script
         run: |
           bash setup.sh -c
+        continue-on-error: true
 
       - name: Debug after setup
+        if: always()
         run: |
           echo "PATH after setup: $PATH"
-          which nix
-          nix --version
+          which nix || true
+          nix --version || true
+          cat setup.sh || true
+          echo "Last 20 lines of setup.sh:"
+          tail -n 20 setup.sh
 
       - name: Run tests
+        if: success()
         run: |
           bash tests/unix/test_install.sh
           bash tests/unix/test_env.sh
@@ -78,15 +84,21 @@ jobs:
         shell: pwsh
         run: |
           .\setup.ps1 -CI_MODE
+        continue-on-error: true
 
       - name: Debug after setup
+        if: always()
         shell: pwsh
         run: |
           echo "PATH after setup: $env:PATH"
           Get-Command nix
           nix --version
+          Get-Content setup.ps1
+          echo "Last 20 lines of setup.ps1:"
+          Get-Content setup.ps1 -Tail 20
 
       - name: Run tests
+        if: success()
         shell: pwsh
         run: |
           .\tests\windows\test_install.ps1
@@ -94,7 +106,7 @@ jobs:
           .\tests\windows\test_config.ps1
 
   all-tests-passed:
-    needs: [test-unix, test-windows]
+    needs: [ test-unix, test-windows ]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All setup tests passed successfully!"

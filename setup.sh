@@ -146,7 +146,6 @@ ensure_nix() {
 
     log "DEBUG" "Current PATH: $PATH"
 }
-}
 
 # Clone the repository or update if it already exists
 clone_or_update_repo() {
