@@ -97,6 +97,16 @@
         };
       });
 
+      apps = forAllSystems (system: {
+        check = {
+          type = "app";
+          program = toString (nixpkgs.legacyPackages.${system}.writeShellScript "run-checks" ''
+            ${self.checks.${system}.pre-commit-check.shellHook}
+            pre-commit run --all-files
+          '');
+        };
+      });
+
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;

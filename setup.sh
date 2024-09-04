@@ -101,7 +101,6 @@ process_hostname() {
     hostname -s 2>/dev/null | tr '[:upper:]' '[:lower:]' || echo "default"
 }
 
-
 ensure_nix() {
     if ! command -v nix &>/dev/null; then
         log "WARNING" "Nix is not installed. Installing..."
@@ -113,6 +112,21 @@ ensure_nix() {
         log "SUCCESS" "Nix is already installed."
     fi
 
+    # Custom function to source Nix profile script
+    source_nix_profile() {
+        local script="$1"
+        log "INFO" "Sourcing Nix profile script: $script"
+
+        # Export necessary variables without running problematic checks
+        export NIX_PROFILES="/nix/var/nix/profiles/default $HOME/.nix-profile"
+        export NIX_SSL_CERT_FILE="/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt"
+        export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+
+        # Source the script, but skip the ZSH_VERSION check
+        # shellcheck disable=SC1090
+        (grep -v 'ZSH_VERSION' "$script" | source /dev/stdin)
+    }
+
     # Try to find and source the nix profile script
     NIX_PROFILE_SCRIPTS=(
         "$HOME/.nix-profile/etc/profile.d/nix.sh"
@@ -122,16 +136,7 @@ ensure_nix() {
 
     for script in "${NIX_PROFILE_SCRIPTS[@]}"; do
         if [ -f "$script" ]; then
-            log "INFO" "Sourcing Nix profile script: $script"
-            # Temporarily set ZSH_VERSION to avoid errors in Bash
-            ZSH_VERSION_BACKUP=$ZSH_VERSION
-            unset ZSH_VERSION
-            # shellcheck disable=SC1090
-            . "$script" || log "WARNING" "Failed to source $script"
-            # Restore ZSH_VERSION if it was set
-            if [ -n "${ZSH_VERSION_BACKUP+x}" ]; then
-                ZSH_VERSION=$ZSH_VERSION_BACKUP
-            fi
+            source_nix_profile "$script"
             break
         fi
     done
@@ -142,14 +147,6 @@ ensure_nix() {
         nix --version
     else
         log "WARNING" "Nix command is not available. There might be an issue with the Nix installation or environment setup."
-    fi
-
-    # Add Nix-related directories to PATH if they're not already there
-    if [[ ":$PATH:" != *":/nix/var/nix/profiles/default/bin:"* ]]; then
-        export PATH="/nix/var/nix/profiles/default/bin:$PATH"
-    fi
-    if [[ ":$PATH:" != *":$HOME/.nix-profile/bin:"* ]]; then
-        export PATH="$HOME/.nix-profile/bin:$PATH"
     fi
 
     log "DEBUG" "Current PATH: $PATH"
@@ -173,8 +170,8 @@ clone_or_update_repo() {
     else
         log "INFO" "Updating repository in $dotfiles_dir"
         if ! (cd "$dotfiles_dir" && git pull --rebase 2>&1 | while IFS= read -r line; do
-            vlog "$line"
-        done); then
+                vlog "$line"
+            done); then
             log "ERROR" "Failed to update repository"
             exit 1
         fi
@@ -188,7 +185,7 @@ run_flake() {
     log "INFO" "Running Nix flake in: $dotfiles_dir"
     if ! nix run --impure "${dotfiles_dir}#homeConfigurations.$(whoami)@$(process_hostname).activationPackage" 2>&1 | while IFS= read -r line; do
         vlog "$line"
-    done; then
+        done; then
         log "ERROR" "Failed to run Nix flake"
         exit 1
     fi
@@ -276,7 +273,7 @@ setup_shortcuts() {
             setup_linux_shortcuts
             ;;
         Darwin)
-#            setup_macos_shortcuts
+            #            setup_macos_shortcuts
             ;;
         MINGW*|MSYS*|CYGWIN*)
             log "WARNING" "Keyboard shortcut setup for Windows is managed in the PowerShell script."
@@ -322,7 +319,7 @@ main() {
         log "INFO" "Running in CI mode"
     fi
 
-   ensure_nix
+    ensure_nix
     log "DEBUG" "Nix version: $(nix --version)"
     log "DEBUG" "Nix store path: $(nix-store --version)"
     log "DEBUG" "Current user: $(whoami)"

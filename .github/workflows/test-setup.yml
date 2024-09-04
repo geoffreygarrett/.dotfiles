@@ -22,24 +22,20 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
-      - name: Debug Nix installation
+      - name: Debug before setup
         run: |
           echo "HOME: $HOME"
           echo "PATH: $PATH"
+          echo "SHELL: $SHELL"
           nix --version
           nix-env --version
           ls -la $HOME/.nix-profile/etc/profile.d || true
           ls -la /nix/var/nix/profiles/default/etc/profile.d || true
           env | grep NIX
 
-      - name: Print Nix profile script content
-        run: |
-          echo "Content of /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh:"
-          cat /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh || echo "File not found"
-
       - name: Run setup script
         run: |
-          bash setup.sh -c
+          bash -x setup.sh -c
 
       - name: Debug after setup
         run: |
@@ -47,6 +43,8 @@ jobs:
           which nix || true
           nix --version || true
           ls -la $HOME/.dotfiles || true
+          echo "Environment variables after setup:"
+          env | sort
 
       - name: Source Nix environment and run tests
         run: |
@@ -69,7 +67,6 @@ jobs:
           bash tests/unix/test_install.sh
           bash tests/unix/test_env.sh
           bash tests/unix/test_config.sh
-
 
   test-windows:
     name: Test on Windows
