@@ -6,7 +6,12 @@
     pkgs.cargo
     pkgs.rustc
     pkgs.rust-analyzer
-    pkgs.gh
+    pkgs.sops
+    pkgs.fastfetch
+
+    # SECRETS
+    pkgs.age
+    pkgs.micromamba
     #     viu
     #    firefox
     #    vscode

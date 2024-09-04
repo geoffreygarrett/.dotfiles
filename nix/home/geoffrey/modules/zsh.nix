@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, config, lib, self, ... }:
 
 let
   shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
@@ -42,6 +42,7 @@ in
     shellAliases = shellAliasesConfig.shellAliases.zsh;
 
     sessionVariables = {
+      FLAKE = "$HOME/.dotfiles";
       LANG = "en_US.UTF-8";
       TERM = "xterm-256color";
       EDITOR = "nvim";
@@ -57,6 +58,7 @@ in
     };
 
     initExtra = ''
+      export FLAKE="$HOME/.dotfiles"
       # if starship is installed, load it
       # if starship is installed, load it
       if command -v starship &> /dev/null; then

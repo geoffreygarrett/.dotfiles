@@ -2,6 +2,7 @@
   description = "Cross-platform terminal setup with Home Manager";
 
   inputs = {
+    systems.url = "github:nix-systems/default-linux";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -24,62 +25,44 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, pre-commit-hooks, nixgl, ... }@inputs:
+  outputs = { self, nixpkgs, home-manager, pre-commit-hooks, nixgl, systems, ... }@inputs:
     let
-      utils = import ./nix/utils.nix { inherit nixpkgs home-manager; };
+      inherit (self) outputs;
+      lib = nixpkgs.lib // home-manager.lib;
       overlays = [ nixgl.overlay ];
-      supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+      pkgsFor = lib.genAttrs (import systems) (
+        system:
+        import nixpkgs {
+          inherit system overlays;
+          config.allowUnfree = true;
+        }
+      );
+      supportedSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      mkPkgs = system: import nixpkgs {
-        inherit system overlays;
-        config.allowUnfree = true;
-      };
     in
     {
-
+      home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
       homeConfigurations = {
-        "geoffrey@apollo" = utils.mkHomeConfiguration {
-          system = "x86_64-linux";
-          username = "geoffrey";
-          hostname = "apollo";
-          extraModules = [
-            ./nix/home
-            ({ pkgs, ... }:
-              let
-                myPkgs = mkPkgs "x86_64-linux";
-              in
-              {
-                home.packages = [
-                  myPkgs.nixgl.auto.nixGLDefault
-                ];
-                home.file.".local/bin/alacritty-gl" = {
-                  text = ''
-                    #!/bin/sh
-                    ${myPkgs.nixgl.auto.nixGLDefault}/bin/nixGL ${pkgs.alacritty}/bin/alacritty "$@"
-                  '';
-                  executable = true;
-                };
-                home.sessionVariables = {
-                  NIXGL = "${myPkgs.nixgl.auto.nixGLDefault}/bin/nixGL";
-                };
-              })
-
-            ./nix/hosts/apollo.nix
-          ];
+        "geoffrey@apollo" = lib.homeManagerConfiguration {
+          pkgs = pkgsFor.x86_64-linux;
+          modules = [ ./nix/home/geoffrey/apollo.nix ./nix/hosts/apollo.nix ];
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
-
-        "geoffreygarrett@artemis" = utils.mkHomeConfiguration {
-          system = "aarch64-darwin";
-          username = "geoffreygarrett";
-          hostname = "artemis";
-          extraModules = [
-            ./nix/home
-            ./nix/darwin
-            ./nix/hosts/artemis.nix
-          ];
+        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
+          pkgs = pkgsFor.aarch64-darwin;
+          modules = [ ./nix/darwin ./nix/home/geoffrey/artemis.nix ./nix/hosts/artemis.nix ];
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
       };
-
       checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
         // forAllSystems (system: {
         pre-commit-check = pre-commit-hooks.lib.${system}.run {
@@ -94,7 +77,7 @@
 
       apps = forAllSystems (system:
         let
-          pkgs = mkPkgs system;
+          pkgs = pkgsFor.${system};
         in
         {
           check = {

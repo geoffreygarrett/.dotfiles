@@ -181,6 +181,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
+    require("plugins.chatgpt"),
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	"folke/zen-mode.nvim", -- Distraction-free coding
@@ -474,19 +475,19 @@ require("lazy").setup({
 		opts = {},
 	},
 
-	{
-		"jackMort/ChatGPT.nvim",
-		event = "VeryLazy",
-		config = function()
-			require("chatgpt").setup()
-		end,
-		dependencies = {
-			"MunifTanjim/nui.nvim",
-			"nvim-lua/plenary.nvim",
-			"folke/trouble.nvim",
-			"nvim-telescope/telescope.nvim",
-		},
-	},
+	--{
+	--	"jackMort/ChatGPT.nvim",
+	--	event = "VeryLazy",
+	--	config = function()
+	--		require("chatgpt").setup()
+	--	end,
+	--	dependencies = {
+	--		"MunifTanjim/nui.nvim",
+	--		"nvim-lua/plenary.nvim",
+	--		"folke/trouble.nvim",
+	--		"nvim-telescope/telescope.nvim",
+	--	},
+	--},
 
 	-- NOTE: Plugins can also be configured to run Lua code when they are loaded.
 	--

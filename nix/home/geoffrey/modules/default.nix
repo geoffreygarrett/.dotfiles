@@ -5,6 +5,7 @@
     ./alacritty.nix
     ./zellij.nix
     ./git.nix
+    ./gh.nix
     ./packages.nix
     ./zsh.nix
     ./nushell.nix

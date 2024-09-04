@@ -64,10 +64,11 @@ let
     (mkAlias "k" "kubectl" "" "Alias for kubectl." shells)
     (mkAlias "pc" "podmanCompose" "" "Alias for podman-compose." shells)
     (mkAlias "viu" "${dependencies.viu.bin}" "" "Alias for viu." shells)
+    #    (mkAlias "neofetch" "fastfetch" "" "Show system information." shells)
     (mkAlias "kpods" "kubectl" "get pods --all-namespaces | grep -v 'kube-system'" "Get all Kubernetes pods excluding the kube-system namespace." shells)
     #(mkAlias "kbox"     "kubectl"  "run temp-pod --rm -i --tty --image=${dependencies.busybox.pkg}/bin/busybox -- /bin/sh" "Run a temporary pod in Kubernetes with a Busybox shell." shells)
-    (mkAlias "rh1" null "nix run .#homeConfigurations.$(whoami)@$(hostname).activationPackage && exec zsh" "Apply home configuration changes and restart shell." shells)
-    (mkAlias "rh" null "${pkgs.bash}/bin/bash ${./rh.sh}" "Apply home configuration changes and restart shell." { zsh = true; nu = true; bash = false; fish = false; })
+    #    (mkAlias "rh1" null "nix run .#homeConfigurations.$(whoami)@$(hostname).activationPackage && exec zsh" "Apply home configuration changes and restart shell." shells)
+    #    (mkAlias "rh" null "${pkgs.bash}/bin/bash ${./rh.sh}" "Apply home configuration changes and restart shell." { zsh = true; nu = true; bash = false; fish = false; })
     (mkAlias "prb" null "cat ~/Downloads/out2.xlsx | from xlsx" "Show PRBs" { zsh = false; nu = true; bash = false; fish = false; })
     (mkAlias "delete-images" null ''
       alias delete-images='f() {

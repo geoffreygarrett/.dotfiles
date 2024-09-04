@@ -8,7 +8,7 @@ in
     extraConfig = ''
       $env.config = {
              show_banner: false,
-             };
+      };
     '';
 
     #    configFile.source = ../../dotfiles/nushell/config.nu;
