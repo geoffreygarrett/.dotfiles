@@ -67,6 +67,8 @@
 #      };
     in {
       home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
+      home-manager.syncthing.enable = true;
+      home-manager.syncthing.tray.enable = true;
       homeConfigurations = {
         "geoffrey@apollo" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "x86_64-linux";

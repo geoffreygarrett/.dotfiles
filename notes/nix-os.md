@@ -24,3 +24,12 @@
 
 Note: This table provides a high-level comparison and doesn't cover all aspects of both operating systems. For more
 detailed information, please refer to the official documentation of Ubuntu and NixOS.
+
+## Secrets
+
+- https://lgug2z.com/articles/handling-secrets-in-nixos-an-overview/
+
+
+## Amazing 
+
+- https://github.com/dustinlyons/nixos-config/tree/main

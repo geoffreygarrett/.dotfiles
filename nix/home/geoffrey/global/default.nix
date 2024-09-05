@@ -1,15 +1,24 @@
 # Reference
 # - [1]
-{ inputs, lib, pkgs, config, outputs, ... }: {
-  imports = [
+{ inputs
+, lib
+, pkgs
+, config
+, outputs
+, ...
+}: {
+  imports =
+    [
 
-    inputs.sops-nix.homeManagerModules.sops
-    #      inputs.impermanence.nixosModules.home-manager.impermanence
-    #      ../features/cli
-    #      ../features/nvim
-    ../modules
-  ];
+      inputs.sops-nix.homeManagerModules.sops
+      #      inputs.impermanence.nixosModules.home-manager.impermanence
+      #      ../features/cli
+      #      ../features/nvim
+      ../modules/shared
+    ];
   #    ++ (builtins.attrValues outputs.homeManagerModules);
+
+
 
   #  nix = {
   #    package = lib.mkDefault pkgs.nix;
@@ -122,6 +131,7 @@
       EDITOR = "neovim";
       # BROWSER = "firefox";
     };
+
 
     #    persistence = {
     #      "/persist/${config.home.homeDirectory}" = {
