@@ -1,5 +1,4 @@
-{ config, lib, pkgs, ... }:
-{
+{ config, lib, pkgs, ... }: {
   home.stateVersion = "22.11";
   imports = [
     ./alacritty.nix
@@ -22,9 +21,6 @@
   fonts.fontconfig.enable = true;
 
   # Add these packages to ensure OpenGL and GLX are installed
-  home.packages = with pkgs; [
-    (pkgs.nerdfonts.override {
-      fonts = [ "JetBrainsMono" ];
-    })
-  ];
+  home.packages = with pkgs;
+    [ (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }) ];
 }

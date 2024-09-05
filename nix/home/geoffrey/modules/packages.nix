@@ -12,6 +12,9 @@
     # SECRETS
     pkgs.age
     pkgs.micromamba
+    pkgs.nixfmt
+    pkgs.libiconv
+    pkgs.rust-script
     #     viu
     #    firefox
     #    vscode

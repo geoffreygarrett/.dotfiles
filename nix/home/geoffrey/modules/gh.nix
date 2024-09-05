@@ -8,11 +8,8 @@ let
     export GITHUB_TOKEN
     ${pkgs.gh}/bin/gh "$@"
   '';
-in
-{
-  sops.secrets.github_token = {
-    sopsFile = config.sops.defaultSopsFile;
-  };
+in {
+  sops.secrets.github_token = { sopsFile = config.sops.defaultSopsFile; };
   programs.gh = {
     enable = true;
     package = gh-wrapped;
@@ -53,11 +50,10 @@ in
     };
     Service = {
       Type = "oneshot";
-      ExecStart = "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github_token.path}";
+      ExecStart =
+        "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github_token.path}";
     };
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
+    Install = { WantedBy = [ "default.target" ]; };
   };
 }
 

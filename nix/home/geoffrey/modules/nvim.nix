@@ -28,11 +28,8 @@ let
         ;;
     esac
   '';
-in
-{
-  sops.secrets.openai_api_key = {
-    sopsFile = config.sops.defaultSopsFile;
-  };
+in {
+  sops.secrets.openai_api_key = { sopsFile = config.sops.defaultSopsFile; };
 
   programs.neovim = {
     enable = true;
@@ -48,24 +45,24 @@ in
     recursive = true;
   };
 
-  xdg.configFile."nvim/lua/plugins/chatgpt.lua".source = pkgs.writeText "chatgpt.lua" ''
-    return {
-        "jackMort/ChatGPT.nvim",
-        event = "VeryLazy",
-        config = function()
-            require("chatgpt").setup({
-                api_key_cmd = '${key-fetcher}/bin/key-fetcher openai-api-key',
-            })
-        end,
-        dependencies = {
-            "MunifTanjim/nui.nvim",
-            "nvim-lua/plenary.nvim",
-            "folke/trouble.nvim",
-            "nvim-telescope/telescope.nvim",
-        },
-    }
-  '';
-
+  xdg.configFile."nvim/lua/plugins/chatgpt.lua".source =
+    pkgs.writeText "chatgpt.lua" ''
+      return {
+          "jackMort/ChatGPT.nvim",
+          event = "VeryLazy",
+          config = function()
+              require("chatgpt").setup({
+                  api_key_cmd = '${key-fetcher}/bin/key-fetcher openai-api-key',
+              })
+          end,
+          dependencies = {
+              "MunifTanjim/nui.nvim",
+              "nvim-lua/plenary.nvim",
+              "folke/trouble.nvim",
+              "nvim-telescope/telescope.nvim",
+          },
+      }
+    '';
 
 }
 

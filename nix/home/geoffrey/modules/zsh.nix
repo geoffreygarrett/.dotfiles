@@ -1,9 +1,7 @@
 { pkgs, config, lib, self, ... }:
 
-let
-  shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
-in
-{
+let shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
+in {
   programs.direnv = {
     enable = true;
     enableZshIntegration = true;

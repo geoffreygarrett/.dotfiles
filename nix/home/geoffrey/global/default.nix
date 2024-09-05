@@ -1,24 +1,15 @@
 # Reference
 # - [1]
-{ inputs
-, lib
-, pkgs
-, config
-, outputs
-, ...
-}: {
-  imports =
-    [
+{ inputs, lib, pkgs, config, outputs, ... }: {
+  imports = [
 
-      inputs.sops-nix.homeManagerModules.sops
-      #      inputs.impermanence.nixosModules.home-manager.impermanence
-      #      ../features/cli
-      #      ../features/nvim
-      ../modules
-    ];
+    inputs.sops-nix.homeManagerModules.sops
+    #      inputs.impermanence.nixosModules.home-manager.impermanence
+    #      ../features/cli
+    #      ../features/nvim
+    ../modules
+  ];
   #    ++ (builtins.attrValues outputs.homeManagerModules);
-
-
 
   #  nix = {
   #    package = lib.mkDefault pkgs.nix;
@@ -42,12 +33,8 @@
   #sops.age.keyFile = "/home/geoffrey/.config/sops/age/keys.txt";
   #sops.defaultSymlinkPath = "/run/user/1000/secrets";
   #sops.defaultSecretsMountPoint = "/run/user/1000/secrets.d";
-  sops.secrets.github_token = {
-    sopsFile = ./secrets.yaml;
-  };
-  sops.secrets.openai_api_key = {
-    sopsFile = ./secrets.yaml;
-  };
+  sops.secrets.github_token = { sopsFile = ./secrets.yaml; };
+  sops.secrets.openai_api_key = { sopsFile = ./secrets.yaml; };
 
   #  # Declare the secrets that are going to be used.
   #  sops.secrets.hello = { };
@@ -73,7 +60,6 @@
   #      WantedBy = [ "default.target" ];
   #    };
   #  };
-
 
   #  # Create a service to set environment variables
   #  systemd.user.services.set-env-vars = {
@@ -125,21 +111,17 @@
   #    };
   #  };
 
-
   home = {
     username = lib.mkDefault "geoffrey";
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "22.05";
     sessionPath = [ "$HOME/.local/bin" ];
-    shellAliases = {
-      hw = "echo Hello, world!";
-    };
+    shellAliases = { hw = "echo Hello, world!"; };
     sessionVariables = {
       FLAKE = "$HOME/.dotfiles";
       EDITOR = "neovim";
       # BROWSER = "firefox";
     };
-
 
     #    persistence = {
     #      "/persist/${config.home.homeDirectory}" = {

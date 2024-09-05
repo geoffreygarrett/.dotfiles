@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-{
+{ config, pkgs, ... }: {
   programs.git = {
     enable = true;
     userName = "geoffreygarrett";
@@ -13,18 +12,10 @@
     };
     extraConfig = {
       init.defaultBranch = "main";
-      color = {
-        ui = "auto";
-      };
-      push = {
-        default = "simple";
-      };
-      fetch = {
-        prune = true;
-      };
-      pull = {
-        rebase = true;
-      };
+      color = { ui = "auto"; };
+      push = { default = "simple"; };
+      fetch = { prune = true; };
+      pull = { rebase = true; };
     };
   };
 }

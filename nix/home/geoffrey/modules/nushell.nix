@@ -1,8 +1,6 @@
 { pkgs, config, lib, ... }:
-let
-  shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
-in
-{
+let shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
+in {
   programs.nushell = {
     enable = true;
     extraConfig = ''
