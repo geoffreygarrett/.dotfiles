@@ -28,7 +28,8 @@ let
         ;;
     esac
   '';
-in {
+in
+{
   sops.secrets.openai_api_key = { sopsFile = config.sops.defaultSopsFile; };
 
   programs.neovim = {

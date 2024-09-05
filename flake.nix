@@ -36,36 +36,77 @@
           overlays = lib.optionals (isLinux system) [ nixgl.overlay ];
           config.allowUnfree = true;
         };
-#      mkApp = scriptName: system: {
-#        type = "app";
-#        program = "${
-#            (nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
-#              #!/usr/bin/env bash
-#              PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
-#              echo "Running ${scriptName} for ${system}"
-#              exec ${self}/apps/${system}/${scriptName}
-#            '')
-#          }/bin/${scriptName}";
-#      };
-#      mkLinuxApps = system: {
-#        "apply" = mkApp "apply" system;
-#        "build-switch" = mkApp "build-switch" system;
-#        "copy-keys" = mkApp "copy-keys" system;
-#        "create-keys" = mkApp "create-keys" system;
-#        "check-keys" = mkApp "check-keys" system;
-#        "install" = mkApp "install" system;
-#        "install-with-secrets" = mkApp "install-with-secrets" system;
-#      };
-#      mkDarwinApps = system: {
-#        "apply" = mkApp "apply" system;
-#        "build" = mkApp "build" system;
-#        "build-switch" = mkApp "build-switch" system;
-#        "copy-keys" = mkApp "copy-keys" system;
-#        "create-keys" = mkApp "create-keys" system;
-#        "check-keys" = mkApp "check-keys" system;
-#        "rollback" = mkApp "rollback" system;
-#      };
-    in {
+
+      mkApp = name: system:
+        let
+          pkgs = pkgsFor system;
+          scriptDir = pkgs.runCommand "${name}-dir" { } ''
+            mkdir -p $out
+            cp ${./nix/apps/${name}.rs} $out/${name}.rs
+            cp ${./nix/apps/shared.rs} $out/shared.rs
+          '';
+        in
+        {
+          type = "app";
+          program = toString (pkgs.writers.writeBash name ''
+            export PATH=${pkgs.git}/bin:${pkgs.rust-script}/bin:$PATH
+            exec rust-script ${scriptDir}/${name}.rs
+          '');
+        };
+
+
+      mkLinuxApps = system: {
+        "apply" = mkApp "apply" system;
+        "build-switch" = mkApp "build-switch" system;
+        "copy-keys" = mkApp "copy-keys" system;
+        "create-keys" = mkApp "create-keys" system;
+        "check-keys" = mkApp "check-keys" system;
+        "install" = mkApp "install" system;
+        "install-with-secrets" = mkApp "install-with-secrets" system;
+      };
+
+      mkDarwinApps = system: {
+        "apply" = mkApp "apply" system;
+        "build" = mkApp "build" system;
+        "build-switch" = mkApp "build-switch" system;
+        "copy-keys" = mkApp "copy-keys" system;
+        "create-keys" = mkApp "create-keys" system;
+        "check-keys" = mkApp "check-keys" system;
+        "rollback" = mkApp "rollback" system;
+      };
+
+      #      mkApp = scriptName: system: {
+      #        type = "app";
+      #        program = "${
+      #            (nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
+      #              #!/usr/bin/env bash
+      #              PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
+      #              echo "Running ${scriptName} for ${system}"
+      #              exec ${self}/apps/${system}/${scriptName}
+      #            '')
+      #          }/bin/${scriptName}";
+      #      };
+      #      mkLinuxApps = system: {
+      #        "apply" = mkApp "apply" system;
+      #        "build-switch" = mkApp "build-switch" system;
+      #        "copy-keys" = mkApp "copy-keys" system;
+      #        "create-keys" = mkApp "create-keys" system;
+      #        "check-keys" = mkApp "check-keys" system;
+      #        "install" = mkApp "install" system;
+      #        "install-with-secrets" = mkApp "install-with-secrets" system;
+      #      };
+      #      mkDarwinApps = system: {
+      #        "apply" = mkApp "apply" system;
+      #        "build" = mkApp "build" system;
+      #        "build-switch" = mkApp "build-switch" system;
+      #        "copy-keys" = mkApp "copy-keys" system;
+      #        "create-keys" = mkApp "create-keys" system;
+      #        "check-keys" = mkApp "check-keys" system;
+      #        "rollback" = mkApp "rollback" system;
+      #      };
+    in
+    {
+      services.pcscd.enable = true;
       home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
       home-manager.syncthing.enable = true;
       home-manager.syncthing.tray.enable = true;
@@ -88,15 +129,15 @@
       };
       checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage)
         self.homeConfigurations // forAllSystems (system: {
-          pre-commit-check = pre-commit-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              nixpkgs-fmt.enable = true;
-              beautysh.enable = true;
-              commitizen.enable = true;
-            };
+        pre-commit-check = pre-commit-hooks.lib.${system}.run {
+          src = ./.;
+          hooks = {
+            nixpkgs-fmt.enable = true;
+            beautysh.enable = true;
+            commitizen.enable = true;
           };
-        });
+        };
+      });
 
       #      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 
@@ -115,7 +156,8 @@
             program = toString (pkgs.writeShellScript "home-manager-switch"
               (builtins.readFile ./scripts/home_manager_switch.sh));
           };
-        });
+        } // (if isLinux system then mkLinuxApps else mkDarwinApps) system
+      );
 
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {

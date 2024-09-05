@@ -7,19 +7,22 @@ let
 
   generateAlias = name: alias:
     let
-      command = if alias.dependency != null then
-        "${
+      command =
+        if alias.dependency != null then
+          "${
           getPackage alias.dependency
         }/bin/${alias.dependency} ${alias.command}"
-      else
-        alias.command;
-    in lib.nameValuePair name command;
+        else
+          alias.command;
+    in
+    lib.nameValuePair name command;
 
   generateShellAliases = shell:
     lib.listToAttrs (lib.filter (alias: builtins.elem shell alias.shells)
       (lib.mapAttrsToList generateAlias toml.aliases));
 
-in {
+in
+{
   shellAliases = {
     zsh = generateShellAliases "zsh";
     bash = generateShellAliases "bash";

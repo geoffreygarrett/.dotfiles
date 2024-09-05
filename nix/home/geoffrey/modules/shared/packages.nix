@@ -1,10 +1,14 @@
 { config, pkgs, ... }:
 
 {
+
+
+  home.sessionVariables.PKG_CONFIG_PATH = "${pkgs.pcsclite}/lib/pkgconfig:${pkgs.opensc}/lib/pkgconfig";
+
+
   # Packages to install
   home.packages = with pkgs; [
-    pkgs.cargo
-    pkgs.rustc
+
     pkgs.rust-analyzer
     pkgs.sops
     pkgs.fastfetch
@@ -13,8 +17,19 @@
     pkgs.age
     pkgs.micromamba
     pkgs.nixfmt
+
+    # RUST-SCRIPT
+    pkgs.cargo
+    pkgs.rustc
     pkgs.libiconv
     pkgs.rust-script
+    pkgs.pcsclite
+    pkgs.gengetopt
+    pkgs.opensc
+    pkgs.pkg-config
+
+    #    pkgs.pkg-config
+
     #     viu
     #    firefox
     #    vscode

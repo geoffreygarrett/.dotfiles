@@ -3,8 +3,8 @@
 //! [dependencies]
 //! colored = "2.0"
 //! regex = "1.5"
-//! dialoguer = "0.10.3"
-//! yubikey = "0.6"
+//! dialoguer = "0.11.0"
+//! yubikey = "0.8.0"
 //! ```
 /*
 #!nix-shell -i rust-script -p rustc -p rust-script -p cargo
@@ -40,9 +40,9 @@ fn ask_for_star() {
 
     if response {
         if is_darwin() {
-            Command::new("open").arg("https://github.com/dustinlyons/nixos-config").spawn().ok();
+            Command::new("open").arg("https://github.com/geoffreygarrett/celestial-blueprint").spawn().ok();
         } else {
-            Command::new("xdg-open").arg("https://github.com/dustinlyons/nixos-config").spawn().ok();
+            Command::new("xdg-open").arg("https://github.com/geoffreygarrett/celestial-blueprint").spawn().ok();
         }
     }
 }

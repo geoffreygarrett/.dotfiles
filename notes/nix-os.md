@@ -30,6 +30,6 @@ detailed information, please refer to the official documentation of Ubuntu and N
 - https://lgug2z.com/articles/handling-secrets-in-nixos-an-overview/
 
 
-## Amazing 
+## Articles
 
-- https://github.com/dustinlyons/nixos-config/tree/main
+- https://fd93.me/nixos-to-ubuntu

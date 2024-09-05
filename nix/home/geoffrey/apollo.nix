@@ -1,6 +1,6 @@
 { pkgs, config, ... }:
 let
-  user = "geoffreygarrett";
+  user = "geoffrey";
 in
 {
   imports = [ ./global ];

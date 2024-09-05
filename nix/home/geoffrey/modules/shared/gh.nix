@@ -8,7 +8,8 @@ let
     export GITHUB_TOKEN
     ${pkgs.gh}/bin/gh "$@"
   '';
-in {
+in
+{
   sops.secrets.github_token = { sopsFile = config.sops.defaultSopsFile; };
   programs.gh = {
     enable = true;
