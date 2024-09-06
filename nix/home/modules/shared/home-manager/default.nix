@@ -9,6 +9,7 @@
     ./nushell.nix
     ./nvim.nix
     ./starship.nix
+    ./firefox.nix
     inputs.sops-nix.homeManagerModules.sops
   ];
   fonts.fontconfig.enable = true;
@@ -19,5 +20,6 @@
   programs.zsh.enable = true;
   programs.nushell.enable = true;
   programs.neovim.enable = true;
+  programs.firefox.enable = true;
   programs.starship.enable = true;
 }
