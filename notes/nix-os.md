@@ -33,3 +33,8 @@ detailed information, please refer to the official documentation of Ubuntu and N
 ## Articles
 
 - https://fd93.me/nixos-to-ubuntu
+
+
+# Repos
+
+- https://github.com/numtide/system-manager

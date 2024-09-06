@@ -136,7 +136,8 @@ vim.cmd([[
   nnoremap <C-f> :Neotree float reveal_file=<cfile> reveal_force_cwd<CR>
 ]])
 -- NOTE: Stuff for Copilot (CUSTOM)
-vim.keymap.set("i", "<C-J>", 'copilot#Accept("\\<CR>")', {
+--
+vim.keymap.set("i", "<C-y>", 'copilot#Accept("<CR>")', {
 	expr = true,
 	silent = true,
 	desc = "Accept Copilot suggestion",
@@ -181,7 +182,8 @@ vim.opt.rtp:prepend(lazypath)
 
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({
-    require("plugins.chatgpt"),
+	require("plugins.chatgpt"),
+	require("plugins.telescope-undo"),
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	"folke/zen-mode.nvim", -- Distraction-free coding

@@ -1,3 +1,1 @@
-{ config, pkgs, system, ... }: {
-  imports = [ ./linux ];
-}
+{ config, pkgs, system, ... }: { imports = [ ./linux ]; }

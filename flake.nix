@@ -6,10 +6,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    darwin = {
-      url = "github:lnl7/nix-darwin/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -18,12 +14,48 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    custom-packages = {
+      url = "./nix/packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-darwin = {
+      url = "github:LnL7/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-homebrew = {
+      url = "github:zhaofengli-wip/nix-homebrew";
+    };
+    homebrew-bundle = {
+      url = "github:homebrew/homebrew-bundle";
+      flake = false;
+    };
+    homebrew-core = {
+      url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+    homebrew-cask = {
+      url = "github:homebrew/homebrew-cask";
+      flake = false;
+    };
     nixgl = { url = "github:guibou/nixGL"; };
   };
   outputs =
-    { self, nixpkgs, home-manager, pre-commit-hooks, nixgl, ... }@inputs:
+    { self
+    , nixpkgs
+    , home-manager
+    , pre-commit-hooks
+    , nixgl
+    , custom-packages
+    , nix-darwin
+    , nix-homebrew
+    , homebrew-bundle
+    , homebrew-core
+    , homebrew-cask
+    , ...
+    }@inputs:
     let
       inherit (self) outputs;
+      user = "geoffrey";
       lib = nixpkgs.lib // home-manager.lib;
       systems.linux = [ "aarch64-linux" "x86_64-linux" ];
       systems.darwin = [ "aarch64-darwin" "x86_64-darwin" ];
@@ -33,10 +65,18 @@
       pkgsFor = system:
         import nixpkgs {
           inherit system;
-          overlays = lib.optionals (isLinux system) [ nixgl.overlay ];
-          config.allowUnfree = true;
+          overlays = [
+            custom-packages.overlays.default
+            (final: prev:
+              nixpkgs.lib.optionalAttrs (isLinux system)
+                (nixgl.overlays.default final prev))
+          ];
+          config = {
+            allowUnfree = true;
+            allowUnfreePredicate = pkg:
+              builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
+          };
         };
-
       mkApp = name: system:
         let
           pkgs = pkgsFor system;
@@ -53,7 +93,6 @@
             exec rust-script ${scriptDir}/${name}.rs
           '');
         };
-
 
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
@@ -74,22 +113,6 @@
         "check-keys" = mkApp "check-keys" system;
         "rollback" = mkApp "rollback" system;
       };
-
-      # Function to configure WireGuard for both macOS and Linux
-      configureWireguard = system:
-        let
-          wg_conf = pkgsFor (system).writeTextFile {
-            name = "wg0.conf";
-            text = builtins.readFile ./secrets/wg0.conf; # Your encrypted wg0.conf (managed by sops)
-          };
-        in
-        pkgsFor (system).mkShell {
-          buildInputs = [ pkgsFor (system).wireguard-tools pkgsFor (system).sops-nix ];
-          shellHook = ''
-            sops -d ${wg_conf} | sudo tee /etc/wireguard/wg0.conf
-            sudo wg-quick up wg0
-          '';
-        };
 
       #      mkApp = scriptName: system: {
       #        type = "app";
@@ -120,8 +143,49 @@
       #        "check-keys" = mkApp "check-keys" system;
       #        "rollback" = mkApp "rollback" system;
       #      };
+
+
+      darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (system:
+        nix-darwin.lib.darwinSystem {
+          inherit system;
+          specialArgs = inputs;
+          modules = [
+            home-manager.darwinModules.home-manager
+            nix-homebrew.darwinModules.nix-homebrew
+            {
+              nix-homebrew = {
+                inherit user;
+                enable = true;
+                taps = {
+                  "homebrew/homebrew-core" = homebrew-core;
+                  "homebrew/homebrew-cask" = homebrew-cask;
+                  "homebrew/homebrew-bundle" = homebrew-bundle;
+                };
+                mutableTaps = false;
+                autoMigrate = true;
+              };
+            }
+            ./hosts/darwin
+          ];
+        }
+      );
+
+      # Define the networking configuration
+      networkingConfig = {
+        nat = {
+          enable = true;
+          externalInterface = "eth0";
+          internalInterfaces = [ "wg0" ];
+        };
+        firewall = {
+          enable = true;
+          allowedUDPPorts = [ 51820 ]; # Port for WireGuard
+        };
+      };
+
     in
     {
+      services.nix-daemon.enable = true;
       services.pcscd.enable = true;
       home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
       home-manager.syncthing.enable = true;
@@ -129,18 +193,21 @@
       homeConfigurations = {
         "geoffrey@apollo" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "x86_64-linux";
-          modules = [ ./nix/home/geoffrey/apollo.nix ./nix/hosts/apollo.nix ];
-          extraSpecialArgs = { inherit inputs outputs; };
+          modules = [
+            ./nix/network.nix
+            ./nix/hosts/apollo.nix
+            ./nix/home/apollo.nix
+          ];
+          extraSpecialArgs = { inherit inputs outputs networkingConfig; };
         };
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
           modules = [
-            ./nix/darwin
+            ./nix/network.nix
             ./nix/hosts/artemis.nix
-            ./nix/home/geoffrey/artemis.nix
-
+            ./nix/home/artemis.nix
           ];
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = { inherit inputs outputs networkingConfig; };
         };
       };
       checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage)
@@ -154,8 +221,6 @@
           };
         };
       });
-
-
 
       #      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 
@@ -174,8 +239,7 @@
             program = toString (pkgs.writeShellScript "home-manager-switch"
               (builtins.readFile ./scripts/home_manager_switch.sh));
           };
-        } // (if isLinux system then mkLinuxApps else mkDarwinApps) system
-      );
+        } // (if isLinux system then mkLinuxApps else mkDarwinApps) system);
 
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {
