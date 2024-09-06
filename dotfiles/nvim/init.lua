@@ -193,6 +193,7 @@ vim.opt.rtp:prepend(lazypath)
 
 -- NOTE: Here is where you install your plugins.
 require("lazy").setup({ -- NOTE: lazy_setup
+	require("plugins.browser-bookmarks"),
 	require("plugins.treesitter"),
 	require("plugins.chatgpt"),
 	require("plugins.telescope-undo"),

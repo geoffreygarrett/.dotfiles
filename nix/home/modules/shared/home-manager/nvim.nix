@@ -36,8 +36,36 @@ in
   programs.neovim = {
     viAlias = true;
     vimAlias = true;
+    extraPackages = with pkgs;
+      [
+        ripgrep # Requirement for telescope
+
+      ];
     extraConfig = ''
       " Any Vimscript configuration can go here
+
+      " SetShell function to switch between Zsh and Nushell dynamically
+      lua << EOF
+        function SetShell(shell_name)
+          if shell_name == "zsh" then
+            vim.opt.shell = "/path/to/zsh"
+            print("Switched to Zsh")
+          elseif shell_name == "nu" then
+            vim.opt.shell = "/path/to/nu"
+            print("Switched to Nushell")
+          else
+            print("Invalid argument. Use 'zsh' or 'nu'.")
+          end
+        end
+
+        vim.api.nvim_create_user_command("SetShell", function(opts)
+          SetShell(opts.args)
+        end, { nargs = 1 })
+
+        -- Example usage in Neovim:
+        -- :SetShell zsh    -- Switch to Zsh
+        -- :SetShell nu     -- Switch to Nushell
+      EOF
     '';
   };
   home.packages = [ pkgs.lazygit ];

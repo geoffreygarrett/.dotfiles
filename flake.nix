@@ -163,6 +163,7 @@
               };
             }
             ./hosts/darwin
+            #homeConfigurations."geoffreygarrett@artemis"
           ];
         });
 
@@ -196,7 +197,6 @@
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
           modules = [
-            ./nix/network.nix
             ./nix/hosts/artemis.nix
             ./nix/home/artemis.nix
           ];

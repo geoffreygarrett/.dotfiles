@@ -1,7 +1,5 @@
-{ config, pkgs, networkingConfig, ... }:
-let networking = networkingConfig;
-
-in {
+{ config, pkgs, ... }:
+{
 
   # Install Tailscale for the user
   home.packages = with pkgs; [ tailscale ];
