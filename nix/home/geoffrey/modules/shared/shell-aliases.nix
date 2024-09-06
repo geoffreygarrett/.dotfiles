@@ -113,6 +113,31 @@ let
       bash = false;
       fish = false;
     })
+    (mkAlias "localip" null ''
+      alias localip='
+      if [[ "$(uname)" == "Darwin" ]]; then
+          # macOS
+          ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2
+      elif [[ -x "$(command -v hostname)" && "$(hostnamectl | grep "Operating System")" == *"Ubuntu"* ]]; then
+          # Ubuntu
+          hostname -i | awk "{print \$3}"
+      elif [[ -x "$(command -v hostname)" && "$(hostnamectl | grep "Operating System")" == *"Debian"* ]]; then
+          # Debian
+          hostname -i
+      elif [[ -x "/sbin/ifconfig" ]]; then
+          # Older Linux systems with ifconfig
+          /sbin/ifconfig eth0 | grep "inet addr" | cut -d: -f2 | awk "{print \$1}"
+      else
+          echo "Unable to determine local IP"
+      fi
+    ''
+      {
+        zsh = true; # Enable for zsh
+        nu = true;
+        bash = true; # Enable for bash
+        fish = false;
+      }
+    )
     (mkAlias "delete-images" null ''
       alias delete-images='f() {
         delete_image() {

@@ -75,6 +75,22 @@
         "rollback" = mkApp "rollback" system;
       };
 
+      # Function to configure WireGuard for both macOS and Linux
+      configureWireguard = system:
+        let
+          wg_conf = pkgsFor (system).writeTextFile {
+            name = "wg0.conf";
+            text = builtins.readFile ./secrets/wg0.conf; # Your encrypted wg0.conf (managed by sops)
+          };
+        in
+        pkgsFor (system).mkShell {
+          buildInputs = [ pkgsFor (system).wireguard-tools pkgsFor (system).sops-nix ];
+          shellHook = ''
+            sops -d ${wg_conf} | sudo tee /etc/wireguard/wg0.conf
+            sudo wg-quick up wg0
+          '';
+        };
+
       #      mkApp = scriptName: system: {
       #        type = "app";
       #        program = "${
@@ -138,6 +154,8 @@
           };
         };
       });
+
+
 
       #      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 

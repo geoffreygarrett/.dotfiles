@@ -27,6 +27,8 @@
     pkgs.gengetopt
     pkgs.opensc
     pkgs.pkg-config
+    pkgs.wireguard-tools
+    pkgs.sops
 
     #    pkgs.pkg-config
 

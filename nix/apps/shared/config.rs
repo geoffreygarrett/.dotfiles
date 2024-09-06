@@ -13,6 +13,7 @@ use toml;
 #[derive(Debug, Clone, Deserialize)]
 pub struct Keys {
     pub ssh: Vec<String>,
+    pub wg: Option<Vec<String>>,
 }
 #[derive(Debug, Clone, Deserialize)]
 pub struct Config {

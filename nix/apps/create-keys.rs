@@ -6,35 +6,50 @@
 //! dirs = "5.0"
 //! serde = { version = "1.0", features = ["derive"] }
 //! toml = "0.5"
+//! tempfile = "3.2.0"
+//! which = "4.0.2"
 //! ```
-//! ```rust
-//! #[path = "shared.rs"]
-//! mod shared;
-//! ```
-/*
-#!nix-shell -i rust-script -p rustc -p rust-script -p cargo
-*/
-
 use colored::*;
 use dialoguer::{Confirm, Password};
 use dirs::home_dir;
 use std::fs;
-use std::io;
+use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::process::{exit, Command};
+use std::process::{Command, exit};
+use tempfile::NamedTempFile;
 
-#[path = "shared.rs"]
+#[path = "shared/config.rs"]
 #[allow(dead_code)]
 mod shared;
 
-fn setup_ssh_directory() -> io::Result<PathBuf> {
-    let ssh_dir = home_dir()
+// Function to set up the SSH or WireGuard directory
+fn setup_directory(dir_name: &str) -> io::Result<PathBuf> {
+    let dir = home_dir()
         .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Home directory not found"))?
-        .join(".ssh");
-    fs::create_dir_all(&ssh_dir)?;
-    Ok(ssh_dir)
+        .join(dir_name);
+    fs::create_dir_all(&dir)?;
+    Ok(dir)
 }
 
+// Function to check if a tool exists, otherwise print a stylized error message
+fn check_tool_exists(tool: &str) -> io::Result<()> {
+    if which::which(tool).is_err() {
+        eprintln!(
+            "{} {} {}",
+            "Error:".bold().red(),
+            tool.bold().yellow(),
+            "not found. Please install it to proceed.".red()
+        );
+        Err(io::Error::new(
+            io::ErrorKind::NotFound,
+            format!("{} not found.", tool),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+// Prompt the user if they want to regenerate the key if it already exists
 fn prompt_for_key_generation(key_path: &Path) -> io::Result<bool> {
     if key_path.exists() {
         println!("  {}: {}", "Existing".yellow(), key_path.display());
@@ -48,7 +63,11 @@ fn prompt_for_key_generation(key_path: &Path) -> io::Result<bool> {
     }
 }
 
-fn generate_key(ssh_dir: &Path, key_name: &str) -> io::Result<bool> {
+// Generate SSH keys using ssh-keygen
+fn generate_ssh_key(ssh_dir: &Path, key_name: &str) -> io::Result<bool> {
+    // Ensure ssh-keygen is available
+    check_tool_exists("ssh-keygen")?;
+
     let key_path = ssh_dir.join(key_name);
 
     if prompt_for_key_generation(&key_path)? {
@@ -91,6 +110,52 @@ fn generate_key(ssh_dir: &Path, key_name: &str) -> io::Result<bool> {
     }
 }
 
+// Generate WireGuard keys using the wg tool
+fn generate_wireguard_keys(wg_dir: &Path, private_key_name: &str, public_key_name: &str) -> io::Result<()> {
+    // Ensure wg command is available
+    check_tool_exists("wg")?;
+
+    let private_key_path = wg_dir.join(private_key_name);
+    let public_key_path = wg_dir.join(public_key_name);
+
+    if prompt_for_key_generation(&private_key_path)? {
+        // Generate WireGuard private key
+        let output = Command::new("wg")
+            .arg("genkey")
+            .output()?;
+
+        if !output.status.success() {
+            return Err(io::Error::new(io::ErrorKind::Other, String::from_utf8_lossy(&output.stderr)));
+        }
+
+        let private_key = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        fs::write(&private_key_path, &private_key)?;
+
+        // Generate WireGuard public key using a temp file for the private key
+        let mut temp_file = NamedTempFile::new()?;
+        writeln!(temp_file, "{}", private_key)?;
+
+        let output = Command::new("wg")
+            .arg("pubkey")
+            .stdin(fs::File::open(temp_file.path())?)
+            .output()?;
+
+        if !output.status.success() {
+            return Err(io::Error::new(io::ErrorKind::Other, String::from_utf8_lossy(&output.stderr)));
+        }
+
+        let public_key = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        fs::write(&public_key_path, public_key)?;
+
+        println!("  {}: {}", "Generated WireGuard keys".green(), private_key_path.display());
+    } else {
+        println!("  {}: {}\n", "Kept".yellow(), private_key_path.display());
+    }
+
+    Ok(())
+}
+
+// Display SSH public keys
 fn display_public_keys(ssh_dir: &Path, key_names: &[String]) -> io::Result<()> {
     println!("\n{}", "Public Keys:".bold().cyan());
     for key_name in key_names {
@@ -104,46 +169,62 @@ fn display_public_keys(ssh_dir: &Path, key_names: &[String]) -> io::Result<()> {
 }
 
 fn main() -> io::Result<()> {
-    println!("{}", "=== Interactive SSH Key Generator ===".bold().blue());
+    println!("{}", "=== Interactive Key Generator ===".bold().blue());
 
-    let keys = match shared::Config::load() {
-        Ok(config) => config.keys.ssh,
+    let config = match shared::Config::load() {
+        Ok(config) => config,
         Err(e) => {
             eprintln!("{}", format!("Failed to load configuration: {}", e).red());
             exit(1);
         }
     };
 
-    let ssh_dir = setup_ssh_directory()?;
+    let ssh_dir = setup_directory(".ssh")?;
     println!("Setting up SSH directory: {}", ssh_dir.display());
 
+    let wg_dir = setup_directory(".wireguard")?;
+    println!("Setting up WireGuard directory: {}", wg_dir.display());
+
     println!("\n{}", "Key Generation:".bold().yellow());
-    for key_name in &keys {
-        generate_key(&ssh_dir, key_name)?;
+    for key_name in &config.keys.ssh {
+        generate_ssh_key(&ssh_dir, key_name)?;
+    }
+
+    if let Some(ref wg_keys) = config.keys.wg {
+        generate_wireguard_keys(&wg_dir, &wg_keys[0], &wg_keys[1])?;
     }
 
     println!("{}", "Key Generation Summary:".bold().green());
-    for key_name in &keys {
+    for key_name in &config.keys.ssh {
         let key_path = ssh_dir.join(key_name);
         if key_path.exists() {
-            println!("  {}: {}", "Present".green(), key_name);
+            println!("  {}: {}", "SSH Present".green(), key_name);
         } else {
-            println!("  {}: {}", "Missing".red(), key_name);
+            println!("  {}: {}", "SSH Missing".red(), key_name);
         }
     }
 
-    println!("\n{}", "Remember to add the necessary keys to Github or other services as required.".yellow());
+    if let Some(ref wg_keys) = config.keys.wg {
+        let wg_private_key_path = wg_dir.join(&wg_keys[0]);
+        let wg_public_key_path = wg_dir.join(&wg_keys[1]);
+        if wg_private_key_path.exists() {
+            println!("  {}: {}", "WireGuard Private Key Present".green(), wg_keys[0]);
+        }
+        if wg_public_key_path.exists() {
+            println!("  {}: {}", "WireGuard Public Key Present".green(), wg_keys[1]);
+        }
+    }
 
     if Confirm::new()
-        .with_prompt("Do you want to display your public keys?")
+        .with_prompt("Do you want to display your SSH public keys?")
         .default(true)
         .interact()
         .map_err(|e| io::Error::new(io::ErrorKind::Other, e.to_string()))?
     {
-        display_public_keys(&ssh_dir, &keys)?;
+        display_public_keys(&ssh_dir, &config.keys.ssh)?;
     }
 
-    println!("\n{}", "SSH key generation process completed successfully.".bold().green());
+    println!("\n{}", "Key generation process completed successfully.".bold().green());
 
     Ok(())
 }

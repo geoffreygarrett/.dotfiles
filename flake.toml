@@ -11,8 +11,20 @@ ssh = [
     "id_ed25519_agenix.pub"
 ]
 
+wg = [
+    "wg_private",
+    "wg_public"
+]
+
 [sops]
 age = true
 from-ssh = "id_ed25519"
 
-#[hosts.apollo]
+[hosts.apollo]
+system = "x86_64-linux"
+modules = [
+    "./nix/home/geoffrey/apollo.nix",
+    "./nix/hosts/apollo.nix"
+]
+
+
