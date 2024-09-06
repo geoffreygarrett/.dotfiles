@@ -24,14 +24,7 @@
 #   - Platforms: x86_64-darwin, aarch64-darwin
 # =============================================================================
 
-{ lib
-, stdenvNoCC
-, fetchurl
-, unzip
-, runCommand
-, writeShellScriptBin
-}:
-
+{ lib, stdenvNoCC, fetchurl, unzip, runCommand, writeShellScriptBin }:
 
 let
   tailscaleUiCli = writeShellScriptBin "tailscale-ui" ''
@@ -50,8 +43,8 @@ let
 
     echo "Tailscale.app launch attempt complete."
   '';
-in
 
+in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "tailscale-ui";
   version = "1.72.2";
@@ -59,7 +52,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
 
   src = fetchurl {
     name = "${finalAttrs.pname}-${finalAttrs.version}.zip";
-    url = "https://pkgs.tailscale.com/stable/Tailscale-${finalAttrs.version}-macos.zip";
+    url =
+      "https://pkgs.tailscale.com/stable/Tailscale-${finalAttrs.version}-macos.zip";
     sha256 = finalAttrs.sha256;
   };
 
@@ -90,7 +84,8 @@ stdenvNoCC.mkDerivation (finalAttrs: {
       your Tailscale network on macOS systems.
     '';
     homepage = "https://tailscale.com";
-    changelog = "https://github.com/tailscale/tailscale/releases/tag/v${finalAttrs.version}";
+    changelog =
+      "https://github.com/tailscale/tailscale/releases/tag/v${finalAttrs.version}";
     license = licenses.unfree;
     sourceProvenance = with sourceTypes; [ binaryNativeCode ];
     platforms = [ "x86_64-darwin" "aarch64-darwin" ];

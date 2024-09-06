@@ -10,9 +10,7 @@ let
   #  additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
-  imports = [
-    ./dock
-  ];
+  imports = [ ./dock ];
 
   # It me
   users.users.${user} = {
@@ -61,7 +59,8 @@ in
         stateVersion = "23.11";
       };
 
-      programs = { } // import ../shared/home-manager.nix { inherit config pkgs lib; };
+      programs = { }
+        // import ../shared/home-manager.nix { inherit config pkgs lib; };
 
       # Marked broken Oct 20, 2022 check later to remove this
       # https://github.com/nix-community/home-manager/issues/3344

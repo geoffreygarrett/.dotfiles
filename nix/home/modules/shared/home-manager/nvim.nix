@@ -1,6 +1,7 @@
 { config, pkgs, lib, inputs, ... }:
 let
   # Define a script that returns either the GitHub token or OpenAI API key
+  #language=sh
   key-fetcher = pkgs.writeShellScriptBin "key-fetcher" ''
     #!/bin/sh
 
@@ -46,6 +47,7 @@ in
   };
 
   xdg.configFile."nvim/lua/plugins/chatgpt.lua".source =
+    #language=lua
     pkgs.writeText "chatgpt.lua" ''
       return {
           "jackMort/ChatGPT.nvim",

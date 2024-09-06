@@ -22,9 +22,7 @@
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-homebrew = {
-      url = "github:zhaofengli-wip/nix-homebrew";
-    };
+    nix-homebrew = { url = "github:zhaofengli-wip/nix-homebrew"; };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
       flake = false;
@@ -144,7 +142,6 @@
       #        "rollback" = mkApp "rollback" system;
       #      };
 
-
       darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (system:
         nix-darwin.lib.darwinSystem {
           inherit system;
@@ -167,8 +164,7 @@
             }
             ./hosts/darwin
           ];
-        }
-      );
+        });
 
       # Define the networking configuration
       networkingConfig = {
@@ -193,11 +189,8 @@
       homeConfigurations = {
         "geoffrey@apollo" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "x86_64-linux";
-          modules = [
-            ./nix/network.nix
-            ./nix/hosts/apollo.nix
-            ./nix/home/apollo.nix
-          ];
+          modules =
+            [ ./nix/network.nix ./nix/hosts/apollo.nix ./nix/home/apollo.nix ];
           extraSpecialArgs = { inherit inputs outputs networkingConfig; };
         };
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {

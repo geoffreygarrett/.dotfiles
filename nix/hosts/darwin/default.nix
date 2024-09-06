@@ -1,5 +1,4 @@
-{ config, pkgs, user, ... }:
-{
+{ config, pkgs, user, ... }: {
   imports = [
     ../../modules/darwin/secrets.nix
     ../../modules/darwin/home-manager.nix
@@ -18,7 +17,11 @@
     gc = {
       user = "root";
       automatic = true;
-      interval = { Weekday = 0; Hour = 2; Minute = 0; };
+      interval = {
+        Weekday = 0;
+        Hour = 2;
+        Minute = 0;
+      };
       options = "--delete-older-than 30d";
     };
 
@@ -32,10 +35,11 @@
   system.checks.verifyNixPath = false;
 
   # Load configuration that is shared across systems
-  environment.systemPackages = with pkgs; [
-    #    emacs-unstable
-    #    agenix.packages."${pkgs.system}".default
-  ] ++ (import ../../modules/shared/packages.nix { inherit pkgs; });
+  environment.systemPackages = with pkgs;
+    [
+      #    emacs-unstable
+      #    agenix.packages."${pkgs.system}".default
+    ] ++ (import ../../modules/shared/packages.nix { inherit pkgs; });
 
   #  launchd.user.agents.emacs.path = [ config.environment.systemPath ];
   #  launchd.user.agents.emacs.serviceConfig = {
@@ -53,9 +57,7 @@
     stateVersion = 4;
 
     defaults = {
-      LaunchServices = {
-        LSQuarantine = false;
-      };
+      LaunchServices = { LSQuarantine = false; };
 
       NSGlobalDomain = {
         AppleShowAllExtensions = true;
@@ -81,9 +83,7 @@
         tilesize = 48;
       };
 
-      finder = {
-        _FXShowPosixPathInTitle = false;
-      };
+      finder = { _FXShowPosixPathInTitle = false; };
 
       trackpad = {
         Clicking = true;

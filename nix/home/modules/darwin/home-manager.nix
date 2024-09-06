@@ -14,7 +14,8 @@ in
   home.username = "${user}";
   home.homeDirectory = "/Users/${user}";
   home.packages = pkgs.callPackage ./packages.nix { inherit pkgs; };
-  home.file."/Applications/Tailscale.app".source = "${pkgs.tailscale-ui}/Applications/Tailscale.app";
+  home.file."/Applications/Tailscale.app".source =
+    "${pkgs.tailscale-ui}/Applications/Tailscale.app";
 
   #  # Fully declarative dock using the latest from Nix Store
   #  local = {
