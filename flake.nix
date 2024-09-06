@@ -53,7 +53,6 @@
     }@inputs:
     let
       inherit (self) outputs;
-      user = "geoffrey";
       lib = nixpkgs.lib // home-manager.lib;
       systems.linux = [ "aarch64-linux" "x86_64-linux" ];
       systems.darwin = [ "aarch64-darwin" "x86_64-darwin" ];
@@ -196,10 +195,7 @@
         };
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
-          modules = [
-            ./nix/hosts/artemis.nix
-            ./nix/home/artemis.nix
-          ];
+          modules = [ ./nix/hosts/artemis.nix ./nix/home/artemis.nix ];
           extraSpecialArgs = { inherit inputs outputs networkingConfig; };
         };
       };
