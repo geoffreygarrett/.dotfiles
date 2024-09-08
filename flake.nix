@@ -88,7 +88,8 @@
       };
       devShell = system:
         let pkgs = nixpkgs.legacyPackages.${system};
-        in {
+        in
+        {
           default = with pkgs;
             mkShell {
               nativeBuildInputs = with pkgs; [
@@ -216,7 +217,7 @@
             }
           ];
           extraSpecialArgs = { inherit inputs outputs; };
-          home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
+          #home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
           home-manager-path = home-manager.outPath;
         };
       };
@@ -258,7 +259,8 @@
 
       apps = forAllSystems (system:
         let pkgs = pkgsFor system;
-        in {
+        in
+        {
           check = {
             type = "app";
             program = toString (pkgs.writeShellScript "run-checks" ''
