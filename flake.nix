@@ -209,7 +209,7 @@
           pkgs = pkgsFor "aarch64-linux";
           modules = [
             ./nix/home/modules/android
-            inputs.sops-nix.homeManagerModules.sops
+            #            inputs.sops-nix.homeManagerModules.sops
             {
               networking.hosts = {
                 "100.78.156.17" = [ "pioneer.home" ];
