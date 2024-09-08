@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: nixpkgs-fmt
         name: nixfmt-rfc-style
-        args: [ --in-place ]
+        args: [ ]
         files: \.nix$
 
   - repo: https://github.com/lovesegfault/beautysh
@@ -19,4 +19,4 @@ repos:
     rev: v3.18.4
     hooks:
       - id: commitizen
-        stages: [commit-msg]
+        stages: [ commit-msg ]

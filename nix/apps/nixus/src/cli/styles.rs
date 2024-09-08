@@ -1,3 +1,6 @@
+use colored::{ColoredString, Colorize};
+use log::Level;
+
 pub fn get_styles() -> clap::builder::Styles {
     clap::builder::Styles::styled()
         .usage(
@@ -34,4 +37,14 @@ pub fn get_styles() -> clap::builder::Styles {
         .placeholder(
             anstyle::Style::new().fg_color(Some(anstyle::Color::Ansi(anstyle::AnsiColor::White))),
         )
+}
+
+pub fn colored_level(level: Level) -> ColoredString {
+    match level {
+        Level::Error => "ERROR".red(),
+        Level::Warn => "WARN".yellow(),
+        Level::Info => "INFO".green(),
+        Level::Debug => "DEBUG".blue(),
+        Level::Trace => "TRACE".cyan(),
+    }
 }

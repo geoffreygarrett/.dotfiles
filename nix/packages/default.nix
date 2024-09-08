@@ -1,5 +1,3 @@
-# File: nix/packages/default.nix
-
 { pkgs, lib, ... }:
 
 let
@@ -13,7 +11,6 @@ let
 
 in
 darwinPackages // {
-  # You can add more packages here that are common to all systems
-  # For example:
+  # NOTE: Can add more packages here that are common to all systems
   # my-common-package = pkgs.callPackage ./common/my-package.nix { };
 }
