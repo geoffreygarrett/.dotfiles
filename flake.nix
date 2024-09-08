@@ -215,7 +215,13 @@
                 "100.78.156.17" = [ "pioneer.home" ];
                 "100.116.122.19" = [ "artemis.home" ];
               };
-              networking.hostName = "pioneer";
+              networking = {
+                hostName = "artemis";
+                extraHosts = {
+                  "100.78.156.17" = [ "pioneer.home" ];
+                  "100.116.122.19" = [ "artemis.home" ];
+                };
+              };
             }
           ];
           extraSpecialArgs = { inherit inputs outputs; };
