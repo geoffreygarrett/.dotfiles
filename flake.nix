@@ -112,6 +112,7 @@
       systems.supported = systems.linux ++ systems.darwin;
       forAllSystems = f: nixpkgs.lib.genAttrs (systems.supported) f;
       isLinux = system: builtins.elem system systems.linux;
+      isTermuxNixAndroid = builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
       pkgsFor = system:
         import nixpkgs {
           inherit system;
@@ -217,7 +218,6 @@
             }
           ];
           extraSpecialArgs = { inherit inputs outputs; };
-          #home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
           home-manager-path = home-manager.outPath;
         };
       };

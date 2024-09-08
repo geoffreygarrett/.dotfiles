@@ -3,7 +3,8 @@
 {
   # Packages to be installed
   environment.packages = with pkgs; [
-    vim # or some other editor, e.g. nano or neovim
+    neovim
+    git
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
 
     # Uncomment the packages you want to install
@@ -164,6 +165,48 @@
             ll = "ls -l";
             hw = "echo 'Hello, World!'";
           };
+        };
+
+        programs.nushell = {
+          enable = true;
+        };
+
+        programs.starship = {
+          enable = true;
+          theme = "nerdfonts";
+          # prompt = "❯";
+          # addNewline = false;
+          # showHostname = false;
+          # showUsername = false;
+          # showCmdDuration = false;
+          # showBattery = false;
+          # showCloud = false;
+          # showGitBranch = false;
+          # showGitState = false;
+          # showPackageVersion = false;
+          # showRuby = false;
+          # showGo = false;
+          # showNode = false;
+          # showPython = false;
+          # showDotnet = false;
+          # showJava = false;
+          # showElixir = false;
+          # showHaskell = false;
+          # showDart = false;
+          # showNim = false;
+          # showMemoryUsage = false;
+          # showAWS = false;
+          # showGCP = false;
+          # showAzure = false;
+          # showDocker = false;
+          # showKubernetes = false;
+          # showConda = false;
+          # showDotnet = false;
+          # showNix = false;
+          # showBattery = false;
+          # showTime = false;
+          # showCustom = false;
+          # custom = [];
         };
 
         home.packages = with pkgs; [
