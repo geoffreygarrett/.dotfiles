@@ -158,7 +158,7 @@
         # Read the changelog before changing this value
         home.stateVersion = "24.05";
 
-        extraSpecialArgs = { inherit inputs outputs; };
+        extraSpecialArgs = { inherit inputs; };
 
         imports = [
           #          ../shared/home-manager/programs
