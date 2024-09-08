@@ -21,6 +21,8 @@
   pkgs.wireguard-tools
   pkgs.tailscale
   pkgs.ripgrep # DEPENDANT: Telescope live_grep
+  # DEVELOPMENT
+  pkgs.lazygit
   # PENETRATION TESTING
   #  pkgs.aircrack-ng
   #  pkgs.airmon-ng

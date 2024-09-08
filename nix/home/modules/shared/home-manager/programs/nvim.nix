@@ -68,7 +68,7 @@ in
       EOF
     '';
   };
-  home.packages = [ pkgs.lazygit ];
+  #  home.packages = [ pkgs.lazygit ];
   xdg.configFile."nvim" = {
     source = "${inputs.self}/dotfiles/nvim";
     recursive = true;
