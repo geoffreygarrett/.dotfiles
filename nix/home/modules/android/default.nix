@@ -164,11 +164,9 @@
           shellAliases = {
             ll = "ls -l";
             hw = "echo 'Hello, World!'";
+            switch = "nix-on-droid switch --flake ~/.dotfiles";
           };
-        };
-
-        programs = { }
-          // import ../shared/home-manager/programs { inherit config pkgs lib; };
+        } // import ../shared/home-manager/programs { inherit config pkgs lib; };
 
         home.packages = with pkgs; [
           htop
