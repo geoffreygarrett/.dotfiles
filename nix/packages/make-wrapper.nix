@@ -1,4 +1,4 @@
-{ lib, writeShellScriptBin }:
+{ writeShellScriptBin }:
 
 target: wrapper:
 writeShellScriptBin (baseNameOf wrapper) ''

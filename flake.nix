@@ -139,9 +139,9 @@
       isTermuxNixAndroid = builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
       pkgsFor = system:
         import nixpkgs {
-          inherit system;
+          inherit system nixgl;
           overlays = [
-            (import ./nix/overlays/packages.nix) # Combined overlay for Darwin and Linux
+            (import ./nix/overlays/packages.nix { inherit nixgl lib; })
           ];
           config = {
             allowUnfree = true;
@@ -149,6 +149,7 @@
               builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
           };
         };
+
 
       mkRustScriptApp =
         import ./nix/lib/mk-rust-script-app.nix { inherit inputs nixpkgs lib; };
