@@ -21,5 +21,12 @@
   pkgs.wireguard-tools
   pkgs.tailscale
   pkgs.ripgrep # DEPENDANT: Telescope live_grep
-
+  # PENETRATION TESTING
+  #  pkgs.aircrack-ng
+  #  pkgs.airmon-ng
+  #  pkgs.airodump-ng
+  #  pkgs.aireplay-ng
+  #  pkgs.aircrack-ng
+  #  pkgs.nmap
+  #  pkgs.metasploit
 ]

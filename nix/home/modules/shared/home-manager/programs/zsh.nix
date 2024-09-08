@@ -1,4 +1,4 @@
-{ pkgs, config, lib, self, ... }:
+{ pkgs, config, lib, inputs, ... }:
 
 let shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
 in {
@@ -52,6 +52,13 @@ in {
       FZF_DEFAULT_COMMAND = "fd --type f --hidden --follow --exclude .git";
       FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border";
     };
+
+    initExtraFirst = ''
+      if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+        . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+      fi
+    '';
 
     initExtra = ''
       export FLAKE="$HOME/.dotfiles"

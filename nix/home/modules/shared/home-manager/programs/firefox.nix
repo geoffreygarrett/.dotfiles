@@ -13,7 +13,7 @@ in
 {
   programs = {
     firefox = {
-      # enable = true;
+      enable = true;
       languagePacks = [ "de" "en-US" ];
 
       # ---- POLICIES ----

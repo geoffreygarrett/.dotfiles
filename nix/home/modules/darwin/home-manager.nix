@@ -1,6 +1,6 @@
 { config, pkgs, lib, home-manager, inputs, user, ... }:
 let
-  shared-programs = import ../shared/home-manager {
+  shared-programs = import ../shared/home-manager/programs {
     inherit config pkgs lib home-manager inputs;
   };
   secrets = import ./secrets.nix { inherit config pkgs user; };
@@ -10,12 +10,14 @@ in
     allowUnfreePredicate = pkg:
       builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
   };
-  imports = [ shared-programs secrets ];
-  home.username = "${user}";
-  home.homeDirectory = "/Users/${user}";
+  imports = [ secrets ];
+  # TODO: Properly separate home config for system level config and home level.
+  #  home.username = "${user}";
+  #  home.homeDirectory = "/Users/${user}";
+  programs = shared-programs // { gpg.enable = true; };
   home.packages = pkgs.callPackage ./packages.nix { inherit pkgs; };
-  home.file."/Applications/Tailscale.app".source =
-    "${pkgs.tailscale-ui}/Applications/Tailscale.app";
+  #  home.file."/Applications/Tailscale.app".source =
+  #    "${pkgs.tailscale-ui}/Applications/Tailscale.app";
 
   #  # Fully declarative dock using the latest from Nix Store
   #  local = {

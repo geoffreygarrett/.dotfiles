@@ -18,10 +18,10 @@ let
     # Determine which key to return based on the argument
     case "$1" in
       "github-token")
-        fetch_key "${config.sops.secrets.github_token.path}" "GitHub token"
+        fetch_key "${config.sops.secrets.github-token.path}" "GitHub token"
         ;;
       "openai-api-key")
-        fetch_key "${config.sops.secrets.openai_api_key.path}" "OpenAI API key"
+        fetch_key "${config.sops.secrets.openai-api-key.path}" "OpenAI API key"
         ;;
       *)
         echo "Usage: $0 {github-token|openai-api-key}"
@@ -31,7 +31,7 @@ let
   '';
 in
 {
-  sops.secrets.openai_api_key = { sopsFile = config.sops.defaultSopsFile; };
+  sops.secrets.openai-api-key = { sopsFile = config.sops.defaultSopsFile; };
 
   programs.neovim = {
     viAlias = true;

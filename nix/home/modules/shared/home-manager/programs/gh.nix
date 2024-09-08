@@ -2,15 +2,30 @@
 let
   # Wrapper for gh that includes the GitHub token
   gh-wrapped = pkgs.writeShellScriptBin "gh" ''
-    if ! GITHUB_TOKEN=$(cat ${config.sops.secrets.github_token.path} 2>/dev/null); then
+    if ! GITHUB_TOKEN=$(cat ${config.sops.secrets.github-token.path} 2>/dev/null); then
       echo -e "\033[1;90m[!] GitHub token retrieval failed from SOPS...\033[0m" >&2
     fi
     export GITHUB_TOKEN
     ${pkgs.gh}/bin/gh "$@"
   '';
+
+  # Debug print the sops config
+  debug_config = builtins.trace
+    "Debug: config = ${builtins.toJSON (removeAttrs config [ "_module" ])}"
+    config;
+  debug_sops = builtins.trace
+    "Debug: config.sops = ${builtins.toJSON (config.sops or "sops not found")}"
+    config;
+
 in
 {
-  sops.secrets.github_token = { sopsFile = config.sops.defaultSopsFile; };
+
+  # Your existing configuration...
+  sops.secrets.github-token = {
+    sopsFile = builtins.trace
+      "Debug: sopsFile = ${builtins.toString config.sops.defaultSopsFile}"
+      config.sops.defaultSopsFile;
+  };
   programs.gh = {
     package = gh-wrapped;
     settings = {
@@ -51,7 +66,7 @@ in
     Service = {
       Type = "oneshot";
       ExecStart =
-        "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github_token.path}";
+        "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github-token.path}";
     };
     Install = { WantedBy = [ "default.target" ]; };
   };

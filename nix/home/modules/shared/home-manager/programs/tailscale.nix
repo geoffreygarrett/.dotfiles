@@ -1,5 +1,4 @@
-{ config, pkgs, ... }:
-{
+{ config, pkgs, ... }: {
 
   # Install Tailscale for the user
   home.packages = with pkgs; [ tailscale ];

@@ -118,3 +118,31 @@ please [open an issue](https://github.com/geoffreygarrett/celestial-blueprint/is
 
 This project uses GitHub Actions for continuous integration. The workflow automatically tests the setup process on
 Windows, macOS, and Ubuntu to ensure cross-platform compatibility.
+
+## Nix Naming Conventions
+
+- **File and Directory Names**: kebab-case
+    - Example: `home-manager.nix`
+
+- **Package Names**: kebab-case
+    - Example: `vscode-with-extensions`
+
+- **Top-level Attribute Names**: kebab-case
+    - Example: `build-inputs`
+
+- **Module Names and Options**: camelCase
+    - Example: `homeManager`, `extraConfig`
+
+- **Function Names and Arguments**: camelCase
+    - Example: `mkDerivation`, `buildInputs`
+
+- **Local Variables**: camelCase
+    - Example: `userConfig`
+
+- **Type Names**: PascalCase
+    - Example: `String`, `Int`
+
+- **Environment Variables**: UPPER_SNAKE_CASE
+    - Example: `NIX_PATH`
+
+**Note**: Maintain consistency within each file or module. When working with existing code, follow the conventions already in use.

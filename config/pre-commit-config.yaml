@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/nix-community/nixpkgs-fmt
+    rev: v1.3.0
+    hooks:
+      - id: nixpkgs-fmt
+        name: nixfmt-rfc-style
+        entry: nixpkgs-fmt
+        language: system
+        files: \.nix$
+
+  - repo: https://github.com/lovesegfault/beautysh
+    rev: v6.2.1
+    hooks:
+      - id: beautysh
+        name: beautysh
+        entry: beautysh
+        language: python
+        types: [ shell ]

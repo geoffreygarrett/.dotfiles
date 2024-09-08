@@ -19,8 +19,8 @@
       "github-token" = {
         # mode "0400": read permission for owner only
         mode = "0400";
-        owner = config.users.users.${user}.name;
-        group = config.users.users.${user}.group;
+        #        owner = config.users.users.${user}.name;
+        #        group = config.users.users.${user}.group;
         # Description: Used for GitHub API authentication
       };
 
@@ -28,39 +28,39 @@
       "openai-api-key" = {
         # mode "0400": read permission for owner only
         mode = "0400";
-        owner = config.users.users.${user}.name;
-        group = config.users.users.${user}.group;
+        #        owner = config.users.users.${user}.name;
+        #        group = config.users.users.${user}.group;
         # Description: Required for OpenAI API access
       };
-
-      # SYNCTHING_CERT
-      "syncthing-cert" = {
-        # mode "0644": read for owner, read for group, read for others
-        mode = "0644";
-        owner = config.users.users.${user}.name;
-        group = "staff";
-        path = "/Users/${user}/Library/Application Support/Syncthing/cert.pem";
-        # Description: Syncthing TLS certificate
-      };
-
-      # SYNCTHING_KEY
-      "syncthing-key" = {
-        # mode "0600": read and write for owner only
-        mode = "0600";
-        owner = config.users.users.${user}.name;
-        group = "staff";
-        path = "/Users/${user}/Library/Application Support/Syncthing/key.pem";
-        # Description: Syncthing private key
-      };
-
-      # TAILSCALE_AUTH_KEY
-      "tailscale-auth-key" = {
-        # mode "0400": read permission for owner only
-        mode = "0400";
-        owner = config.users.users.${user}.name;
-        group = config.users.users.${user}.group;
-        # Description: Used for Tailscale node authentication
-      };
+      #
+      #      # SYNCTHING_CERT
+      #      "syncthing-cert" = {
+      #        # mode "0644": read for owner, read for group, read for others
+      #        mode = "0644";
+      ##        owner = config.users.users.${user}.name;
+      ##        group = "staff";
+      ##        path = "/Users/${user}/Library/Application Support/Syncthing/cert.pem";
+      #        # Description: Syncthing TLS certificate
+      #      };
+      #
+      #      # SYNCTHING_KEY
+      #      "syncthing-key" = {
+      #        # mode "0600": read and write for owner only
+      #        mode = "0600";
+      ##        owner = config.users.users.${user}.name;
+      ##        group = "staff";
+      ##        path = "/Users/${user}/Library/Application Support/Syncthing/key.pem";
+      #        # Description: Syncthing private key
+      #      };
+      #
+      #      # TAILSCALE_AUTH_KEY
+      #      "tailscale-auth-key" = {
+      #        # mode "0400": read permission for owner only
+      #        mode = "0400";
+      ##        owner = config.users.users.${user}.name;
+      ##        group = config.users.users.${user}.group;
+      #        # Description: Used for Tailscale node authentication
+      #      };
     };
   };
 }
