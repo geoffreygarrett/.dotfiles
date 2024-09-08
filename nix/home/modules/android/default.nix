@@ -167,7 +167,7 @@
             switch = "nix-on-droid switch --flake ~/.dotfiles";
           };
         }
-        // import ../shared/home-manager/programs/git { inherit inputs config pkgs lib; }
+        #        // import ../shared/home-manager/programs/git { inherit inputs config pkgs lib; }
         // import ../shared/home-manager/programs/nushell { inherit inputs config pkgs lib; }
         // import ../shared/home-manager/programs/nvim { inherit inputs config pkgs lib; }
         // import ../shared/home-manager/programs/starship { inherit inputs config pkgs lib; }
