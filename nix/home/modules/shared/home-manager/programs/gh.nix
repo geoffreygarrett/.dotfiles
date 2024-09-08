@@ -27,6 +27,7 @@ in
       config.sops.defaultSopsFile;
   };
   programs.gh = {
+    enable = true;
     package = gh-wrapped;
     settings = {
       options = {

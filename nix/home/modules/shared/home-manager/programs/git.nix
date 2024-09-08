@@ -1,5 +1,6 @@
 { config, pkgs, ... }: {
   programs.git = {
+    enable = true;
     userName = "geoffreygarrett";
     userEmail = "26066340+geoffreygarrett@users.noreply.github.com";
     aliases = {

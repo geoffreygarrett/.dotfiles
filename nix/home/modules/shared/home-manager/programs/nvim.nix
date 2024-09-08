@@ -34,6 +34,7 @@ in
   sops.secrets.openai-api-key = { sopsFile = config.sops.defaultSopsFile; };
 
   programs.neovim = {
+    enable = true;
     viAlias = true;
     vimAlias = true;
     extraPackages = with pkgs;

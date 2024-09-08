@@ -8,6 +8,7 @@ in {
   };
 
   programs.zsh = {
+    enable = true;
     autocd = true;
     dotDir = ".config/zsh";
     enableCompletion = true;

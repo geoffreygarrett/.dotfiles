@@ -1,5 +1,6 @@
 { config, pkgs, lib, inputs, ... }: {
   programs.alacritty = {
+    enable = true;
     package =
       if lib.hasPrefix "x86_64-linux" pkgs.system
         || lib.hasPrefix "aarch64-linux" pkgs.system then

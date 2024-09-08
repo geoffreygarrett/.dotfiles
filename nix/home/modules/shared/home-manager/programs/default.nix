@@ -5,7 +5,7 @@ let
   importModule = file: import file { inherit config lib pkgs inputs; };
 in
 {
-
+  # Import modules that each manage their own program configurations
   imports = [
     (importModule ./alacritty.nix)
     (importModule ./zellij.nix)
@@ -17,16 +17,4 @@ in
     (importModule ./starship.nix)
     (importModule ./qemu.nix)
   ];
-
-  programs = {
-    alacritty.enable = true;
-    zellij.enable = true;
-    git.enable = true;
-    gh.enable = true;
-    zsh.enable = true;
-    nushell.enable = true;
-    qemu.enable = true;
-    neovim.enable = true;
-    starship.enable = true;
-  };
 }
