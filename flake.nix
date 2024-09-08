@@ -57,6 +57,13 @@
 
     # Linux-specific
     nixgl = { url = "github:guibou/nixGL"; };
+
+    # CLI
+    # Add rust-overlay input for better Rust support
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs =
     { self
@@ -74,10 +81,34 @@
     , homebrew-cask
       # ANDROID
     , nix-on-droid
+      # CLI
+    , rust-overlay
+
     , ...
     }@inputs:
     let
       inherit (self) outputs;
+      # Add a function to build the Nixus app
+      buildNixusApp = system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+            overlays = [ (import rust-overlay) ];
+          };
+          rustPkgs = pkgs.rustPlatform;
+        in
+        rustPkgs.buildRustPackage {
+          pname = "nixus";
+          version = "0.1.0";
+          src = ./nix/apps/nixus;
+          cargoLock = {
+            lockFile = ./nix/apps/nixus/Cargo.lock;
+          };
+          buildInputs = with pkgs; [
+            openssl
+            pkg-config
+          ];
+        };
       users = {
         geoffrey = {
           username = "geoffrey";
@@ -259,9 +290,19 @@
       # apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 
       apps = forAllSystems (system:
-        let pkgs = pkgsFor system;
+        let
+          pkgs = pkgsFor system;
+          nixusApp = buildNixusApp system;
         in
         {
+          default = {
+            type = "app";
+            program = "${nixusApp}/bin/nixus";
+          };
+          nixus = {
+            type = "app";
+            program = "${nixusApp}/bin/nixus";
+          };
           check = {
             type = "app";
             program = toString (pkgs.writeShellScript "run-checks" ''
@@ -269,14 +310,8 @@
               pre-commit run --all-files
             '');
           };
-          switch = {
-            type = "app";
-            program = toString (pkgs.writeShellScript "home-manager-switch"
-              (builtins.readFile ./scripts/home_manager_switch.sh));
-          };
-        } // (if isLinux system then mkLinuxApps else mkDarwinApps) system);
-      #      devShells = forAllSystems devShell;
-
+        } // (if isLinux system then mkLinuxApps else mkDarwinApps) system
+      );
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;

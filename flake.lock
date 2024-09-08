@@ -26,11 +26,11 @@
       "locked": {
         "lastModified": 1,
         "narHash": "sha256-wOSbMHEgjHudTREBa0Kt1BGtPdleqtSqknRcjh9ob8M=",
-        "path": "/nix/store/cqfcq5idfr331rfmdfnkdfxhli09syp9-source/nix/packages",
+        "path": "/nix/store/lv4mi77wihw5fxf082jahi4fxrdp3345-source/nix/packages",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/cqfcq5idfr331rfmdfnkdfxhli09syp9-source/nix/packages",
+        "path": "/nix/store/lv4mi77wihw5fxf082jahi4fxrdp3345-source/nix/packages",
         "type": "path"
       }
     },
@@ -516,7 +516,28 @@
         "nixgl": "nixgl",
         "nixpkgs": "nixpkgs_4",
         "pre-commit-hooks": "pre-commit-hooks",
+        "rust-overlay": "rust-overlay",
         "sops-nix": "sops-nix"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1725762472,
+        "narHash": "sha256-thdxLVdcfrJNMFV3Ej9mDIh6QgHyoYswiW0SFNwod8A=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "57a1564c924ee4acbffe0ad3d65c7e90d3e77cd8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "type": "github"
       }
     },
     "scss-reset": {

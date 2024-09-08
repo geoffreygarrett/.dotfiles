@@ -77,7 +77,7 @@ in
         ../../home/modules/shared/home-manager/programs
       ];
 
-      home = home-manager-config.home // {
+      home = {
         enableNixpkgsReleaseCheck = false;
         packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
           {
@@ -89,16 +89,16 @@ in
         stateVersion = "23.11";
       };
 
-      programs = {
-        nushell = {
-          enable = true;
-          extraConfig = ''
-            $env.config = {
-              show_banner: false,
-            };
-          '';
-        };
-      };
+      #      programs = {
+      #        nushell = {
+      #          enable = true;
+      #          extraConfig = ''
+      #            $env.config = {
+      #              show_banner: false,
+      #            };
+      #          '';
+      #        };
+      #      };
 
 
 
