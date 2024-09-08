@@ -158,7 +158,7 @@
     {
       services.nix-daemon.enable = true;
       services.pcscd.enable = true;
-      #      home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
+      home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
       home-manager.syncthing = {
         enable = true;
         tray.enable = true;
