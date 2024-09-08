@@ -9,13 +9,6 @@
     ./custom-font.nix
   ];
 
-
-
-  nix-on-droid.terminal.font = {
-    enable = true;
-    path = "${pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }}/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-Regular.ttf";
-  };
-
   services.ssh = {
     enable = true;
     port = 8022;

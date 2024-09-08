@@ -40,8 +40,28 @@ pub fn run(args: DarwinArgs) -> Result<(), String> {
             build(&flake_dir, &system_type, &args.args)?;
             switch(&flake_dir, &system_type, &args.args)
         }
-        DarwinCommand::Rollback => rollback(&flake_dir, &system_type, &args.args),
+        DarwinCommand::Rollback => rollback(&flake_dir, &system_type, &args.args)
     }
+}
+
+fn forward_command(flake_dir: &PathBuf, command: &str, extra_args: &[String]) -> Result<(), String> {
+    println!("{}", format!("Forwarding '{}' command to darwin-rebuild...", command).yellow());
+
+    CheckedCommand::new("/run/current-system/sw/bin/darwin-rebuild")
+        .map_err(|e| format!("Failed to create darwin-rebuild command: {}", e))?
+        .arg(command)  // Use the forwarded command
+        .args(extra_args)
+        .current_dir(flake_dir)
+        .status()
+        .map_err(|e| format!("Failed to forward command: {}", e))
+        .and_then(|status| {
+            if status.success() {
+                println!("{}", "Command forwarded successfully.".green());
+                Ok(())
+            } else {
+                Err("Forwarded command failed".into())
+            }
+        })
 }
 
 fn build(flake_dir: &PathBuf, system_type: &str, extra_args: &[String]) -> Result<(), String> {

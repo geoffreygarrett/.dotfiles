@@ -6,6 +6,7 @@ use clap_complete::{generate, Generator};
 use clap_complete_nushell::Nushell;
 use colored::*;
 use env_logger::Builder;
+#[allow(unused_imports)]
 use log::{debug, error, info, Level, LevelFilter, warn};
 
 mod cli;
