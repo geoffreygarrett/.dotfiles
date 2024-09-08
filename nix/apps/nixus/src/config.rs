@@ -1,17 +1,13 @@
-//! ```cargo
-//! [dependencies]
-//! colored = "2.0"
-//! dirs = "5.0"
-//! serde = { version = "1.0", features = ["derive"] }
-//! toml = "0.7"
-//! snafu = "0.7"
-//! ```
-use colored::*;
-use serde::Deserialize;
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
+
+// src/config.rs
+use colored::*;
+use serde::Deserialize;
 use snafu::{ResultExt, Snafu};
+
+use crate::config;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Keys {
@@ -25,6 +21,7 @@ pub struct Config {
 }
 
 #[derive(Debug, Snafu)]
+#[allow(dead_code)]
 pub enum ConfigError {
     #[snafu(display("Failed to read file at {}: {}", path.display(), source))]
     ReadFile { source: std::io::Error, path: PathBuf },
@@ -90,6 +87,7 @@ pub fn find_flake_dir() -> Result<PathBuf, ConfigError> {
     Err(ConfigError::NoFlakeConfig)
 }
 
+#[allow(dead_code)]
 pub fn print_flake_info() {
     println!("{}", "Flake Locations:".green().bold());
     match get_flake_locations() {
@@ -97,7 +95,7 @@ pub fn print_flake_info() {
             for (index, location) in locations.iter().enumerate() {
                 println!("{}. {}", index + 1, location.display());
             }
-        },
+        }
         Err(e) => println!("{} {}", "Error getting flake locations:".red().bold(), e),
     }
 
@@ -107,12 +105,37 @@ pub fn print_flake_info() {
     }
 }
 
+pub fn get_flake_dir(flake: Option<PathBuf>) -> Result<PathBuf, String> {
+    flake
+        .or_else(|| std::env::var("NIXUS_FLAKE").ok().map(PathBuf::from))
+        .or_else(|| config::find_flake_dir().ok())
+        .ok_or_else(|| "Failed to determine flake directory. Please specify with --flake or set NIXUS_FLAKE environment variable.".to_string())
+}
+
+
+pub fn determine_system_type() -> String {
+    let arch = env::consts::ARCH;
+    let os = env::consts::OS;
+
+    match (arch, os) {
+        ("x86_64", "linux") => "x86_64-linux",
+        ("x86_64", "macos") => "x86_64-darwin",
+        ("aarch64", "linux") => "aarch64-linux",
+        ("aarch64", "macos") => "aarch64-darwin",
+        ("aarch64", "android") => "aarch64-android",
+        _ => panic!("Unsupported system: {} {}", arch, os),
+    }.to_string()
+}
+
+
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::fs::File;
     use std::io::Write;
+
     use tempfile::tempdir;
+
+    use super::*;
 
     #[test]
     fn test_config_from_file() {
@@ -127,7 +150,7 @@ mod tests {
 
         let config = Config::from_file(file_path).unwrap();
         assert_eq!(config.keys.ssh, vec!["key1", "key2"]);
-        assert_eq!(config.keys.wg, Some(vec!["wg1", "wg2"]));
+        assert_eq!(config.keys.wg, Some(vec!["wg1".to_string(), "wg2".to_string()]));
     }
 
     #[test]

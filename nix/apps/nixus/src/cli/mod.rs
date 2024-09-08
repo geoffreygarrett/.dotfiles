@@ -1,3 +1,4 @@
+// src/cli/mod.rs
 use clap::Subcommand;
 
 pub mod darwin;
@@ -7,8 +8,8 @@ pub mod home;
 
 #[derive(Subcommand)]
 pub enum Commands {
-    Darwin(darwin::Args),
-    Android(android::Args),
-    NixOS(nixos::Args),
-    Home(home::Args),
+    Darwin(darwin::DarwinArgs),
+    Android(android::AndroidArgs),
+    NixOS(nixos::NixOSArgs),
+    Home(home::HomeArgs),
 }

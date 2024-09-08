@@ -1,28 +1,23 @@
-// src/cli/darwin.rs
+use std::path::PathBuf;
+use std::process::Command;
+
 use clap::Args;
 use colored::*;
-use std::process::Command;
-use std::env;
-use std::path::PathBuf;
 
 #[derive(Args)]
-pub struct Args {
+pub struct DarwinArgs {
     #[arg(short, long)]
-    flake_dir: Option<String>,
+    flake: Option<PathBuf>,
 
     #[arg(last = true)]
     args: Vec<String>,
 }
 
-pub fn run(args: Args) {
+pub fn run(args: DarwinArgs) -> Result<(), String> {
     println!("{}", "Running Darwin configuration switch...".blue().bold());
 
-    let flake_dir = args.flake_dir
-        .map(PathBuf::from)
-        .or_else(|| env::var("NIXUS_FLAKE").ok().map(PathBuf::from))
-        .unwrap_or_else(|| std::env::current_dir().expect("Failed to get current directory"));
-
-    let system_type = determine_system_type();
+    let flake_dir = crate::config::get_flake_dir(args.flake)?;
+    let system_type = crate::config::determine_system_type();
 
     // Build step
     println!("{}", "Building configuration...".yellow());
@@ -33,11 +28,11 @@ pub fn run(args: Args) {
         .arg("nix-command flakes")
         .args(&args.args)
         .current_dir(&flake_dir)
-        .status();
+        .status()
+        .map_err(|e| format!("Failed to execute build command: {}", e))?;
 
-    if let Err(e) = build_status {
-        eprintln!("{}: {}", "Build failed".red(), e);
-        return;
+    if !build_status.success() {
+        return Err("Build failed".into());
     }
 
     // Switch step
@@ -48,29 +43,21 @@ pub fn run(args: Args) {
         .arg(format!(".#{}", system_type))
         .args(&args.args)
         .current_dir(&flake_dir)
-        .status();
+        .status()
+        .map_err(|e| format!("Failed to execute switch command: {}", e))?;
 
-    match switch_status {
-        Ok(status) if status.success() => println!("{}", "Switch to new configuration complete!".green()),
-        Ok(_) => eprintln!("{}", "Switch failed".red()),
-        Err(e) => eprintln!("{}: {}", "Failed to execute switch command".red(), e),
+    if !switch_status.success() {
+        return Err("Switch failed".into());
     }
+
+    println!("{}", "Switch to new configuration complete!".green());
 
     // Cleanup
     let _ = Command::new("unlink")
         .arg("./result")
         .current_dir(&flake_dir)
         .status();
+
+    Ok(())
 }
 
-fn determine_system_type() -> String {
-    match env::consts::ARCH {
-        "x86_64" => "x86_64-darwin",
-        "aarch64" => "aarch64-darwin",
-        arch => panic!("Unsupported architecture for Darwin: {}", arch),
-    }.to_string()
-}
-
-// src/main.rs remains the same
-
-// src/cli/mod.rs remains the same
