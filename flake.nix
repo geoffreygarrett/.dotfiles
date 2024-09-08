@@ -141,10 +141,7 @@
         import nixpkgs {
           inherit system;
           overlays = [
-            (import ./nix/packages) # This is your custom packages overlay
-            (final: prev:
-              nixpkgs.lib.optionalAttrs (isLinux system && !isTermuxNixAndroid)
-                (nixgl.overlays.default final prev))
+            (import ./nix/overlays/packages.nix) # Combined overlay for Darwin and Linux
           ];
           config = {
             allowUnfree = true;

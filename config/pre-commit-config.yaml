@@ -14,3 +14,9 @@ repos:
         name: beautysh
         args: [ --indent-size=2, --force-function-style=fnpar ]
         types: [ shell ]
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.18.4
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
