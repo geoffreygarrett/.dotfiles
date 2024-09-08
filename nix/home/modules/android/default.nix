@@ -173,7 +173,6 @@
 
         programs.starship = {
           enable = true;
-          theme = "nerdfonts";
           # prompt = "❯";
           # addNewline = false;
           # showHostname = false;
