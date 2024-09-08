@@ -212,7 +212,7 @@
             #            inputs.sops-nix.homeManagerModules.sops
             {
               networking = {
-                hostName = "artemis";
+                #                hostName = "artemis";
                 extraHosts = {
                   "100.78.156.17" = [ "pioneer.home" ];
                   "100.116.122.19" = [ "artemis.home" ];
