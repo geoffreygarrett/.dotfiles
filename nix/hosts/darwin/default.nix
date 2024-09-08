@@ -66,6 +66,7 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    #    programs = { };
     users.${user} = {
       imports = [
         ../../home/modules/shared/home-manager/programs
@@ -78,6 +79,8 @@ in
       #        };
       #
       #      };
+      #            programs = { }
+      #              // import ../../home/modules/shared/home-manager/programs { inherit config inputs user pkgs lib; };
       home = home-manager-config.home // {
         enableNixpkgsReleaseCheck = false;
         packages = pkgs.callPackage ../../home/modules/darwin/packages.nix

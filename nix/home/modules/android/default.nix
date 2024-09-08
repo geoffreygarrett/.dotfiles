@@ -167,46 +167,8 @@
           };
         };
 
-        programs.nushell = {
-          enable = true;
-        };
-
-        programs.starship = {
-          enable = true;
-          # prompt = "❯";
-          # addNewline = false;
-          # showHostname = false;
-          # showUsername = false;
-          # showCmdDuration = false;
-          # showBattery = false;
-          # showCloud = false;
-          # showGitBranch = false;
-          # showGitState = false;
-          # showPackageVersion = false;
-          # showRuby = false;
-          # showGo = false;
-          # showNode = false;
-          # showPython = false;
-          # showDotnet = false;
-          # showJava = false;
-          # showElixir = false;
-          # showHaskell = false;
-          # showDart = false;
-          # showNim = false;
-          # showMemoryUsage = false;
-          # showAWS = false;
-          # showGCP = false;
-          # showAzure = false;
-          # showDocker = false;
-          # showKubernetes = false;
-          # showConda = false;
-          # showDotnet = false;
-          # showNix = false;
-          # showBattery = false;
-          # showTime = false;
-          # showCustom = false;
-          # custom = [];
-        };
+        programs = { }
+          // import ../shared/home-manager/programs { inherit config pkgs lib; };
 
         home.packages = with pkgs; [
           htop
