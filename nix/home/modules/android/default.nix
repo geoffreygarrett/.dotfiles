@@ -158,15 +158,17 @@
         # Read the changelog before changing this value
         home.stateVersion = "24.05";
 
+        extraSpecialArgs = { inherit inputs outputs; };
+
         imports = [
-          ../shared/home-manager/programs
+          #          ../shared/home-manager/programs
           # Uncomment the modules you want to import
           # ../shared/home-manager/programs/git.nix
-          # ../shared/home-manager/programs/nushell.nix
-          # ../shared/home-manager/programs/nvim.nix
-          # ../shared/home-manager/programs/starship.nix
-          # ../shared/home-manager/programs/zellij.nix
-          # ../shared/home-manager/programs/zsh.nix
+          ../shared/home-manager/programs/nushell.nix
+          #           ../shared/home-manager/programs/nvim.nix
+          ../shared/home-manager/programs/starship.nix
+          ../shared/home-manager/programs/zellij.nix
+          ../shared/home-manager/programs/zsh.nix
         ];
 
         # Your home-manager configuration goes here

@@ -26,11 +26,11 @@
       "locked": {
         "lastModified": 1,
         "narHash": "sha256-wOSbMHEgjHudTREBa0Kt1BGtPdleqtSqknRcjh9ob8M=",
-        "path": "/nix/store/wqhbq6adrwf77wa3ijbdkd1lqxcjf030-source/nix/packages",
+        "path": "/nix/store/ga6pzwhr7i033pw1xgnqk037kq4yq0az-source/nix/packages",
         "type": "path"
       },
       "original": {
-        "path": "/nix/store/wqhbq6adrwf77wa3ijbdkd1lqxcjf030-source/nix/packages",
+        "path": "/nix/store/ga6pzwhr7i033pw1xgnqk037kq4yq0az-source/nix/packages",
         "type": "path"
       }
     },
