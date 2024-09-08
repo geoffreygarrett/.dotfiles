@@ -206,13 +206,11 @@
       ##############################
       nixOnDroidConfigurations = {
         default = nix-on-droid.lib.nixOnDroidConfiguration {
-          pkgs = pkgsFor "aarch64-linux";
+          pkgs = import nixpkgs { system = "aarch64-linux"; };
           modules = [
             ./nix/home/modules/android
-            #            inputs.sops-nix.homeManagerModules.sops
             {
               networking = {
-                #                hostName = "artemis";
                 hosts = {
                   "100.78.156.17" = [ "pioneer.home" ];
                   "100.116.122.19" = [ "artemis.home" ];
