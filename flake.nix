@@ -34,12 +34,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Custom Packages
-    custom-packages = {
-      url = "./nix/packages";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # macOS-specific
     nix-homebrew = { url = "github:zhaofengli-wip/nix-homebrew"; };
     homebrew-bundle = {
@@ -70,7 +64,6 @@
     , nixpkgs
     , home-manager
     , pre-commit-hooks
-    , custom-packages
       # LINUX
     , nixgl
       # DARWIN
@@ -148,7 +141,7 @@
         import nixpkgs {
           inherit system;
           overlays = [
-            custom-packages.overlays.default
+            (import ./nix/packages) # This is your custom packages overlay
             (final: prev:
               nixpkgs.lib.optionalAttrs (isLinux system && !isTermuxNixAndroid)
                 (nixgl.overlays.default final prev))
@@ -159,6 +152,7 @@
               builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
           };
         };
+
       mkRustScriptApp =
         import ./nix/lib/mk-rust-script-app.nix { inherit inputs nixpkgs lib; };
       mkRustBinaryApp =

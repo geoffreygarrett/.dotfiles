@@ -4,8 +4,7 @@ repos:
     hooks:
       - id: nixpkgs-fmt
         name: nixfmt-rfc-style
-        entry: nixpkgs-fmt
-        language: system
+        args: [ --in-place ]
         files: \.nix$
 
   - repo: https://github.com/lovesegfault/beautysh
@@ -13,6 +12,5 @@ repos:
     hooks:
       - id: beautysh
         name: beautysh
-        entry: beautysh
-        language: python
+        args: [ --indent-size=2, --force-function-style=fnpar ]
         types: [ shell ]
