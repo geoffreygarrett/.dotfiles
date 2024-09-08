@@ -1,6 +1,54 @@
 { inputs, config, lib, pkgs, ... }:
 
 {
+
+  imports = [
+    ./ssh.nix
+    ./storage.nix
+    ./battery.nix
+    ./custom-font.nix
+  ];
+
+
+
+  nix-on-droid.terminal.font = {
+    enable = true;
+    path = "${pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }}/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-Regular.ttf";
+  };
+
+  services.ssh = {
+    enable = true;
+    port = 8022;
+    authorizedKeys = [
+      "ssh-rsa AAAAB3NzaC1yc2EAAA..." # Your public key here
+    ];
+    aliases = {
+      sshd-start = "sshd-start";
+      sshd-stop = "pkill sshd";
+      sshd-restart = "sshd-stop && sshd-start";
+      ssh-keygen = "ssh-keygen -t ed25519"; # Example of adding a new alias
+    };
+  };
+
+  services.storage = {
+    enable = true;
+    showInfoOnStartup = true;
+    aliases = {
+      storage-info = "storage-info";
+      storage-usage = "du -h -d 2 /sdcard | sort -h"; # Modified to show 2 levels deep
+    };
+  };
+
+  services.battery = {
+    enable = true;
+    showInfoOnStartup = true;
+    aliases = {
+      battery-info = "battery-info";
+      battery-saver = "am start -a android.settings.BATTERY_SAVER_SETTINGS";
+      battery-full = "termux-notification -t 'Battery Full' -c 'Your battery is fully charged'"; # New alias
+    };
+  };
+
   # Packages to be installed
   environment.packages = with pkgs; [
     neovim

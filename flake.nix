@@ -119,7 +119,7 @@
           overlays = [
             custom-packages.overlays.default
             (final: prev:
-              nixpkgs.lib.optionalAttrs (isLinux system)
+              nixpkgs.lib.optionalAttrs (isLinux system && !isTermuxNixAndroid)
                 (nixgl.overlays.default final prev))
           ];
           config = {

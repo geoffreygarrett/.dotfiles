@@ -14,7 +14,7 @@ in
     (importModule ./zsh.nix)
     (importModule ./nushell.nix)
     (importModule ./nvim.nix)
-    (importModule ./starship.nix)
+    #    (importModule ./starship.nix)
     (importModule ./qemu.nix)
   ];
 }

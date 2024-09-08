@@ -10,6 +10,10 @@ let
 in
 {
 
+  imports = [
+    ../../home/modules/shared/cachix
+  ];
+
   #    imports = [
 
   #    #    ../../modules/darwin/secrets.nix
@@ -55,6 +59,7 @@ in
       #      "hidden-bar" = 1452453066;
       #      "wireguard" = 1451685025;
       #      "yoink" = 457622435;
+      "deco" = 1186159417;
       "tailscale" = 1475387142;
     };
 
@@ -66,12 +71,84 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    #    programs = { };
-    users.${user} = {
+    users.${user} = { config, lib, pkgs, inputs, ... }: {
       imports = [
-        ../../home/modules/shared/home-manager/programs
         ../../home/modules/darwin/secrets.nix
+        ../../home/modules/shared/home-manager/programs
       ];
+
+      home = home-manager-config.home // {
+        enableNixpkgsReleaseCheck = false;
+        packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
+          {
+            inherit pkgs;
+          } ++ [
+          pkgs.nushell
+        ];
+
+        stateVersion = "23.11";
+      };
+
+      programs = {
+        nushell = {
+          enable = true;
+          extraConfig = ''
+            $env.config = {
+              show_banner: false,
+            };
+          '';
+        };
+      };
+
+
+
+      #  home-manager = {
+      #    useGlobalPkgs = true;
+      #    useUserPackages = true;
+      #    #    programs = { };
+      #    users.${user} = {
+      #      imports = [
+      ##        ../../home/modules/shared/home-manager/programs
+      #        ../../home/modules/darwin/secrets.nix
+      #      ];
+      ##      programs = import ../../home/modules/shared/home-manager/programs {
+      ##        inherit config lib pkgs inputs;
+      ##      };
+      #
+      #
+      #    config =
+      #      { config, lib, pkgs, inputs, ... }:
+      #      {
+      #
+      #      home = home-manager-config.home // {
+      #        enableNixpkgsReleaseCheck = false;
+      #        packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
+      #          {
+      #            inherit pkgs;
+      #          } ++ [
+      #                    pkgs.nushell
+      #        ];
+      #
+      #        stateVersion = "23.11";
+      #      };
+      #
+      #        programs = {
+      #          nushell = {
+      #            enable = true;
+      #            extraConfig = ''
+      #              $env.config = {
+      #                show_banner: false,
+      #              };
+      #            '';
+      #          };
+      #          #  home.packages = with pkgs; [
+      #          #   cargo
+      #          #  ];
+      #         # programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
+      #};
+      #      };
+
+
       #      programs = {
       #
       #        nushell = {
@@ -81,17 +158,7 @@ in
       #      };
       #            programs = { }
       #              // import ../../home/modules/shared/home-manager/programs { inherit config inputs user pkgs lib; };
-      home = home-manager-config.home // {
-        enableNixpkgsReleaseCheck = false;
-        packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
-          {
-            inherit pkgs;
-          } ++ [
-          #          pkgs.nushell
-        ];
 
-        stateVersion = "23.11";
-      };
       #      programs = {} // {
       #        nushell = {
       #          enable = true;
