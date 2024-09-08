@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ inputs, config, lib, pkgs, ... }:
 
 {
   # Packages to be installed
@@ -166,7 +166,7 @@
             hw = "echo 'Hello, World!'";
             switch = "nix-on-droid switch --flake ~/.dotfiles";
           };
-        } // import ../shared/home-manager/programs { inherit config pkgs lib; };
+        } // import ../shared/home-manager/programs { inherit inputs config pkgs lib; };
 
         home.packages = with pkgs; [
           htop
