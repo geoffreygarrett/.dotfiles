@@ -6,7 +6,7 @@ mod cli;
 mod config;
 
 #[derive(Parser)]
-#[clap(name = "nixus")]
+#[clap(name = "nixus", styles=crate::cli::styles::get_styles())]
 #[clap(about = "A CLI tool for managing Nix configurations")]
 struct Cli {
     #[clap(subcommand)]
