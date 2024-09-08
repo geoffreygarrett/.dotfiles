@@ -158,7 +158,6 @@
     {
       services.nix-daemon.enable = true;
       services.pcscd.enable = true;
-      home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
       home-manager.syncthing = {
         enable = true;
         tray.enable = true;
@@ -210,6 +209,7 @@
           pkgs = pkgsFor "aarch64-linux";
           modules = [
             ./nix/home/modules/android
+            inputs.sops-nix.homeManagerModules.sops
             {
               networking.hosts = {
                 "100.78.156.17" = [ "pioneer.home" ];
