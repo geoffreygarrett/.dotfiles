@@ -10,6 +10,7 @@ use log::{debug, error, info, Level, LevelFilter, warn};
 
 mod cli;
 mod config;
+mod utils;
 
 #[derive(Parser)]
 #[clap(name = "nixus", styles = crate::cli::styles::get_styles())]
