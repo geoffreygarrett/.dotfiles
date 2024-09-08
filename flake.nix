@@ -141,7 +141,7 @@
         import nixpkgs {
           inherit system nixgl;
           overlays = [
-            (final: prev: import ./nix/overlays { inherit lib nixgl; })
+            (import ./nix/overlays/default.nix { inherit lib nixgl; })
           ];
           config = {
             allowUnfree = true;
@@ -149,6 +149,7 @@
               builtins.elem (lib.getName pkg) [ "tailscale-ui" "hammerspoon" ];
           };
         };
+
 
 
 
