@@ -5,6 +5,7 @@
   environment.packages = with pkgs; [
     neovim
     git
+    openssh
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
 
     # Uncomment the packages you want to install
@@ -39,15 +40,17 @@
   # };
 
   # Environment variables
-  # environment.sessionVariables = {
-  #   EDITOR = "vim";
-  # };
+  environment.sessionVariables = {
+    EDITOR = "nvim";
+  };
+
+
 
   # Text to show on every new shell
-  # environment.motd = ''
-  #   Welcome to Nix-on-Droid!
-  # '';
-
+  environment.motd = ''
+    echo "Welcome to Nix-on-Droid!" | lolcat
+    fortune | lolcat
+  '';
   # Extra options passed to proot
   # build.extraProotOptions = [ ];
 
@@ -81,15 +84,15 @@
   # };
 
   # Networking configuration
-  # networking = {
-  #   hostName = "nix-on-droid";
-  #   extraHosts = ''
-  #     192.168.0.1 router.local
-  #   '';
-  #   # hosts = {
-  #   #   "192.168.0.2" = [ "nas.local" ];
-  #   # };
-  # };
+  #   networking = {
+  #     hostName = "nix-on-droid";
+  #     extraHosts = ''
+  #       192.168.68.1 router.haemanthus.local
+  #     '';
+  #     # hosts = {
+  #     #   "192.168.0.2" = [ "nas.local" ];
+  #     # };
+  #   };
 
   # Terminal configuration
   # terminal = {
@@ -151,14 +154,14 @@
     # useUserPackages = false;
     # extraSpecialArgs = { };
     # sharedModules = [ ];
+    extraSpecialArgs = { inherit inputs; };
 
     config =
-      { config, lib, pkgs, ... }:
+      { config, lib, pkgs, inputs, ... }:
       {
         # Read the changelog before changing this value
         home.stateVersion = "24.05";
 
-        extraSpecialArgs = { inherit inputs; };
 
         imports = [
           #          ../shared/home-manager/programs
@@ -187,6 +190,7 @@
         home.packages = with pkgs; [
           htop
           fortune
+          lolcat
         ];
       };
     #      // import ../shared/home-manager/programs/git.nix { inherit inputs config pkgs lib; }

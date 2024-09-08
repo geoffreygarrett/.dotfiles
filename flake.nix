@@ -211,10 +211,11 @@
             ./nix/home/modules/android
             #            inputs.sops-nix.homeManagerModules.sops
             {
-              networking.hosts = {
+              networking.extraHosts = {
                 "100.78.156.17" = [ "pioneer.home" ];
                 "100.116.122.19" = [ "artemis.home" ];
               };
+              networking.hostName = "pioneer";
             }
           ];
           extraSpecialArgs = { inherit inputs outputs; };
