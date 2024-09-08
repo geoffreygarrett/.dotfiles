@@ -159,12 +159,14 @@
         home.stateVersion = "24.05";
 
         # Your home-manager configuration goes here
-        programs.bash = {
-          enable = true;
-          shellAliases = {
-            ll = "ls -l";
-            hw = "echo 'Hello, World!'";
-            switch = "nix-on-droid switch --flake ~/.dotfiles";
+        programs = {
+          bash = {
+            enable = true;
+            shellAliases = {
+              ll = "ls -l";
+              hw = "echo 'Hello, World!'";
+              switch = "nix-on-droid switch --flake ~/.dotfiles";
+            };
           };
         }
         // import ../shared/home-manager/programs/git.nix { inherit inputs config pkgs lib; }
