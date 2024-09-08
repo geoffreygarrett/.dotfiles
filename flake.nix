@@ -213,7 +213,7 @@
             {
               networking = {
                 #                hostName = "artemis";
-                extraHosts = {
+                hosts = {
                   "100.78.156.17" = [ "pioneer.home" ];
                   "100.116.122.19" = [ "artemis.home" ];
                 };
