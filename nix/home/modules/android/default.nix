@@ -167,12 +167,12 @@
             switch = "nix-on-droid switch --flake ~/.dotfiles";
           };
         }
-        #        // import ../shared/home-manager/programs/git { inherit inputs config pkgs lib; }
-        // import ../shared/home-manager/programs/nushell { inherit inputs config pkgs lib; }
-        // import ../shared/home-manager/programs/nvim { inherit inputs config pkgs lib; }
-        // import ../shared/home-manager/programs/starship { inherit inputs config pkgs lib; }
-        // import ../shared/home-manager/programs/zellij { inherit inputs config pkgs lib; }
-        // import ../shared/home-manager/programs/zsh { inherit inputs config pkgs lib; };
+        // import ../shared/home-manager/programs/git.nix { inherit inputs config pkgs lib; }
+        // import ../shared/home-manager/programs/nushell.nix { inherit inputs config pkgs lib; }
+        // import ../shared/home-manager/programs/nvim.nix { inherit inputs config pkgs lib; }
+        // import ../shared/home-manager/programs/starship.nix { inherit inputs config pkgs lib; }
+        // import ../shared/home-manager/programs/zellij.nix { inherit inputs config pkgs lib; }
+        // import ../shared/home-manager/programs/zsh.nix { inherit inputs config pkgs lib; };
 
         home.packages = with pkgs; [
           htop
