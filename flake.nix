@@ -141,14 +141,16 @@
         import nixpkgs {
           inherit system nixgl;
           overlays = [
-            (import ./nix/overlays/packages.nix { inherit nixgl lib; })
+            (final: prev: import ./nix/overlays { inherit lib nixgl; })
           ];
           config = {
             allowUnfree = true;
             allowUnfreePredicate = pkg:
-              builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
+              builtins.elem (lib.getName pkg) [ "tailscale-ui" "hammerspoon" ];
           };
         };
+
+
 
 
       mkRustScriptApp =
