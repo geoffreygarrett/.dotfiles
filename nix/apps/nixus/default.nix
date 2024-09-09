@@ -28,7 +28,7 @@ rustPkgs.buildRustPackage {
     gnugrep
   ] ++ pkgs.lib.optionals (lib.isDarwin system) [
     pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-  ] ++ pkgs.lib.optionals (lib.isTermux system) [
+  ] ++ pkgs.lib.optionals (lib.isAndroid system) [
     nix-on-droid.packages.${system}.nix-on-droid
   ];
 
@@ -53,7 +53,7 @@ rustPkgs.buildRustPackage {
         pkgs.nix
         pkgs.jq
         pkgs.gnugrep
-      ] ++ pkgs.lib.optionals (lib.isTermux system) [
+      ] ++ pkgs.lib.optionals (lib.isAndroid system) [
         nix-on-droid.packages.${system}.nix-on-droid
       ])}
   '';

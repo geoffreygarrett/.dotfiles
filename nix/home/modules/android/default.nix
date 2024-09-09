@@ -206,6 +206,7 @@ in
       {
         # Read the changelog before changing this value
         home.stateVersion = "24.05";
+        system.os = "android";
         imports = [
           #          ../shared/home-manager/programs
           # Uncomment the modules you want to import
@@ -249,8 +250,8 @@ in
           fortune
           lolcat
           pkgs.writeScriptBin
-          "screenshot"
-          (builtins.readFile ./screenshot.sh)
+          "screengrab"
+          (builtins.readFile ./screengrab.sh)
         ];
       };
   };

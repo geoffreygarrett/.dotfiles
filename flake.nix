@@ -70,8 +70,7 @@
       lib = nixpkgs.lib // home-manager.lib // {
         isLinux = system: builtins.elem system systems.linux;
         isDarwin = system: builtins.elem system systems.darwin;
-        isTermux = system: builtins.elem system systems.linux;
-        #        isTermux = system: builtins.elem system systems.linux && builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
+        isAndroid = system: builtins.elem system systems.android;
       };
       forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
       pkgsFor = system: import nixpkgs {
@@ -80,7 +79,7 @@
           (final: prev: {
             nix-on-droid = nix-on-droid.packages.${system};
           })
-        ] ++ lib.optional (lib.isTermux system) nix-on-droid.overlays.default
+        ] ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
         ++ lib.optional (lib.isLinux system) nixgl.overlay;
       };
     in
