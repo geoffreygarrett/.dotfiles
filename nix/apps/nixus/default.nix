@@ -1,4 +1,4 @@
-{ system, pkgs, lib, rust-overlay }:
+{ system, pkgs, lib, rust-overlay, nix-on-droid, ... }:
 
 let
   rustPkgs = pkgs.rustPlatform;
@@ -11,15 +11,13 @@ rustPkgs.buildRustPackage {
   cargoLock = {
     lockFile = ./Cargo.lock;
   };
-
-  # Ensure nix-on-droid is available if building for Android
-  preBuild =
-    if system == "aarch64-linux" then ''
-      if ! nix-on-droid --version > /dev/null 2>&1; then
-        echo "Error: nix-on-droid not found" >&2
-        exit 1
-      fi
-    '' else "";
+  buildFeatures = [ "${system}" ];
+  #    preBuild = ''
+  #      if ! ${pkgs.nix-on-droid} --version > /dev/null 2>&1; then
+  #        echo "Error: nix-on-droid not found" >&2
+  #        exit 1
+  #      fi
+  #    '';
 
   buildInputs = with pkgs; [
     openssl
@@ -31,7 +29,7 @@ rustPkgs.buildRustPackage {
   ] ++ pkgs.lib.optionals (lib.isDarwin system) [
     pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
   ] ++ pkgs.lib.optionals (lib.isTermux system) [
-    pkgs.nix-on-droid
+    nix-on-droid.packages.${system}.nix-on-droid
   ];
 
   nativeBuildInputs = with pkgs; [
@@ -55,8 +53,8 @@ rustPkgs.buildRustPackage {
         pkgs.nix
         pkgs.jq
         pkgs.gnugrep
-      ] ++ pkgs.lib.optionals (system == "aarch64-linux") [
-        pkgs.nix-on-droid
+      ] ++ pkgs.lib.optionals (lib.isTermux system) [
+        nix-on-droid.packages.${system}.nix-on-droid
       ])}
   '';
 

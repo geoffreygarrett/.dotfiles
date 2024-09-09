@@ -3,6 +3,22 @@ name = "nixus"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = ["common"]
+linux-aarch64 = []
+linux-x86_64 = []
+darwin-aarch64 = []
+darwin-x86_64 = []
+aarch64-linux = []
+armv7-linux = []
+armv8-linux = []
+x86_64-linux = []
+linux = ["linux-aarch64", "linux-x86_64"]
+darwin = ["darwin-aarch64", "darwin-x86_64"]
+android = ["aarch64-linux", "armv7-linux", "armv8-linux", "x86_64-linux"]
+supported = ["linux", "darwin", "android"]
+common = []
+
 [dependencies]
 #rusb = "0.9.4"
 #dialoguer = "0.11.0"

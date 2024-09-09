@@ -78,14 +78,15 @@
     let
       inherit (self) outputs;
       user = "geoffreygarrett";
-
       systems.linux = [ "aarch64-linux" "x86_64-linux" ];
       systems.darwin = [ "aarch64-darwin" "x86_64-darwin" ];
-      systems.supported = systems.linux ++ systems.darwin;
+      systems.android = [ "aarch64-linux" "armv7-linux" "armv8-linux" "x86_64-linux" ];
+      systems.supported = systems.linux ++ systems.darwin ++ systems.android;
       lib = nixpkgs.lib // home-manager.lib // {
         isLinux = system: builtins.elem system systems.linux;
         isDarwin = system: builtins.elem system systems.darwin;
-        isTermux = system: builtins.elem system systems.linux && builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux";
+        isTermux = system: builtins.elem system systems.linux;
+        #        isTermux = system: builtins.elem system systems.linux && builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
       };
       forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
       pkgsFor = system: import nixpkgs {
@@ -109,7 +110,7 @@
         in
         {
           nixus = import ./nix/apps/nixus {
-            inherit system pkgs rust-overlay lib;
+            inherit system pkgs rust-overlay lib nix-on-droid;
           };
         });
 
@@ -175,22 +176,28 @@
       ##############################
       # Nix-on-Droid Configuration
       ##############################
-      nixOnDroidConfigurations = {
-        default = nix-on-droid.lib.nixOnDroidConfiguration {
-          pkgs = pkgsFor "aarch64-linux";
-          modules = [
-            ./nix/home/modules/android
+      nixOnDroidConfigurations =
+        let
+          configurations = nixpkgs.lib.genAttrs systems.android (system:
             {
-              networking = {
-                hosts = {
-                  "100.78.156.17" = [ "pioneer.home" ];
-                  "100.116.122.19" = [ "artemis.home" ];
-                };
+              config = nix-on-droid.lib.nixOnDroidConfiguration {
+                pkgs = pkgsFor system;
+                modules = [
+                  ./nix/home/modules/android
+                  {
+                    networking.hosts = {
+                      "100.78.156.17" = [ "pioneer.home" ];
+                      "100.116.122.19" = [ "artemis.home" ];
+                    };
+                  }
+                ];
               };
-            }
-          ];
+            });
+        in
+        {
+          inherit configurations;
+          default = configurations."aarch64-linux";
         };
-      };
 
       ##############################
       # Home Configuration
