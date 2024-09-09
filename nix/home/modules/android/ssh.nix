@@ -32,6 +32,15 @@ in
       default = [ "rsa" "ed25519" ];
       description = "The types of SSH keys to generate.";
     };
+    aliases = mkOption {
+      type = types.attrsOf types.str;
+      default = {
+        sshd-start = "sshd-start";
+        sshd-stop = "pkill sshd";
+        sshd-restart = "sshd-stop && sshd-start";
+      };
+      description = "Aliases for SSH-related commands.";
+    };
   };
 
   config = mkIf cfg.enable {
@@ -82,15 +91,6 @@ in
             fi
     '';
 
-    options.services.ssh.aliases = mkOption {
-      type = types.attrsOf types.str;
-      default = {
-        sshd-start = "sshd-start";
-        sshd-stop = "pkill sshd";
-        sshd-restart = "sshd-stop && sshd-start";
-      };
-      description = "Aliases for SSH-related commands.";
-    };
 
     #    # Add SSH-related aliases to the custom shell aliases module
     #    custom.shellAliases.aliases = mkIf config.custom.shellAliases.enable {
