@@ -40,6 +40,8 @@ pub fn run(args: AndroidArgs) -> Result<(), String> {
     println!("{}", "Running Android configuration...".blue().bold());
     let flake_dir = crate::config::get_flake_dir(args.flake)?;
 
+    // iterate through all $NIX_PROFILES and
+
     match args.command {
         AndroidCommand::Build => build(&flake_dir, args.cache, args.cachix_cache.as_deref(), &args.args),
         AndroidCommand::Switch => switch(&flake_dir, args.cache, args.cachix_cache.as_deref(), &args.args),

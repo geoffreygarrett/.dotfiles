@@ -1,4 +1,4 @@
-{ system, pkgs, rust-overlay, nix-on-droid ? null }:
+{ system, pkgs, rust-overlay }:
 
 let
   rustPkgs = pkgs.rustPlatform;
