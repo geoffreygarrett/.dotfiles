@@ -1,9 +1,23 @@
-{ agenix, inputs, config, lib, pkgs, home-manager, ... }:
+{
+  self,
+  inputs,
+  config,
+  lib,
+  pkgs,
+  home-manager,
+  ...
+}:
 
 let
   user = "geoffreygarrett";
-  home-manager-config = import ../../home/modules/darwin/home-manager.nix {
-    inherit config pkgs home-manager lib inputs;
+  home-manager-config = import ../../modules/darwin/home-manager.nix {
+    inherit
+      config
+      pkgs
+      home-manager
+      lib
+      inputs
+      ;
     inherit user;
   };
 
@@ -11,13 +25,13 @@ in
 {
 
   imports = [
-    ../../home/modules/shared/cachix
+    ../../modules/shared/cachix
   ];
 
   #    imports = [
 
   #    #    ../../modules/darwin/secrets.nix
-  #    ../../home/modules/darwin/home-manager.nix
+  #    ../../modules/darwin/home-manager.nix
   #    #    ../../modules/shared
   #    #    ../../modules/shared/cachix
   #    #     agenix.darwinModules.default
@@ -71,108 +85,117 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    users.${user} = { config, lib, pkgs, inputs, ... }: {
-      imports = [
-        ../../home/modules/darwin/secrets.nix
-        ../../home/modules/shared/home-manager/programs
-      ];
-
-      home = {
-        enableNixpkgsReleaseCheck = false;
-        packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
-          {
-            inherit pkgs;
-          } ++ [
-          pkgs.nushell
+    users.${user} =
+      {
+        config,
+        lib,
+        pkgs,
+        inputs,
+        self,
+        ...
+      }:
+      {
+        imports = [
+          ../../modules/darwin/secrets.nix
+          ../../modules/shared/home-manager/programs
         ];
 
-        stateVersion = "23.11";
+        home = {
+          enableNixpkgsReleaseCheck = false;
+          packages =
+            pkgs.callPackage ../../modules/darwin/packages.nix {
+              inherit pkgs;
+            }
+            ++ [
+              pkgs.nushell
+            ];
+
+          stateVersion = "23.11";
+        };
+
+        #      programs = {
+        #        nushell = {
+        #          enable = true;
+        #          extraConfig = ''
+        #            $env.config = {
+        #              show_banner: false,
+        #            };
+        #          '';
+        #        };
+        #      };
+
+        #  home-manager = {
+        #    useGlobalPkgs = true;
+        #    useUserPackages = true;
+        #    #    programs = { };
+        #    users.${user} = {
+        #      imports = [
+        ##        ../../home/modules/shared/home-manager/programs
+        #        ../../home/modules/darwin/secrets.nix
+        #      ];
+        ##      programs = import ../../home/modules/shared/home-manager/programs {
+        ##        inherit config lib pkgs inputs;
+        ##      };
+        #
+        #
+        #    config =
+        #      { config, lib, pkgs, inputs, ... }:
+        #      {
+        #
+        #      home = home-manager-config.home // {
+        #        enableNixpkgsReleaseCheck = false;
+        #        packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
+        #          {
+        #            inherit pkgs;
+        #          } ++ [
+        #                    pkgs.nushell
+        #        ];
+        #
+        #        stateVersion = "23.11";
+        #      };
+        #
+        #        programs = {
+        #          nushell = {
+        #            enable = true;
+        #            extraConfig = ''
+        #              $env.config = {
+        #                show_banner: false,
+        #              };
+        #            '';
+        #          };
+        #          #  home.packages = with pkgs; [
+        #          #   cargo
+        #          #  ];
+        #         # programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
+        #};
+        #      };
+
+        #      programs = {
+        #
+        #        nushell = {
+        #          enable = true;
+        #        };
+        #
+        #      };
+        #            programs = { }
+        #              // import ../../home/modules/shared/home-manager/programs { inherit config inputs user pkgs lib; };
+
+        #      programs = {} // {
+        #        nushell = {
+        #          enable = true;
+        #        };
+        #      };
+        #      programs = home-manager-config.programs // {
+        #        # Ensure 'programs.firefox' is included correctly
+        #        programs.firefox = {
+        #          enable = true;
+        #          # Add more Firefox-specific options here...
+        #        };
+        #        };
       };
-
-      #      programs = {
-      #        nushell = {
-      #          enable = true;
-      #          extraConfig = ''
-      #            $env.config = {
-      #              show_banner: false,
-      #            };
-      #          '';
-      #        };
-      #      };
-
-
-
-      #  home-manager = {
-      #    useGlobalPkgs = true;
-      #    useUserPackages = true;
-      #    #    programs = { };
-      #    users.${user} = {
-      #      imports = [
-      ##        ../../home/modules/shared/home-manager/programs
-      #        ../../home/modules/darwin/secrets.nix
-      #      ];
-      ##      programs = import ../../home/modules/shared/home-manager/programs {
-      ##        inherit config lib pkgs inputs;
-      ##      };
-      #
-      #
-      #    config =
-      #      { config, lib, pkgs, inputs, ... }:
-      #      {
-      #
-      #      home = home-manager-config.home // {
-      #        enableNixpkgsReleaseCheck = false;
-      #        packages = pkgs.callPackage ../../home/modules/darwin/packages.nix
-      #          {
-      #            inherit pkgs;
-      #          } ++ [
-      #                    pkgs.nushell
-      #        ];
-      #
-      #        stateVersion = "23.11";
-      #      };
-      #
-      #        programs = {
-      #          nushell = {
-      #            enable = true;
-      #            extraConfig = ''
-      #              $env.config = {
-      #                show_banner: false,
-      #              };
-      #            '';
-      #          };
-      #          #  home.packages = with pkgs; [
-      #          #   cargo
-      #          #  ];
-      #         # programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
-      #};
-      #      };
-
-
-      #      programs = {
-      #
-      #        nushell = {
-      #          enable = true;
-      #        };
-      #
-      #      };
-      #            programs = { }
-      #              // import ../../home/modules/shared/home-manager/programs { inherit config inputs user pkgs lib; };
-
-      #      programs = {} // {
-      #        nushell = {
-      #          enable = true;
-      #        };
-      #      };
-      #      programs = home-manager-config.programs // {
-      #        # Ensure 'programs.firefox' is included correctly
-      #        programs.firefox = {
-      #          enable = true;
-      #          # Add more Firefox-specific options here...
-      #        };
-      #        };
+    extraSpecialArgs = {
+      inherit inputs user self;
     };
-    extraSpecialArgs = { inherit inputs user; };
   };
 
   # Auto upgrade nix package and the daemon service.
@@ -181,7 +204,10 @@ in
   # Setup user, packages, programs
   nix = {
     package = pkgs.nix;
-    settings.trusted-users = [ "@admin" "${user}" ];
+    settings.trusted-users = [
+      "@admin"
+      "${user}"
+    ];
 
     gc = {
       user = "root";
@@ -204,12 +230,14 @@ in
   system.checks.verifyNixPath = false;
 
   # Load configuration that is shared across systems
-  environment.systemPackages = with pkgs;
+  environment.systemPackages =
+    with pkgs;
     [
       pkgs.nushell
       #    emacs-unstable
       #    agenix.packages."${pkgs.system}".default
-    ] ++ (import ../../home/modules/shared/packages.nix { inherit pkgs; });
+    ]
+    ++ (import ../../modules/shared/packages.nix { inherit pkgs; });
 
   #  launchd.user.agents.emacs.path = [ config.environment.systemPath ];
   #  launchd.user.agents.emacs.serviceConfig = {
@@ -227,7 +255,9 @@ in
     stateVersion = 4;
 
     defaults = {
-      LaunchServices = { LSQuarantine = false; };
+      LaunchServices = {
+        LSQuarantine = false;
+      };
 
       NSGlobalDomain = {
         AppleShowAllExtensions = true;
@@ -253,7 +283,9 @@ in
         tilesize = 48;
       };
 
-      finder = { _FXShowPosixPathInTitle = false; };
+      finder = {
+        _FXShowPosixPathInTitle = false;
+      };
 
       trackpad = {
         Clicking = true;

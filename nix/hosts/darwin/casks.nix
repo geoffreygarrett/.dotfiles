@@ -32,7 +32,6 @@ _:
   #  "raycast"
   #  "asana"
 
-
   # Browsers
   #  "google-chrome"
 

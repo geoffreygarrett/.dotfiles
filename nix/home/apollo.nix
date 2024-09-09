@@ -1,10 +1,26 @@
-{ config, pkgs, lib, home-manager, inputs, ... }:
-let user = "geoffrey";
-in {
+{
+  config,
+  pkgs,
+  lib,
+  home-manager,
+  inputs,
+  ...
+}:
+let
+  user = "geoffrey";
+in
+{
   home.username = "${user}";
   imports = [
     (import ./modules/nixos/home-manager.nix {
-      inherit config pkgs lib home-manager inputs user;
+      inherit
+        config
+        pkgs
+        lib
+        home-manager
+        inputs
+        user
+        ;
     })
   ];
 

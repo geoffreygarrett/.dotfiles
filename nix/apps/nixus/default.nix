@@ -1,4 +1,11 @@
-{ system, pkgs, lib, rust-overlay, nix-on-droid, ... }:
+{
+  system,
+  pkgs,
+  lib,
+  rust-overlay,
+  nix-on-droid,
+  ...
+}:
 
 let
   rustPkgs = pkgs.rustPlatform;
@@ -19,18 +26,22 @@ rustPkgs.buildRustPackage {
   #      fi
   #    '';
 
-  buildInputs = with pkgs; [
-    openssl
-    pkg-config
-    cachix
-    nix
-    jq
-    gnugrep
-  ] ++ pkgs.lib.optionals (lib.isDarwin system) [
-    pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-  ] ++ pkgs.lib.optionals (lib.isAndroid system) [
-    nix-on-droid.packages.${system}.nix-on-droid
-  ];
+  buildInputs =
+    with pkgs;
+    [
+      openssl
+      pkg-config
+      cachix
+      nix
+      jq
+      gnugrep
+    ]
+    ++ pkgs.lib.optionals (lib.isDarwin system) [
+      pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+    ]
+    ++ pkgs.lib.optionals (lib.isAndroid system) [
+      nix-on-droid.packages.${system}.nix-on-droid
+    ];
 
   nativeBuildInputs = with pkgs; [
     pkg-config
@@ -48,14 +59,19 @@ rustPkgs.buildRustPackage {
 
   postInstall = ''
     wrapProgram $out/bin/nixus \
-      --prefix PATH : ${pkgs.lib.makeBinPath ([
-        pkgs.cachix
-        pkgs.nix
-        pkgs.jq
-        pkgs.gnugrep
-      ] ++ pkgs.lib.optionals (lib.isAndroid system) [
-        nix-on-droid.packages.${system}.nix-on-droid
-      ])}
+      --prefix PATH : ${
+        pkgs.lib.makeBinPath (
+          [
+            pkgs.cachix
+            pkgs.nix
+            pkgs.jq
+            pkgs.gnugrep
+          ]
+          ++ pkgs.lib.optionals (lib.isAndroid system) [
+            nix-on-droid.packages.${system}.nix-on-droid
+          ]
+        )
+      }
   '';
 
   meta = with pkgs.lib; {

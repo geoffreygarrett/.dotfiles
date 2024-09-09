@@ -1,4 +1,10 @@
-{ config, pkgs, lib, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 let
   # Wrapper for gh that includes the GitHub token
   gh-wrapped = pkgs.writeShellScriptBin "gh" ''
@@ -10,21 +16,15 @@ let
   '';
 
   # Debug print the sops config
-  debug_config = builtins.trace
-    "Debug: config = ${builtins.toJSON (removeAttrs config [ "_module" ])}"
-    config;
-  debug_sops = builtins.trace
-    "Debug: config.sops = ${builtins.toJSON (config.sops or "sops not found")}"
-    config;
+  debug_config = builtins.trace "Debug: config = ${builtins.toJSON (removeAttrs config [ "_module" ])}" config;
+  debug_sops = builtins.trace "Debug: config.sops = ${builtins.toJSON (config.sops or "sops not found")}" config;
 
 in
 {
 
   # Your existing configuration...
   sops.secrets.github-token = {
-    sopsFile = builtins.trace
-      "Debug: sopsFile = ${builtins.toString config.sops.defaultSopsFile}"
-      config.sops.defaultSopsFile;
+    sopsFile = builtins.trace "Debug: sopsFile = ${builtins.toString config.sops.defaultSopsFile}" config.sops.defaultSopsFile;
   };
   programs.gh = {
     enable = true;
@@ -66,10 +66,10 @@ in
     };
     Service = {
       Type = "oneshot";
-      ExecStart =
-        "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github-token.path}";
+      ExecStart = "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github-token.path}";
     };
-    Install = { WantedBy = [ "default.target" ]; };
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 }
-

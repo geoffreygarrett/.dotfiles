@@ -258,9 +258,9 @@ pub fn find_sops_file() -> Result<PathBuf, String> {
 
     let mut potential_locations = vec![
         "secrets.yaml".to_string(),
-        "secrets/secrets.yaml".to_string(),
+        "secrets/default.yaml".to_string(),
         ".secrets.yaml".to_string(),
-        ".secrets/secrets.yaml".to_string(),
+        ".secrets/default.yaml".to_string(),
         "config/secrets.yaml".to_string(),
     ];
 

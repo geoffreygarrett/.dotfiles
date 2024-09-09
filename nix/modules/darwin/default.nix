@@ -1,7 +1,14 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
-let user = "geoffreygarrett";
-in {
+let
+  user = "geoffreygarrett";
+in
+{
 
   # Ensure the Syncthing directory exists
   #  system.activationScripts.syncthing-dir = ''

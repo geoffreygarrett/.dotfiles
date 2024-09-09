@@ -1,4 +1,10 @@
-{ config, pkgs, user, ... }: {
+{
+  config,
+  pkgs,
+  user,
+  ...
+}:
+{
 
   sops = {
     # Define the default options for all secrets

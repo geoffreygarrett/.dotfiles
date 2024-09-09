@@ -49,7 +49,9 @@
     };
 
     # macOS-specific
-    nix-homebrew = { url = "github:zhaofengli-wip/nix-homebrew"; };
+    nix-homebrew = {
+      url = "github:zhaofengli-wip/nix-homebrew";
+    };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
       flake = false;
@@ -64,7 +66,9 @@
     };
 
     # Linux-specific
-    nixgl = { url = "github:guibou/nixGL"; };
+    nixgl = {
+      url = "github:guibou/nixGL";
+    };
 
     # CLI
     # Add rust-overlay input for better Rust support
@@ -74,24 +78,25 @@
     };
   };
   outputs =
-    { self
-    , nixpkgs
-    , home-manager
-    , pre-commit-hooks
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      pre-commit-hooks,
       # LINUX
-    , nixgl
+      nixgl,
       # DARWIN
-    , darwin
-    , nix-homebrew
-    , homebrew-bundle
-    , homebrew-core
-    , homebrew-cask
+      darwin,
+      nix-homebrew,
+      homebrew-bundle,
+      homebrew-core,
+      homebrew-cask,
       # ANDROID
-    , nix-on-droid
+      nix-on-droid,
       # CLI
-    , rust-overlay
+      rust-overlay,
 
-    , ...
+      ...
     }@inputs:
     let
       inherit (self) outputs;
@@ -108,11 +113,14 @@
           github-username = "geoffreygarrett";
         };
       };
-      devShell = system:
-        let pkgs = nixpkgs.legacyPackages.${system};
+      devShell =
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
         in
         {
-          default = with pkgs;
+          default =
+            with pkgs;
             mkShell {
               nativeBuildInputs = with pkgs; [
                 bashInteractive
@@ -129,12 +137,19 @@
         };
       lib = nixpkgs.lib // home-manager.lib;
       user = "geoffreygarrett";
-      systems.linux = [ "aarch64-linux" "x86_64-linux" ];
-      systems.darwin = [ "aarch64-darwin" "x86_64-darwin" ];
+      systems.linux = [
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
+      systems.darwin = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
       systems.supported = systems.linux ++ systems.darwin;
       forAllSystems = f: nixpkgs.lib.genAttrs (systems.supported) f;
       isLinux = system: builtins.elem system systems.linux;
-      pkgsFor = system:
+      pkgsFor =
+        system:
         import nixpkgs {
           inherit system nixgl;
           overlays = [
@@ -142,19 +157,17 @@
           ];
           config = {
             allowUnfree = true;
-            allowUnfreePredicate = pkg:
-              builtins.elem (lib.getName pkg) [ "tailscale-ui" "hammerspoon" ];
+            allowUnfreePredicate =
+              pkg:
+              builtins.elem (lib.getName pkg) [
+                "tailscale-ui"
+                "hammerspoon"
+              ];
           };
         };
 
-
-
-
-
-      mkRustScriptApp =
-        import ./nix/lib/mk-rust-script-app.nix { inherit inputs nixpkgs lib; };
-      mkRustBinaryApp =
-        import ./nix/lib/mk-rust-binary-app.nix { inherit inputs nixpkgs lib; };
+      mkRustScriptApp = import ./nix/lib/mk-rust-script-app.nix { inherit inputs nixpkgs lib; };
+      mkRustBinaryApp = import ./nix/lib/mk-rust-binary-app.nix { inherit inputs nixpkgs lib; };
       mkLinuxConfiguration = import ./nix/lib/mk-nixos-configuration.nix {
         inherit inputs nixpkgs lib;
       };
@@ -200,7 +213,9 @@
             ./nix/home/apollo.nix
             inputs.sops-nix.homeManagerModules.sops
           ];
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
@@ -209,20 +224,23 @@
             ./nix/home/artemis.nix
             inputs.sops-nix.homeManagerModules.sops
           ];
-          extraSpecialArgs = { inherit inputs outputs; };
-        };
-      };
-      checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage)
-        self.homeConfigurations // forAllSystems (system: {
-        pre-commit-check = pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            nixpkgs-fmt.enable = true;
-            beautysh.enable = true;
-            commitizen.enable = true;
+          extraSpecialArgs = {
+            inherit inputs outputs;
           };
         };
-      });
+      };
+      checks =
+        nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
+        // forAllSystems (system: {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              nixpkgs-fmt.enable = true;
+              beautysh.enable = true;
+              commitizen.enable = true;
+            };
+          };
+        });
 
       ##############################
       # Nix-on-Droid Configuration
@@ -241,7 +259,9 @@
               };
             }
           ];
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
           home-manager-path = home-manager.outPath;
         };
       };
@@ -249,7 +269,8 @@
       ##############################
       # Packages Configuration
       ##############################
-      packages = forAllSystems (system:
+      packages = forAllSystems (
+        system:
         let
           pkgs = pkgsFor system;
         in
@@ -267,7 +288,8 @@
       ##############################
       # Darwin Configuration
       ##############################
-      darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (system:
+      darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (
+        system:
         darwin.lib.darwinSystem {
           inherit system;
           pkgs = pkgsFor system;
@@ -288,21 +310,29 @@
               };
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.sharedModules =
-                [ inputs.sops-nix.homeManagerModules.sops ];
+              home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
               #            home-manager.users.${user} = import ./nix/home/artemis.nix;
             }
             ./nix/hosts/darwin
           ];
-          specialArgs = { inherit inputs; };
-        });
+          specialArgs = {
+            inherit inputs;
+          };
+        }
+      );
       #
       # apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
-      apps = forAllSystems (system:
+      apps = forAllSystems (
+        system:
         let
           pkgs = pkgsFor system;
           nixusApp = import ./nix/apps/nixus {
-            inherit system nixpkgs rust-overlay nix-on-droid;
+            inherit
+              system
+              nixpkgs
+              rust-overlay
+              nix-on-droid
+              ;
           };
         in
         {
@@ -322,8 +352,8 @@
           check = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "run-checks" ''
-                ${self.checks.${system}.pre-commit-check.shellHook}
-                pre-commit run --all-files
+              ${self.checks.${system}.pre-commit-check.shellHook}
+              pre-commit run --all-files
             ''}/bin/run-checks"; # Point to the generated script
           };
         }

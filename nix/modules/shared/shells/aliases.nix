@@ -5,21 +5,22 @@ let
 
   getPackage = name: pkgs.${builtins.getAttr name toml.packages};
 
-  generateAlias = name: alias:
+  generateAlias =
+    name: alias:
     let
       command =
         if alias.dependency != null then
-          "${
-          getPackage alias.dependency
-        }/bin/${alias.dependency} ${alias.command}"
+          "${getPackage alias.dependency}/bin/${alias.dependency} ${alias.command}"
         else
           alias.command;
     in
     lib.nameValuePair name command;
 
-  generateShellAliases = shell:
-    lib.listToAttrs (lib.filter (alias: builtins.elem shell alias.shells)
-      (lib.mapAttrsToList generateAlias toml.aliases));
+  generateShellAliases =
+    shell:
+    lib.listToAttrs (
+      lib.filter (alias: builtins.elem shell alias.shells) (lib.mapAttrsToList generateAlias toml.aliases)
+    );
 
 in
 {

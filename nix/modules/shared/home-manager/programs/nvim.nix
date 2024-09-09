@@ -1,4 +1,10 @@
-{ config, pkgs, lib, inputs, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 let
   # Define a script that returns either the GitHub token or OpenAI API key
   #language=sh
@@ -31,17 +37,18 @@ let
   '';
 in
 {
-  sops.secrets.openai-api-key = { sopsFile = config.sops.defaultSopsFile; };
+  sops.secrets.openai-api-key = {
+    sopsFile = config.sops.defaultSopsFile;
+  };
 
   programs.neovim = {
     enable = true;
     viAlias = true;
     vimAlias = true;
-    extraPackages = with pkgs;
-      [
-        ripgrep # Requirement for telescope
+    extraPackages = with pkgs; [
+      ripgrep # Requirement for telescope
 
-      ];
+    ];
     extraConfig = ''
       " Any Vimscript configuration can go here
 
@@ -96,4 +103,3 @@ in
     '';
 
 }
-

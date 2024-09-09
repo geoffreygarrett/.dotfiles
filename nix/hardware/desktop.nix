@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   boot = {
@@ -31,7 +36,10 @@
   hardware.opengl = {
     enable = true;
     driSupport = true;
-    extraPackages = with pkgs; [ nvidia_x11 libva ];
+    extraPackages = with pkgs; [
+      nvidia_x11
+      libva
+    ];
   };
 
   # Input devices configuration

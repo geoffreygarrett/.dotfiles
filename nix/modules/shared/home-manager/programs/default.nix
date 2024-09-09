@@ -1,8 +1,23 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   # Helper function to import modules with arguments
-  importModule = file: import file { inherit config lib pkgs inputs; };
+  importModule =
+    file:
+    import file {
+      inherit
+        config
+        lib
+        pkgs
+        inputs
+        ;
+    };
 in
 {
   # Import modules that each manage their own program configurations

@@ -1,1 +1,4 @@
-{ pkgs, ... }: { imports = [ ./global ]; }
+{ pkgs, ... }:
+{
+  imports = [ ./global ];
+}

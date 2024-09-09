@@ -1,6 +1,15 @@
 # Reference
 # - [1]
-{ inputs, lib, pkgs, config, outputs, networking, ... }: {
+{
+  inputs,
+  lib,
+  pkgs,
+  config,
+  outputs,
+  networking,
+  ...
+}:
+{
   #  imports =
   #    [
   #
@@ -29,8 +38,12 @@
   #sops.age.keyFile = "/home/geoffrey/.config/sops/age/keys.txt";
   #sops.defaultSymlinkPath = "/run/user/1000/secrets";
   #sops.defaultSecretsMountPoint = "/run/user/1000/secrets.d";
-  sops.secrets.github_token = { sopsFile = ./secrets.yaml; };
-  sops.secrets.openai_api_key = { sopsFile = ./secrets.yaml; };
+  sops.secrets.github_token = {
+    sopsFile = ./secrets.yaml;
+  };
+  sops.secrets.openai_api_key = {
+    sopsFile = ./secrets.yaml;
+  };
 
   #  # Declare the secrets that are going to be used.
   #  sops.secrets.hello = { };
@@ -112,7 +125,9 @@
     homeDirectory = lib.mkDefault "/home/${config.home.username}";
     stateVersion = lib.mkDefault "22.05";
     sessionPath = [ "$HOME/.local/bin" ];
-    shellAliases = { hw = "echo Hello, world!"; };
+    shellAliases = {
+      hw = "echo Hello, world!";
+    };
     sessionVariables = {
       FLAKE = "$HOME/.dotfiles";
       EDITOR = "neovim";

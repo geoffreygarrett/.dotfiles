@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -29,7 +34,10 @@ in
     };
     keyTypes = mkOption {
       type = types.listOf types.str;
-      default = [ "rsa" "ed25519" ];
+      default = [
+        "rsa"
+        "ed25519"
+      ];
       description = "The types of SSH keys to generate.";
     };
     aliases = mkOption {
@@ -44,16 +52,19 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.packages = with pkgs; [
-      openssh
-    ] ++ [
-      (pkgs.writeScriptBin "sshd-start" ''
-        #!${pkgs.runtimeShell}
+    environment.packages =
+      with pkgs;
+      [
+        openssh
+      ]
+      ++ [
+        (pkgs.writeScriptBin "sshd-start" ''
+          #!${pkgs.runtimeShell}
 
-        echo "Starting sshd in non-daemonized way on port ${toString cfg.port}"
-        ${openssh}/bin/sshd -f "${config.user.home}/sshd/sshd_config" -D -e
-      '')
-    ];
+          echo "Starting sshd in non-daemonized way on port ${toString cfg.port}"
+          ${openssh}/bin/sshd -f "${config.user.home}/sshd/sshd_config" -D -e
+        '')
+      ];
 
     build.activation.sshd = ''
             sshdTmpDirectory="${config.user.home}/sshd-tmp"
@@ -74,7 +85,11 @@ in
 
               $VERBOSE_ECHO "Writing sshd_config..."
               $DRY_RUN_CMD cat << EOF > "$sshdTmpDirectory/sshd_config"
-              ${builtins.concatStringsSep "\n" (map (keyType: "HostKey ${config.user.home}/sshd/ssh_host_${keyType}_key") cfg.keyTypes)}
+              ${
+                builtins.concatStringsSep "\n" (
+                  map (keyType: "HostKey ${config.user.home}/sshd/ssh_host_${keyType}_key") cfg.keyTypes
+                )
+              }
               Port ${toString cfg.port}
               PermitRootLogin no
               PasswordAuthentication no
@@ -90,7 +105,6 @@ in
               $DRY_RUN_CMD mv $VERBOSE_ARG "$sshdTmpDirectory" "$sshdDirectory"
             fi
     '';
-
 
     #    # Add SSH-related aliases to the custom shell aliases module
     #    custom.shellAliases.aliases = mkIf config.custom.shellAliases.enable {

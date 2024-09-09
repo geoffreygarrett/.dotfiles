@@ -1,8 +1,15 @@
-{ config, pkgs, user, ... }: {
+{
+  self,
+  config,
+  pkgs,
+  user,
+  ...
+}:
+{
 
   sops = {
     # Define the default options for all secrets
-    defaultSopsFile = ../../global/secrets.yaml;
+    defaultSopsFile = "${self}/secrets/default.yaml";
     age.sshKeyPaths = [ "/home/${user}/.ssh/id_ed25519" ];
     # Permission modes are in octal representation (same as chmod),
     # the digits represent: user|group|others

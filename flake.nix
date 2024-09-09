@@ -35,7 +35,9 @@
     };
 
     # macOS-specific
-    nix-homebrew = { url = "github:zhaofengli-wip/nix-homebrew"; };
+    nix-homebrew = {
+      url = "github:zhaofengli-wip/nix-homebrew";
+    };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
       flake = false;
@@ -50,7 +52,9 @@
     };
 
     # Linux-specific
-    nixgl = { url = "github:guibou/nixGL"; };
+    nixgl = {
+      url = "github:guibou/nixGL";
+    };
 
     # CLI
     rust-overlay = {
@@ -59,50 +63,91 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, pre-commit-hooks, nixgl, darwin, nix-homebrew, nix-on-droid, rust-overlay, homebrew-core, homebrew-cask, homebrew-bundle, ... }@inputs:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      pre-commit-hooks,
+      nixgl,
+      darwin,
+      nix-homebrew,
+      nix-on-droid,
+      rust-overlay,
+      homebrew-core,
+      homebrew-cask,
+      homebrew-bundle,
+      ...
+    }@inputs:
     let
       inherit (self) outputs;
       user = "geoffreygarrett";
-      systems.linux = [ "aarch64-linux" "x86_64-linux" ];
-      systems.darwin = [ "aarch64-darwin" "x86_64-darwin" ];
-      systems.android = [ "aarch64-linux" "armv7-linux" "armv8-linux" "x86_64-linux" ];
+      systems.linux = [
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
+      systems.darwin = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
+      systems.android = [
+        "aarch64-linux"
+        "armv7-linux"
+        "armv8-linux"
+        "x86_64-linux"
+      ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
-      lib = nixpkgs.lib // home-manager.lib // {
-        isLinux = system: builtins.elem system systems.linux;
-        isDarwin = system: builtins.elem system systems.darwin;
-        isAndroid = system: builtins.elem system systems.android;
-      };
+      lib =
+        nixpkgs.lib
+        // home-manager.lib
+        // {
+          isLinux = system: builtins.elem system systems.linux;
+          isDarwin = system: builtins.elem system systems.darwin;
+          isAndroid = system: builtins.elem system systems.android;
+        };
       forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
-      pkgsFor = system: import nixpkgs {
-        inherit system;
-        overlays = [
-          (final: prev: {
-            nix-on-droid = nix-on-droid.packages.${system};
-          })
-        ] ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
-        ++ lib.optional (lib.isLinux system) nixgl.overlay;
-      };
+      pkgsFor =
+        system:
+        import nixpkgs {
+          inherit system;
+          overlays =
+            [
+              (final: prev: {
+                nix-on-droid = nix-on-droid.packages.${system};
+              })
+            ]
+            ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
+            ++ lib.optional (lib.isLinux system) nixgl.overlay;
+        };
     in
     {
 
       ##############################
       # Packages Configuration
       ##############################
-      packages = forAllSystems (system:
+      packages = forAllSystems (
+        system:
         let
           pkgs = pkgsFor system;
         in
         {
           nixus = import ./nix/apps/nixus {
-            inherit system pkgs rust-overlay lib nix-on-droid;
+            inherit
+              system
+              pkgs
+              rust-overlay
+              lib
+              nix-on-droid
+              ;
           };
-        });
-
+        }
+      );
 
       ##############################
       # Apps Configuration
       ##############################
-      apps = forAllSystems (system:
+      apps = forAllSystems (
+        system:
         let
           pkgs = pkgsFor system;
           nixusApp = self.packages.${system}.nixus;
@@ -121,8 +166,8 @@
           check = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "run-checks" ''
-                ${self.checks.${system}.pre-commit-check.shellHook}
-                pre-commit run --all-files
+              ${self.checks.${system}.pre-commit-check.shellHook}
+              pre-commit run --all-files
             ''}/bin/run-checks";
           };
         }
@@ -131,7 +176,8 @@
       ##############################
       # Darwin Configuration
       ##############################
-      darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (system:
+      darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (
+        system:
         darwin.lib.darwinSystem {
           inherit system;
           pkgs = pkgsFor system;
@@ -154,8 +200,11 @@
             }
             ./nix/hosts/darwin
           ];
-          specialArgs = { inherit inputs; };
-        });
+          specialArgs = {
+            inherit inputs self;
+          };
+        }
+      );
 
       ##############################
       # Nix-on-Droid Configuration
@@ -163,7 +212,7 @@
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
         pkgs = pkgsFor "aarch64-linux";
         modules = [
-          ./nix/home/modules/android
+          ./nix/modules/android
           {
             networking.hosts = {
               "100.78.156.17" = [ "pioneer.home" ];
@@ -171,35 +220,13 @@
             };
           }
           {
-            home-manager.extraSpecialArgs = { inherit inputs outputs; };
+            home-manager.extraSpecialArgs = {
+              inherit inputs outputs;
+            };
             home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
           }
         ];
       };
-
-
-      #      }
-      #        let
-      #          configurations = nixpkgs.lib.genAttrs systems.android (system:
-      #            {
-      #              config = nix-on-droid.lib.nixOnDroidConfiguration {
-      #                pkgs = pkgsFor system;
-      #                modules = [
-      #                  ./nix/home/modules/android
-      #                  {
-      #                    networking.hosts = {
-      #                      "100.78.156.17" = [ "pioneer.home" ];
-      #                      "100.116.122.19" = [ "artemis.home" ];
-      #                    };
-      #                  }
-      #                ];
-      #              };
-      #            });
-      #        in
-      #        {
-      #          inherit configurations;
-      #          default = configurations."aarch64-linux";
-      #        };
 
       ##############################
       # Home Configuration
@@ -210,10 +237,11 @@
           modules = [
             ./nix/network.nix
             ./nix/hosts/apollo.nix
-            ./nix/home/apollo.nix
             inputs.sops-nix.homeManagerModules.sops
           ];
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
         "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
           pkgs = pkgsFor "aarch64-darwin";
@@ -222,24 +250,27 @@
             ./nix/home/artemis.nix
             inputs.sops-nix.homeManagerModules.sops
           ];
-          extraSpecialArgs = { inherit inputs outputs; };
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
         };
       };
 
       ##############################
       # Checks Configuration
       ##############################
-      checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage)
-        self.homeConfigurations // forAllSystems (system: {
-        pre-commit-check = pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            nixfmt-rfc-style.enable = true;
-            beautysh.enable = true;
-            commitizen.enable = true;
+      checks =
+        nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
+        // forAllSystems (system: {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              nixfmt-rfc-style.enable = true;
+              beautysh.enable = true;
+              commitizen.enable = true;
+            };
           };
-        };
-      });
+        });
 
       ##############################
       # Dev Shell Configuration

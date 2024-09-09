@@ -1,7 +1,13 @@
-{ config, pkgs, user, ... }: {
+{
+  config,
+  pkgs,
+  user,
+  ...
+}:
+{
   # SOPS
   sops.age.keyFile = "/home/${user}/.config/sops/age/keys.txt";
-  sops.defaultSopsFile = ./../../global/secrets.yaml;
+  sops.defaultSopsFile = ../../global/secrets.yaml;
 
   sops.secrets.github_token = {
     #    file = "${secrets}/github-token.age";

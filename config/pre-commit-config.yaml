@@ -1,10 +1,9 @@
 repos:
-  - repo: https://github.com/nix-community/nixpkgs-fmt
-    rev: v1.3.0
+  - repo: https://github.com/NixOS/nixfmt
+    rev: v0.6.0
     hooks:
-      - id: nixpkgs-fmt
+      - id: nixfmt
         name: nixfmt-rfc-style
-        args: [ ]
         files: \.nix$
 
   - repo: https://github.com/commitizen-tools/commitizen

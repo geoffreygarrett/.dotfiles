@@ -1,20 +1,35 @@
-{ config, pkgs, lib, home-manager, inputs, user, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  home-manager,
+  inputs,
+  user,
+  ...
+}:
 let
   shared-programs = import ../shared/home-manager/programs {
-    inherit config pkgs lib home-manager inputs;
+    inherit
+      config
+      pkgs
+      lib
+      home-manager
+      inputs
+      ;
   };
   secrets = import ./secrets.nix { inherit config pkgs user; };
 in
 {
   nixpkgs.config = {
-    allowUnfreePredicate = pkg:
-      builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
+    allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "tailscale-ui" ];
   };
   imports = [ secrets ];
   # TODO: Properly separate home config for system level config and home level.
   #  home.username = "${user}";
   #  home.homeDirectory = "/Users/${user}";
-  programs = shared-programs // { gpg.enable = true; };
+  programs = shared-programs // {
+    gpg.enable = true;
+  };
   home.packages = pkgs.callPackage ./packages.nix { inherit pkgs; };
   #  home.file."/Applications/Tailscale.app".source =
   #    "${pkgs.tailscale-ui}/Applications/Tailscale.app";

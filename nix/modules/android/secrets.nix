@@ -1,8 +1,15 @@
-{ config, pkgs, user, ... }: {
+{
+  self,
+  config,
+  pkgs,
+  user,
+  ...
+}:
+{
 
   sops = {
     # Define the default options for all secrets
-    defaultSopsFile = ../../global/secrets.yaml;
+    defaultSopsFile = "${self.path}/default.yaml";
     age.sshKeyPaths = [ "/data/data/com.termux.nix/files/home/.ssh/id_ed25519" ];
     # Permission modes are in octal representation (same as chmod),
     # the digits represent: user|group|others

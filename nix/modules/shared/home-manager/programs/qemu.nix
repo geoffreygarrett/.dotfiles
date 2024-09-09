@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -96,15 +101,14 @@ let
     enableKsm = mkOption {
       type = types.bool;
       default = true;
-      description =
-        "Whether to enable Kernel Same-page Merging (KSM) on Linux.";
+      description = "Whether to enable Kernel Same-page Merging (KSM) on Linux.";
     };
   };
 
 in
 {
-  options.programs.qemu = commonOptions
-    // (if pkgs.stdenv.isDarwin then darwinOptions else linuxOptions);
+  options.programs.qemu =
+    commonOptions // (if pkgs.stdenv.isDarwin then darwinOptions else linuxOptions);
 
   config = mkIf cfg.enable {
     home.packages = [ cfg.package ] ++ cfg.extraPackages;
@@ -122,16 +126,13 @@ in
       ${optionalString cfg.virglSupport "virgl = on"}
 
       # Platform-specific settings
-      ${optionalString pkgs.stdenv.isDarwin
-      (optionalString cfg.enableHvf "hvf = on")}
-      ${optionalString pkgs.stdenv.isLinux
-      (optionalString cfg.enableKsm "ksm = on")}
+      ${optionalString pkgs.stdenv.isDarwin (optionalString cfg.enableHvf "hvf = on")}
+      ${optionalString pkgs.stdenv.isLinux (optionalString cfg.enableKsm "ksm = on")}
     '';
 
     # QEMU aliases for convenience
     home.shellAliases = {
-      "qemu-system" =
-        "${cfg.package}/bin/qemu-system-${pkgs.stdenv.hostPlatform.qemuArch}";
+      "qemu-system" = "${cfg.package}/bin/qemu-system-${pkgs.stdenv.hostPlatform.qemuArch}";
     };
   };
 }

@@ -1,4 +1,5 @@
-{ config, pkgs, ... }: {
+{ config, pkgs, ... }:
+{
 
   # Install Tailscale for the user
   home.packages = with pkgs; [ tailscale ];
@@ -6,12 +7,17 @@
   # Set up a systemd user service for automatic Tailscale connection
   systemd.user.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
-    after = [ "network-pre.target" "tailscale.service" ];
-    wants = [ "network-pre.target" "tailscale.service" ];
+    after = [
+      "network-pre.target"
+      "tailscale.service"
+    ];
+    wants = [
+      "network-pre.target"
+      "tailscale.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
-      ExecStart =
-        "${pkgs.tailscale}/bin/tailscale up --authkey tskey-examplekeyhere";
+      ExecStart = "${pkgs.tailscale}/bin/tailscale up --authkey tskey-examplekeyhere";
       Restart = "on-failure";
       RestartSec = "10s";
     };
