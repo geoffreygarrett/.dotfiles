@@ -39,9 +39,9 @@ in
       $DRY_RUN_CMD chmod 644 "${config.user.home}/.termux/font.ttf"
     '';
 
-    environment.shellAliases = {
-      update-font = "nix-on-droid switch --flake '.#'";
-    };
+    #    environment.shellAliases = {
+    #      update-font = "nix-on-droid switch --flake '.#'";
+    #    };
 
     environment.motd = mkIf cfg.enable ''
       echo "Custom font is enabled. To update the font, modify your configuration and run 'update-font'."

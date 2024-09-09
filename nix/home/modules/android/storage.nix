@@ -59,6 +59,6 @@ in
       echo "Type '${cfg.aliases.storage-usage}' to see storage usage in /sdcard."
     '';
 
-    environment.shellAliases = cfg.aliases;
+    #    environment.shellAliases = cfg.aliases;
   };
 }

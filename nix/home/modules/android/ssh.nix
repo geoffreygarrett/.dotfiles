@@ -91,6 +91,6 @@ in
             fi
     '';
 
-    environment.shellAliases = cfg.aliases;
+    #    environment.shellAliases = cfg.aliases;
   };
 }

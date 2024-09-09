@@ -5,7 +5,7 @@
   imports = [
     ./ssh.nix
     ./storage.nix
-    ./battery.nix
+    #    ./battery.nix
     ./font.nix
     ../shared/cachix
 
