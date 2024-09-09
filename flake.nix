@@ -169,7 +169,6 @@
                 pkgs = pkgsFor system;
                 modules = [
                   ./nix/home/modules/android
-                  ./nix/home/modules/shared/cachix
                   {
                     networking.hosts = {
                       "100.78.156.17" = [ "pioneer.home" ];

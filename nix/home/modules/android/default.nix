@@ -7,6 +7,8 @@
     ./storage.nix
     ./battery.nix
     ./custom-font.nix
+    .../shared/cachix
+
   ];
 
   services.ssh = {
