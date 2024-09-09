@@ -14,24 +14,35 @@ pub struct CheckedCommand {
     sops_env_name: Option<String>,
 }
 
+
+/// Checks if a program is available in the system's PATH
+fn is_program_available(program: &str) -> bool {
+    let status = Command::new("sh")
+        .arg("-c")
+        .arg(format!("command -v {}", program))
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status();
+
+    status.map_or(false, |s| s.success())
+}
+
+
 impl CheckedCommand {
     pub fn new<S: AsRef<OsStr>>(program: S) -> Result<Self, Error> {
         let program_str = program.as_ref().to_string_lossy();
-        let status = Command::new("which")
-            .arg(&program)
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .status();
-        match status {
-            Ok(exit_status) if exit_status.success() => Ok(Self {
+
+        if is_program_available(&program_str) {
+            Ok(Self {
                 inner: Command::new(program),
                 live_output: false,
                 env_callback: None,
                 sops_file: None,
                 sops_key: None,
                 sops_env_name: None,
-            }),
-            _ => Err(Error::new(ErrorKind::NotFound, format!("Command '{}' not found", program_str))),
+            })
+        } else {
+            Err(Error::new(ErrorKind::NotFound, format!("Command '{}' not found", program_str)))
         }
     }
 
