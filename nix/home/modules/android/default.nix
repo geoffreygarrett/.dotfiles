@@ -10,9 +10,9 @@ in
 
   imports = [
     ./ssh.nix
-    ./storage.nix
+    #    ./storage.nix
     #    ./battery.nix
-    ./font.nix
+    #    ./font.nix
 
   ];
 
@@ -32,14 +32,14 @@ in
     };
   };
 
-  services.storage = {
-    enable = true;
-    showInfoOnStartup = true;
-    aliases = {
-      storage-info = "storage-info";
-      storage-usage = "du -h -d 2 /sdcard | sort -h"; # Modified to show 2 levels deep
-    };
-  };
+  #  services.storage = {
+  #    enable = true;
+  #    showInfoOnStartup = true;
+  #    aliases = {
+  #      storage-info = "storage-info";
+  #      storage-usage = "du -h -d 2 /sdcard | sort -h"; # Modified to show 2 levels deep
+  #    };
+  #  };
 
   #  services.battery = {
   #    enable = true;
