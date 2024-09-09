@@ -49,7 +49,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    environment.systemPackages = with pkgs; [
+    environment.packages = with pkgs; [
       openssh
     ] ++ [
       (pkgs.writeScriptBin "sshd-start" ''
