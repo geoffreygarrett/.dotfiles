@@ -102,7 +102,13 @@
         let
           pkgs = import nixpkgs {
             inherit system;
-            overlays = [ (import rust-overlay) ];
+            overlays = [
+              (import rust-overlay)
+            ] ++ (if isAndroid then [
+              (final: prev: {
+                nix-on-droid = nix-on-droid.packages.${system}.nix-on-droid;
+              })
+            ] else [ ]);
           };
           rustPkgs = pkgs.rustPlatform;
         in
@@ -123,11 +129,21 @@
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ] ++ pkgs.lib.optionals isAndroid [
-            nix-on-droid.packages.${system}.nix-on-droid
+            pkg.nix-on-droid
           ];
           nativeBuildInputs = with pkgs; [
             pkg-config
             makeWrapper
+          ];
+
+          # Runtime dependencies now including nix-on-droid conditionally
+          propagatedBuildInputs = with pkgs; [
+            cachix
+            nix
+            jq
+            gnugrep
+          ] ++ pkgs.lib.optionals isAndroid [
+            nix-on-droid
           ];
 
           postInstall = ''
@@ -138,7 +154,7 @@
                       pkgs.jq
                       pkgs.gnugrep
                     ] ++ pkgs.lib.optionals isAndroid [
-                      nix-on-droid.packages.${system}.nix-on-droid
+                      pkgs.nix-on-droid
                     ])}
           '';
           meta = with pkgs.lib; {
