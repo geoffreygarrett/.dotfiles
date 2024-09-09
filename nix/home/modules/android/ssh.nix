@@ -82,6 +82,16 @@ in
             fi
     '';
 
+    options.services.ssh.aliases = mkOption {
+      type = types.attrsOf types.str;
+      default = {
+        sshd-start = "sshd-start";
+        sshd-stop = "pkill sshd";
+        sshd-restart = "sshd-stop && sshd-start";
+      };
+      description = "Aliases for SSH-related commands.";
+    };
+
     #    # Add SSH-related aliases to the custom shell aliases module
     #    custom.shellAliases.aliases = mkIf config.custom.shellAliases.enable {
     #      sshd-start = { command = "sshd-start"; priority = 50; };
