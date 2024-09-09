@@ -203,7 +203,7 @@ in
     extraSpecialArgs = { inherit services; };
 
     config =
-      { config, lib, pkgs, inputs, ... }:
+      { config, lib, pkgs, inputs, services, ... }:
       {
         # Read the changelog before changing this value
         home.stateVersion = "24.05";
