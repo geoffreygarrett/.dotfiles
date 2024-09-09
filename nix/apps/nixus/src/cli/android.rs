@@ -13,7 +13,7 @@ enum AndroidCommand {
     Rollback,
 }
 
-const NIX_ON_DROID: &str = "~/.nix-profile/bin/nix-on-droid";
+const NIX_ON_DROID: &str = "nix-on-droid";
 const CACHIX: &str = "cachix";
 
 
