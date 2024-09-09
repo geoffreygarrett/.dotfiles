@@ -100,7 +100,7 @@
         in
         {
           nixus = import ./nix/apps/nixus {
-            inherit system pkgs rust-overlay nix-on-droid;
+            inherit system pkgs rust-overlay;
           };
         });
 
@@ -112,7 +112,7 @@
         let
           pkgs = pkgsFor system;
           nixusApp = import ./nix/apps/nixus {
-            inherit system pkgs rust-overlay nix-on-droid;
+            inherit system pkgs rust-overlay;
           };
         in
         {
