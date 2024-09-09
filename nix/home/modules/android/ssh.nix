@@ -82,11 +82,11 @@ in
             fi
     '';
 
-    # Add SSH-related aliases to the custom shell aliases module
-    custom.shellAliases.aliases = mkIf config.custom.shellAliases.enable {
-      sshd-start = { command = "sshd-start"; priority = 50; };
-      sshd-stop = { command = "pkill sshd"; priority = 50; };
-      sshd-restart = { command = "sshd-stop && sshd-start"; priority = 50; };
-    };
+    #    # Add SSH-related aliases to the custom shell aliases module
+    #    custom.shellAliases.aliases = mkIf config.custom.shellAliases.enable {
+    #      sshd-start = { command = "sshd-start"; priority = 50; };
+    #      sshd-stop = { command = "pkill sshd"; priority = 50; };
+    #      sshd-restart = { command = "sshd-stop && sshd-start"; priority = 50; };
+    #    };
   };
 }
