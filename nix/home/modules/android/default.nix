@@ -41,15 +41,15 @@ in
     };
   };
 
-  services.battery = {
-    enable = true;
-    showInfoOnStartup = true;
-    aliases = {
-      battery-info = "battery-info";
-      battery-saver = "am start -a android.settings.BATTERY_SAVER_SETTINGS";
-      battery-full = "termux-notification -t 'Battery Full' -c 'Your battery is fully charged'"; # New alias
-    };
-  };
+  #  services.battery = {
+  #    enable = true;
+  #    showInfoOnStartup = true;
+  #    aliases = {
+  #      battery-info = "battery-info";
+  #      battery-saver = "am start -a android.settings.BATTERY_SAVER_SETTINGS";
+  #      battery-full = "termux-notification -t 'Battery Full' -c 'Your battery is fully charged'"; # New alias
+  #    };
+  #  };
 
   # Packages to be installed
   environment.packages = with pkgs; [
