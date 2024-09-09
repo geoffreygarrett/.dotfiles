@@ -123,7 +123,7 @@
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ] ++ pkgs.lib.optionals isTermuxNixAndroid [
-            pkgs.nix-on-droid
+            nix-on-droid.packages.${system}.nix-on-droid
           ];
           nativeBuildInputs = with pkgs; [
             pkg-config
@@ -137,10 +137,9 @@
                 pkgs.nix
                 pkgs.jq
                 pkgs.gnugrep
-                pkgs.nix-on-droid
+                nix-on-droid.packages.${system}.nix-on-droid
               ]}
           '';
-
           meta = with pkgs.lib; {
             description = "Nixus - A Nix-based system management tool";
             homepage = "https://github.com/geoffreygarrett/celestial-blueprint";
