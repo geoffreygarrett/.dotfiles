@@ -132,8 +132,8 @@ in
             fi
     '';
 
-    environment.shellAliases = cfg.aliases // {
-      sshd-update = "sshd-update-config";
-    };
+    #    environment.shellAliases = cfg.aliases // {
+    #      sshd-update = "sshd-update-config";
+    #    };
   };
 }
