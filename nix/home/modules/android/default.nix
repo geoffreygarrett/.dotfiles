@@ -248,14 +248,11 @@ in
           htop
           fortune
           lolcat
+          pkgs.writeScriptBin
+          "screenshot"
+          (builtins.readFile ./screenshot.sh)
         ];
       };
-    #      // import ../shared/home-manager/programs/git.nix { inherit inputs config pkgs lib; }
-    #      // import ../shared/home-manager/programs/nushell.nix { inherit inputs config pkgs lib; }
-    #      #      // import ../shared/home-manager/programs/nvim.nix { inherit inputs config pkgs lib; }
-    #      // import ../shared/home-manager/programs/starship.nix { inherit inputs config pkgs lib; }
-    #      // import ../shared/home-manager/programs/zellij.nix { inherit inputs config pkgs lib; }
-    #      // import ../shared/home-manager/programs/zsh.nix { inherit inputs config pkgs lib; };
   };
 
   # Build configuration
