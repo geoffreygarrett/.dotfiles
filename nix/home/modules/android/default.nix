@@ -7,13 +7,14 @@
     ./storage.nix
     ./battery.nix
     ./custom-font.nix
+    ../shared/cachix
   ];
 
   services.ssh = {
     enable = true;
     port = 8022;
     authorizedKeys = [
-      "ssh-rsa AAAAB3NzaC1yc2EAAA..." # Your public key here
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7" # Your public key here
     ];
     aliases = {
       sshd-start = "sshd-start";
