@@ -37,14 +37,14 @@ rustPkgs.buildRustPackage {
     makeWrapper
   ];
 
-  propagatedBuildInputs = with pkgs; [
-    cachix
-    nix
-    jq
-    gnugrep
-  ] ++ pkgs.lib.optionals (system == "aarch64-linux") [
-    pkgs.nix-on-droid
-  ];
+  #  propagatedBuildInputs = with pkgs; [
+  #    cachix
+  #    nix
+  #    jq
+  #    gnugrep
+  #  ] ++ pkgs.lib.optionals (system == "aarch64-linux") [
+  #    pkgs.nix-on-droid
+  #  ];
 
   postInstall = ''
     wrapProgram $out/bin/nixus \
