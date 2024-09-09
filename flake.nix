@@ -129,13 +129,12 @@
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ] ++ pkgs.lib.optionals isAndroid [
-            pkg.nix-on-droid
+            pkgs.nix-on-droid
           ];
           nativeBuildInputs = with pkgs; [
             pkg-config
             makeWrapper
           ];
-
           # Runtime dependencies now including nix-on-droid conditionally
           propagatedBuildInputs = with pkgs; [
             cachix
@@ -143,7 +142,7 @@
             jq
             gnugrep
           ] ++ pkgs.lib.optionals isAndroid [
-            nix-on-droid
+            pkgs.nix-on-droid
           ];
 
           postInstall = ''
