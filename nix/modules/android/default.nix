@@ -249,9 +249,6 @@ in
         home.packages = with pkgs; [
           fortune
           lolcat
-          pkgs.writeScriptBin
-          "screengrab"
-          (builtins.readFile ./screengrab.sh)
         ];
       };
   };
