@@ -137,8 +137,10 @@
                 pkgs.nix
                 pkgs.jq
                 pkgs.gnugrep
+
+              ] ++ pkgs.lib.optionals isTermuxNixAndroid [
                 nix-on-droid.packages.${system}.nix-on-droid
-              ]}
+              ]};
           '';
           meta = with pkgs.lib; {
             description = "Nixus - A Nix-based system management tool";
