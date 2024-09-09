@@ -18,7 +18,7 @@ in
 
   services.ssh = {
     enable = true;
-    port = 8022;
+    port = 22;
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7"
     ];
@@ -74,7 +74,7 @@ in
     #xz
     #zip
     #unzip
-  ];
+  ] // pkgs.callPackage ./packages.nix { inherit pkgs; };
 
   # Backup extension for /etc files
   environment.etcBackupExtension = ".bak";
