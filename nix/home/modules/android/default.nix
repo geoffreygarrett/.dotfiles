@@ -206,7 +206,7 @@ in
     # useUserPackages = false;
     # extraSpecialArgs = { };
     # sharedModules = [ ];
-    extraSpecialArgs = { inherit inputs; };
+    #    extraSpecialArgs = { inherit inputs; };
 
     config =
       { config, lib, pkgs, inputs, ... }:
