@@ -120,7 +120,6 @@
             nix
             jq
             gnugrep
-            nix-on-droid.apps.aarch64-linux.nix-on-droid
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ] ++ pkgs.lib.optionals isTermuxNixAndroid [
@@ -138,6 +137,7 @@
                 pkgs.nix
                 pkgs.jq
                 pkgs.gnugrep
+                pkgs.nix-on-droid
               ]}
           '';
 
