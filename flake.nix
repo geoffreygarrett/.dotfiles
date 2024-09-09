@@ -107,7 +107,7 @@
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ];
-
+          #         $CACHIX_AUTH_TOKEN
           nativeBuildInputs = with pkgs; [
             pkg-config
             makeWrapper

@@ -3,8 +3,9 @@ use std::path::PathBuf;
 
 use clap::{Args, ValueEnum};
 use colored::*;
+use log::{debug, error, info, trace};
 
-use crate::utils::CheckedCommand;
+use crate::utils::{CheckedCommand, find_sops_file, get_custom_locations, is_git_repo};
 
 #[derive(Debug, Clone, ValueEnum)]
 enum CachixCommand {
@@ -36,21 +37,37 @@ pub struct CachixArgs {
     /// Additional arguments to pass to the underlying commands
     #[arg(last = true)]
     args: Vec<String>,
+
+    /// Path to the SOPS file containing the Cachix token
+    #[arg(long)]
+    sops_file: Option<PathBuf>,
 }
 
 
-fn push(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn setup_cachix_command(cmd: CheckedCommand, sops_file: &Option<PathBuf>) -> Result<CheckedCommand, String> {
+    let mut cmd = cmd.with_live_output();
+    if let Some(sops_file) = sops_file {
+        cmd = cmd.optional_sops_secret_with_name(sops_file.to_str().unwrap(), "cachix-auth-token.value", "CACHIX_AUTH_TOKEN");
+    } else {
+        let sops_file = find_sops_file()?;
+        cmd = cmd.optional_sops_secret_with_name(sops_file.to_str().unwrap(), "cachix-auth-token.value", "CACHIX_AUTH_TOKEN");
+    }
+    Ok(cmd)
+}
+
+fn push(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing runtime dependencies to Cachix...".yellow());
 
     let output = CheckedCommand::new("nix-build")
         .map_err(|e| format!("Failed to create nix-build command: {}", e))?
         .current_dir(dir)
         .args(extra_args)
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix-build: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .stdin(std::process::Stdio::piped())
@@ -65,13 +82,15 @@ fn push(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String>
     Ok(())
 }
 
-fn push_deps(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+
+fn push_deps(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing build and runtime dependencies to Cachix...".yellow());
 
     let nix_build = CheckedCommand::new("nix-build")
         .map_err(|e| format!("Failed to create nix-build command: {}", e))?
         .current_dir(dir)
         .args(extra_args)
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix-build: {}", e))?;
 
@@ -79,6 +98,7 @@ fn push_deps(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), St
         .map_err(|e| format!("Failed to create nix-store command: {}", e))?
         .arg("-qd")
         .stdin(std::process::Stdio::piped())
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix-store -qd: {}", e))?;
 
@@ -86,6 +106,7 @@ fn push_deps(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), St
         .map_err(|e| format!("Failed to create nix-store command: {}", e))?
         .args(&["-qR", "--include-outputs"])
         .stdin(std::process::Stdio::piped())
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix-store -qR: {}", e))?;
 
@@ -94,11 +115,12 @@ fn push_deps(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), St
         .arg("-v")
         .arg("\\.drv$")
         .stdin(std::process::Stdio::piped())
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute grep: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .stdin(std::process::Stdio::piped())
@@ -113,7 +135,7 @@ fn push_deps(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), St
     Ok(())
 }
 
-fn push_shell(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn push_shell(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing shell environment to Cachix...".yellow());
 
     let output = CheckedCommand::new("nix-build")
@@ -123,11 +145,12 @@ fn push_shell(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), S
         .arg("inputDerivation")
         .current_dir(dir)
         .args(extra_args)
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix-build: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .stdin(std::process::Stdio::piped())
@@ -142,7 +165,7 @@ fn push_shell(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), S
     Ok(())
 }
 
-fn push_all(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn push_all(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing all paths to Cachix...".yellow());
 
     let output = CheckedCommand::new("nix")
@@ -150,11 +173,12 @@ fn push_all(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), Str
         .arg("path-info")
         .arg("--all")
         .current_dir(dir)
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix path-info: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .args(extra_args)
@@ -170,11 +194,11 @@ fn push_all(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), Str
     Ok(())
 }
 
-fn watch_store(cache: &str) -> Result<(), String> {
+fn watch_store(cache: &str, sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Watching Nix store and pushing to Cachix...".yellow());
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("watch-store")
         .arg(cache)
         .status()
@@ -189,7 +213,7 @@ fn watch_store(cache: &str) -> Result<(), String> {
         })
 }
 
-fn watch_exec(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn watch_exec(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     if extra_args.is_empty() {
         return Err("No command specified for watch-exec".into());
     }
@@ -199,8 +223,8 @@ fn watch_exec(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), S
     let mut cachix_args: Vec<&str> = vec!["watch-exec", cache, "--"];
     cachix_args.extend(extra_args.iter().map(String::as_str));
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .args(&cachix_args)
         .current_dir(dir)
         .status()
@@ -215,16 +239,16 @@ fn watch_exec(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), S
         })
 }
 
-fn push_flake_inputs(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn push_flake_inputs(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing flake inputs to Cachix...".yellow());
-
-    let nix_output = CheckedCommand::new("nix")
+    let _nix_output = CheckedCommand::new("nix")
         .map_err(|e| format!("Failed to create nix command: {}", e))?
         .arg("flake")
         .arg("archive")
         .arg("--json")
         .current_dir(dir)
         .args(extra_args)
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix flake archive: {}", e))?;
 
@@ -233,11 +257,12 @@ fn push_flake_inputs(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Resul
         .arg("-r")
         .arg(".path,(.inputs|to_entries[].value.path)")
         .stdin(std::process::Stdio::piped())
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute jq: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .stdin(std::process::Stdio::piped())
@@ -252,7 +277,7 @@ fn push_flake_inputs(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Resul
     Ok(())
 }
 
-fn push_flake_runtime(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn push_flake_runtime(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing flake runtime closure to Cachix...".yellow());
 
     let nix_output = CheckedCommand::new("nix")
@@ -261,6 +286,7 @@ fn push_flake_runtime(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Resu
         .arg("--json")
         .current_dir(dir)
         .args(extra_args)
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute nix build: {}", e))?;
 
@@ -269,11 +295,12 @@ fn push_flake_runtime(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Resu
         .arg("-r")
         .arg(".[].outputs | to_entries[].value")
         .stdin(std::process::Stdio::piped())
+        .with_live_output()
         .output()
         .map_err(|e| format!("Failed to execute jq: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .stdin(std::process::Stdio::piped())
@@ -288,19 +315,20 @@ fn push_flake_runtime(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Resu
     Ok(())
 }
 
-fn push_flake_shell(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn push_flake_shell(dir: &PathBuf, cache: &str, extra_args: &[String], sops_file: &Option<PathBuf>) -> Result<(), String> {
     println!("{}", "Pushing flake shell environment to Cachix...".yellow());
 
     CheckedCommand::new("nix")
         .map_err(|e| format!("Failed to create nix command: {}", e))?
+        .with_live_output()
         .args(&["develop", "--profile", "dev-profile", "-c", "true"])
         .current_dir(dir)
         .args(extra_args)
         .status()
         .map_err(|e| format!("Failed to execute nix develop: {}", e))?;
 
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+    setup_cachix_command(CheckedCommand::new("cachix")
+                             .map_err(|e| format!("Failed to create cachix command: {}", e))?, sops_file)?
         .arg("push")
         .arg(cache)
         .arg("dev-profile")
@@ -317,31 +345,6 @@ fn push_flake_shell(dir: &PathBuf, cache: &str, extra_args: &[String]) -> Result
         })
 }
 
-// Updated helper function to run a command and pipe its output to cachix
-fn pipe_to_cachix<F>(command_fn: F, cache: &str) -> Result<(), String>
-where
-    F: FnOnce() -> Result<CheckedCommand, String>,
-{
-    let output = command_fn()?
-        .output()
-        .map_err(|e| format!("Failed to execute command: {}", e))?;
-
-    CheckedCommand::new("cachix")
-        .map_err(|e| format!("Failed to create cachix command: {}", e))?
-        .arg("push")
-        .arg(cache)
-        .stdin(std::process::Stdio::piped())
-        .spawn()
-        .map_err(|e| format!("Failed to spawn cachix process: {}", e))?
-        .stdin
-        .unwrap()
-        .write_all(&output.stdout)
-        .map_err(|e| format!("Failed to write to cachix stdin: {}", e))?;
-
-    Ok(())
-}
-
-// Add this function to clean up the dev-profile after pushing
 fn cleanup_dev_profile(dir: &PathBuf) -> Result<(), String> {
     println!("{}", "Cleaning up dev-profile...".yellow());
 
@@ -362,23 +365,22 @@ fn cleanup_dev_profile(dir: &PathBuf) -> Result<(), String> {
         })
 }
 
-// Update the run function to include cleanup for push_flake_shell
 pub fn run(args: CachixArgs) -> Result<(), String> {
     println!("{}", "Running Cachix operation...".blue().bold());
 
     let dir = args.dir.unwrap_or_else(|| std::env::current_dir().unwrap());
 
     let result = match args.command {
-        CachixCommand::Push => push(&dir, &args.cache, &args.args),
-        CachixCommand::PushAll => push_all(&dir, &args.cache, &args.args),
-        CachixCommand::PushDeps => push_deps(&dir, &args.cache, &args.args),
-        CachixCommand::PushShell => push_shell(&dir, &args.cache, &args.args),
-        CachixCommand::WatchStore => watch_store(&args.cache),
-        CachixCommand::WatchExec => watch_exec(&dir, &args.cache, &args.args),
-        CachixCommand::PushFlakeInputs => push_flake_inputs(&dir, &args.cache, &args.args),
-        CachixCommand::PushFlakeRuntime => push_flake_runtime(&dir, &args.cache, &args.args),
+        CachixCommand::Push => push(&dir, &args.cache, &args.args, &args.sops_file),
+        CachixCommand::PushAll => push_all(&dir, &args.cache, &args.args, &args.sops_file),
+        CachixCommand::PushDeps => push_deps(&dir, &args.cache, &args.args, &args.sops_file),
+        CachixCommand::PushShell => push_shell(&dir, &args.cache, &args.args, &args.sops_file),
+        CachixCommand::WatchStore => watch_store(&args.cache, &args.sops_file),
+        CachixCommand::WatchExec => watch_exec(&dir, &args.cache, &args.args, &args.sops_file),
+        CachixCommand::PushFlakeInputs => push_flake_inputs(&dir, &args.cache, &args.args, &args.sops_file),
+        CachixCommand::PushFlakeRuntime => push_flake_runtime(&dir, &args.cache, &args.args, &args.sops_file),
         CachixCommand::PushFlakeShell => {
-            let push_result = push_flake_shell(&dir, &args.cache, &args.args);
+            let push_result = push_flake_shell(&dir, &args.cache, &args.args, &args.sops_file);
             cleanup_dev_profile(&dir)?;
             push_result
         }
@@ -387,7 +389,6 @@ pub fn run(args: CachixArgs) -> Result<(), String> {
     result.map_err(|e| format!("Cachix operation failed: {}", e))
 }
 
-// Add this function to check if the necessary commands are available
 pub fn check_dependencies() -> Result<(), String> {
     let dependencies = vec!["nix", "cachix", "jq"];
 

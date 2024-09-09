@@ -8,7 +8,7 @@ use chrono::{DateTime, Local};
 use colored::Colorize;
 use log::{debug, error, info, trace, warn};
 
-use crate::utils::{ask_for_confirmation, CheckedCommand, get_custom_locations, is_git_repo};
+use crate::utils::{ask_for_confirmation, CheckedCommand, find_sops_file, get_custom_locations, is_git_repo};
 
 pub struct SshKeyManager {
     ssh_dir: PathBuf,
@@ -28,51 +28,6 @@ impl SshKeyManager {
         let sops_file = Self::find_sops_file()?;
         debug!("Using SOPS file: {:?}", sops_file);
         Ok(Self { ssh_dir, sops_file })
-    }
-
-    fn find_sops_file() -> Result<PathBuf, String> {
-        debug!("Searching for SOPS secrets file");
-        let current_dir = std::env::current_dir().map_err(|e| format!("Failed to get current directory: {}", e))?;
-        debug!("Starting search from current directory: {:?}", current_dir);
-
-        let mut potential_locations = vec![
-            "secrets.yaml".to_string(),
-            "secrets/secrets.yaml".to_string(),
-            ".secrets.yaml".to_string(),
-            ".secrets/secrets.yaml".to_string(),
-            "config/secrets.yaml".to_string(),
-        ];
-
-        potential_locations.extend(get_custom_locations());
-
-        debug!("Searching in locations: {:?}", potential_locations);
-
-        let mut dir = current_dir.as_path();
-        loop {
-            for location in &potential_locations {
-                let file_path = dir.join(location);
-                trace!("Checking for SOPS file at: {:?}", file_path);
-                if file_path.exists() {
-                    info!("Found SOPS secrets file at: {:?}", file_path);
-                    return Ok(file_path);
-                }
-            }
-
-            if is_git_repo(dir) {
-                debug!("Reached Git repository root at: {:?}", dir);
-                break;
-            }
-            if dir.parent().is_none() {
-                debug!("Reached filesystem root");
-                break;
-            }
-
-            dir = dir.parent().unwrap();
-            debug!("Moving up to parent directory: {:?}", dir);
-        }
-
-        error!("SOPS secrets file not found in any of the expected locations");
-        Err("SOPS secrets file not found".to_string())
     }
 
     pub(crate) fn sync(&self) -> Result<(), String> {
