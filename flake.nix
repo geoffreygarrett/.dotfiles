@@ -125,7 +125,6 @@
           ] ++ pkgs.lib.optionals isTermuxNixAndroid [
             pkgs.nix-on-droid
           ];
-          #         $CACHIX_AUTH_TOKEN
           nativeBuildInputs = with pkgs; [
             pkg-config
             makeWrapper
