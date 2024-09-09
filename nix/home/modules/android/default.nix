@@ -22,7 +22,7 @@ in
     enable = true;
     port = 8022;
     authorizedKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7" # Your public key here
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7"
     ];
     aliases = {
       sshd-start = "sshd-start";
@@ -95,7 +95,6 @@ in
   };
 
 
-
   # Text to show on every new shell
   environment.motd = ''
     echo "Welcome to Nix-on-Droid!" | lolcat
@@ -129,11 +128,11 @@ in
   # time.timeZone = "Europe/Berlin";
 
   # User configuration
-  # user = {
-  #   shell = "${pkgs.bashInteractive}/bin/bash";
-  #   # uid = 1000;  # Do not change unless you know what you're doing
-  #   # gid = 1000;  # Do not change unless you know what you're doing
-  # };
+  user = {
+    shell = "${pkgs.zsh}/bin/bash";
+    # uid = 1000;  # Do not change unless you know what you're doing
+    # gid = 1000;  # Do not change unless you know what you're doing
+  };
 
   # Networking configuration
   #   networking = {
@@ -158,7 +157,6 @@ in
   # };
 
   terminal.font = "${pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }}/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-Regular.ttf";
-  #    font = "${pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; }}/share/fonts/truetype/NerdFonts/JetBrainsMonoNerdFontMono-Regular.ttf";
   terminal.colors = {
     # Main colors
     background = "#0F111A";
@@ -203,7 +201,7 @@ in
   home-manager = {
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
-    # useUserPackages = false;
+    useUserPackages = true;
     # extraSpecialArgs = { };
     # sharedModules = [ ];
     #    extraSpecialArgs = { inherit inputs; };
@@ -213,14 +211,12 @@ in
       {
         # Read the changelog before changing this value
         home.stateVersion = "24.05";
-
-
         imports = [
           #          ../shared/home-manager/programs
           # Uncomment the modules you want to import
           # ../shared/home-manager/programs/git.nix
           ../shared/home-manager/programs/nushell.nix
-          #           ../shared/home-manager/programs/nvim.nix
+          ../shared/home-manager/programs/nvim.nix
           ../shared/home-manager/programs/starship.nix
           ../shared/home-manager/programs/zellij.nix
           ../shared/home-manager/programs/zsh.nix

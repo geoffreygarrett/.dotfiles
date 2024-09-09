@@ -41,27 +41,68 @@ in
       };
       description = "Aliases for SSH-related commands.";
     };
+    sopsCallback = mkOption {
+      type = types.nullOr (types.functionTo types.attrs);
+      default = null;
+      description = "Function to be called when SOPS becomes available. It should return an attrset of updated SSH options.";
+    };
   };
 
   config = mkIf cfg.enable {
-    environment.packages = with pkgs; [
+    environment.systemPackages = with pkgs; [
       openssh
     ] ++ [
       (pkgs.writeScriptBin "sshd-start" ''
         #!${pkgs.runtimeShell}
 
         echo "Starting sshd in non-daemonized way on port ${toString cfg.port}"
-        ${openssh}/bin/sshd -f "${config.user.home}/sshd/sshd_config" -D -e
+        ${pkgs.openssh}/bin/sshd -f "${config.users.users.${config.user.name}.home}/sshd/sshd_config" -D -e
+      '')
+      (pkgs.writeScriptBin "sshd-update-config" ''
+        #!${pkgs.runtimeShell}
+
+        if [ -n "''${SOPS_AGE_KEY_FILE:-}" ]; then
+          echo "SOPS is available. Updating SSH configuration..."
+          ${optionalString (cfg.sopsCallback != null) ''
+            # Call the SOPS callback function and update the configuration
+            ${pkgs.nix}/bin/nix-instantiate --eval --expr '(import ${./ssh-module.nix} { inherit config lib pkgs; }).config.services.ssh.sopsCallback { }' | ${pkgs.jq}/bin/jq -r > /tmp/ssh_updated_config.json
+
+            # Apply the updated configuration
+            if [ -f /tmp/ssh_updated_config.json ]; then
+              port=$(jq -r '.port // empty' /tmp/ssh_updated_config.json)
+              authorizedKeys=$(jq -r '.authorizedKeys // empty' /tmp/ssh_updated_config.json)
+              extraConfig=$(jq -r '.extraConfig // empty' /tmp/ssh_updated_config.json)
+
+              if [ -n "$port" ]; then
+                sed -i "s/^Port .*/Port $port/" ${config.users.users.${config.user.name}.home}/sshd/sshd_config
+              fi
+
+              if [ -n "$authorizedKeys" ]; then
+                echo "$authorizedKeys" > ${config.users.users.${config.user.name}.home}/.ssh/authorized_keys
+              fi
+
+              if [ -n "$extraConfig" ]; then
+                echo "$extraConfig" >> ${config.users.users.${config.user.name}.home}/sshd/sshd_config
+              fi
+
+              echo "SSH configuration updated. Restart the SSH server to apply changes."
+            else
+              echo "Failed to update SSH configuration."
+            fi
+          ''}
+        else
+          echo "SOPS is not yet available. SSH configuration remains unchanged."
+        fi
       '')
     ];
 
-    build.activation.sshd = ''
-            sshdTmpDirectory="${config.user.home}/sshd-tmp"
-            sshdDirectory="${config.user.home}/sshd"
+    system.activationScripts.sshd = ''
+            sshdTmpDirectory="${config.users.users.${config.user.name}.home}/sshd-tmp"
+            sshdDirectory="${config.users.users.${config.user.name}.home}/sshd"
 
-            $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${config.user.home}/.ssh"
-            $DRY_RUN_CMD echo "${concatStringsSep "\n" cfg.authorizedKeys}" > "${config.user.home}/.ssh/authorized_keys"
-            $DRY_RUN_CMD chmod 600 "${config.user.home}/.ssh/authorized_keys"
+            $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${config.users.users.${config.user.name}.home}/.ssh"
+            $DRY_RUN_CMD echo "${concatStringsSep "\n" cfg.authorizedKeys}" > "${config.users.users.${config.user.name}.home}/.ssh/authorized_keys"
+            $DRY_RUN_CMD chmod 600 "${config.users.users.${config.user.name}.home}/.ssh/authorized_keys"
 
             if [[ ! -d "$sshdDirectory" ]]; then
               $DRY_RUN_CMD rm $VERBOSE_ARG --recursive --force "$sshdTmpDirectory"
@@ -74,7 +115,7 @@ in
 
               $VERBOSE_ECHO "Writing sshd_config..."
               $DRY_RUN_CMD cat << EOF > "$sshdTmpDirectory/sshd_config"
-              ${builtins.concatStringsSep "\n" (map (keyType: "HostKey ${config.user.home}/sshd/ssh_host_${keyType}_key") cfg.keyTypes)}
+              ${builtins.concatStringsSep "\n" (map (keyType: "HostKey ${config.users.users.${config.user.name}.home}/sshd/ssh_host_${keyType}_key") cfg.keyTypes)}
               Port ${toString cfg.port}
               PermitRootLogin no
               PasswordAuthentication no
@@ -91,6 +132,8 @@ in
             fi
     '';
 
-    #    environment.shellAliases = cfg.aliases;
+    environment.shellAliases = cfg.aliases // {
+      sshd-update = "sshd-update-config";
+    };
   };
 }
