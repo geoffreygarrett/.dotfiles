@@ -200,7 +200,7 @@ in
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit config pkgs lib; };
+    extraSpecialArgs = { };
 
     config =
       { config, lib, pkgs, inputs, ... }:

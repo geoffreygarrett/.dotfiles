@@ -3,7 +3,7 @@
   sops = {
     # Define the default options for all secrets
     defaultSopsFile = ../../global/secrets.yaml;
-    age.sshKeyPaths = [ "/${config.user.home}/.ssh/id_ed25519" ];
+    age.sshKeyPaths = [ "/data/data/com.termux.nix/files/home/.ssh/id_ed25519" ];
     # Permission modes are in octal representation (same as chmod),
     # the digits represent: user|group|others
     # 7 - full (rwx)
