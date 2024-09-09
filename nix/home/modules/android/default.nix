@@ -227,7 +227,7 @@ in
               ll = "ls -l";
               hw = "echo 'Hello, World!'";
               switch = "nix-on-droid switch --flake ~/.dotfiles";
-            } // lib.optionalAttrs config.services.ssh.enable config.services.ssh.aliases;
+            } // lib.optionalAttrs services.ssh.enable services.ssh.aliases;
           };
         };
 
