@@ -267,6 +267,7 @@
             hooks = {
               nixfmt-rfc-style.enable = true;
               beautysh.enable = true;
+              rustfmt.enable = true;
               commitizen.enable = true;
             };
           };

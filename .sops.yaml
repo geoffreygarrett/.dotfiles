@@ -2,12 +2,12 @@
 # without having to repeat yourself.
 # Also see https://github.com/Mic92/dotfiles/blob/master/nixos/.sops.yaml
 # for a more complex example.
-keys:
-  - &apollo age10nd9h4mh8vuq7h29karutjw6227g26uuztuut82p08sdc2vel4gqr4c62e
-  - &artemis age18jgsuq5wf3jv426rhst5saxc3etz29te3dx3tugg7466tje3layqvtar5f
+#keys:
+#  - &apollo age10nd9h4mh8vuq7h29karutjw6227g26uuztuut82p08sdc2vel4gqr4c62e
+#  - &artemis age18jgsuq5wf3jv426rhst5saxc3etz29te3dx3tugg7466tje3layqvtar5f
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
       - age:
-          - *apollo
-          - *artemis
+          - age10nd9h4mh8vuq7h29karutjw6227g26uuztuut82p08sdc2vel4gqr4c62e # apollo
+          - age18jgsuq5wf3jv426rhst5saxc3etz29te3dx3tugg7466tje3layqvtar5f # artemis
