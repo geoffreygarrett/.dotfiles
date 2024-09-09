@@ -96,7 +96,7 @@
       ##############################
       packages = forAllSystems (system:
         let
-          pkgs = import nixpkgs { inherit system; };
+          pkgs = pkgsFor system;
         in
         {
           nixus = import ./nix/apps/nixus {
@@ -111,9 +111,7 @@
       apps = forAllSystems (system:
         let
           pkgs = pkgsFor system;
-          nixusApp = import ./nix/apps/nixus {
-            inherit system pkgs rust-overlay;
-          };
+          nixusApp = self.packages.${system}.nixus;
         in
         {
           default = {
