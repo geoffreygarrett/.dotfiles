@@ -7,7 +7,7 @@
     ./storage.nix
     ./battery.nix
     ./font.nix
-    .../shared/cachix
+    ../shared/cachix
 
   ];
 
