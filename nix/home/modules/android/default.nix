@@ -74,7 +74,7 @@ in
     #xz
     #zip
     #unzip
-  ] // pkgs.callPackage ./packages.nix { inherit pkgs; };
+  ] ++ pkgs.callPackage ./packages.nix { inherit pkgs; };
 
   # Backup extension for /etc files
   environment.etcBackupExtension = ".bak";
