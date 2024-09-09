@@ -1,5 +1,11 @@
 { inputs, config, lib, pkgs, ... }:
+let
+  # Load the cachix configuration but do not immediately incorporate it into the system configuration
+  cachixConfig = import ../shared/cachix { inherit pkgs lib; };
 
+  # Assuming cachixConfig is structured as { settings = { ... }; }, extract the settings
+  unwrappedCachixConfig = cachixConfig.settings;
+in
 {
 
   imports = [
@@ -7,9 +13,10 @@
     ./storage.nix
     #    ./battery.nix
     ./font.nix
-    ../shared/cachix
 
   ];
+
+
 
   services.ssh = {
     enable = true;
@@ -110,6 +117,8 @@
     # registry = { };
     # substituters = [ ];
     # trustedPublicKeys = [ ];
+    substituters = unwrappedCachixConfig.substituters;
+    trustedPublicKeys = unwrappedCachixConfig.trusted-public-keys;
   };
 
   # Nixpkgs configuration
