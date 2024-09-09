@@ -1,10 +1,10 @@
 { config, lib, pkgs, ... }:
 let
-  # Load the cachix configuration but do not immediately incorporate it into the system configuration
-  cachixConfig = import ../shared/cachix { inherit pkgs lib; };
-
-  # Assuming cachixConfig is structured as { settings = { ... }; }, extract the settings
-  unwrappedCachixConfig = cachixConfig.settings;
+  #  # Load the cachix configuration but do not immediately incorporate it into the system configuration
+  #  cachixConfig = import ../shared/cachix { inherit pkgs lib; };
+  #
+  #  # Assuming cachixConfig is structured as { settings = { ... }; }, extract the settings
+  #  unwrappedCachixConfig = cachixConfig.settings;
 in
 {
 
@@ -116,9 +116,9 @@ in
     # nixPath = [ ];
     # registry = { };
     # substituters = [ ];
-    # trustedPublicKeys = [ ];
-    substituters = unwrappedCachixConfig.substituters;
-    trustedPublicKeys = unwrappedCachixConfig.trusted-public-keys;
+    #    # trustedPublicKeys = [ ];
+    #    substituters = unwrappedCachixConfig.substituters;
+    #    trustedPublicKeys = unwrappedCachixConfig.trusted-public-keys;
   };
 
   # Nixpkgs configuration
