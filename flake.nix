@@ -100,14 +100,35 @@
           buildInputs = with pkgs; [
             openssl
             pkg-config
+            cachix
+            nix
+            jq
+            gnugrep
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
           ];
 
           nativeBuildInputs = with pkgs; [
-            #            rustPkgs.cargoSetupHook
             pkg-config
+            makeWrapper
           ];
+
+          postInstall = ''
+            wrapProgram $out/bin/nixus \
+              --prefix PATH : ${pkgs.lib.makeBinPath [
+                pkgs.cachix
+                pkgs.nix
+                pkgs.jq
+                pkgs.gnugrep
+              ]}
+          '';
+
+          meta = with pkgs.lib; {
+            description = "Nixus - A Nix-based system management tool";
+            homepage = "https://github.com/geoffreygarrett/celestial-blueprint";
+            license = licenses.mit;
+            maintainers = with maintainers; [ your-name ];
+          };
         };
       users = {
         geoffrey = {

@@ -44,6 +44,7 @@ enum Commands {
     NixOS(cli::nixos::NixOSArgs),
     Home(cli::home::HomeArgs),
     SshKeys(cli::ssh_keys::SshKeysArgs),
+    Cachix(cli::cachix::CachixArgs),
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -144,6 +145,10 @@ fn main() {
         Commands::SshKeys(args) => {
             info!("Running SSH keys command");
             cli::ssh_keys::run_ssh_keys(args)
+        }
+        Commands::Cachix(args) => {
+            info!("Running Cachix command");
+            cli::cachix::run(args)
         }
     };
 
