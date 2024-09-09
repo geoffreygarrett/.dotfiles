@@ -6,7 +6,7 @@
     ./ssh.nix
     ./storage.nix
     ./battery.nix
-    ./custom-font.nix
+    ./font.nix
     .../shared/cachix
 
   ];
