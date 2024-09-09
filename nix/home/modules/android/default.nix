@@ -214,6 +214,7 @@ in
           # TODO: The neovim should have a dependency on this,
           #       or more accurately, the GH neovim plugin.
           ../shared/home-manager/programs/gh.nix
+          ../shared/home-manager/programs/htop.nix
           ../shared/home-manager/programs/nushell.nix
           ../shared/home-manager/programs/nvim.nix
           ../shared/home-manager/programs/starship.nix
@@ -246,7 +247,6 @@ in
 
 
         home.packages = with pkgs; [
-          htop
           fortune
           lolcat
           pkgs.writeScriptBin
