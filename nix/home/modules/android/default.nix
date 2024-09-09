@@ -16,8 +16,6 @@ in
 
   ];
 
-
-
   services.ssh = {
     enable = true;
     port = 8022;
@@ -28,7 +26,7 @@ in
       sshd-start = "sshd-start";
       sshd-stop = "pkill sshd";
       sshd-restart = "sshd-stop && sshd-start";
-      ssh-keygen = "ssh-keygen -t ed25519"; # Example of adding a new alias
+      ssh-keygen = "ssh-keygen -t ed25519";
     };
   };
 
@@ -230,7 +228,7 @@ in
               ll = "ls -l";
               hw = "echo 'Hello, World!'";
               switch = "nix-on-droid switch --flake ~/.dotfiles";
-            };
+            } // lib.optionalAttrs config.services.ssh.enable config.services.ssh.aliases;
           };
         };
 
