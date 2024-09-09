@@ -161,79 +161,93 @@
       ##############################
       # Nix-on-Droid Configuration
       ##############################
-      nixOnDroidConfigurations =
-        let
-          configurations = nixpkgs.lib.genAttrs systems.android (system:
-            {
-              config = nix-on-droid.lib.nixOnDroidConfiguration {
-                pkgs = pkgsFor system;
-                modules = [
-                  ./nix/home/modules/android
-                  {
-                    networking.hosts = {
-                      "100.78.156.17" = [ "pioneer.home" ];
-                      "100.116.122.19" = [ "artemis.home" ];
-                    };
-                  }
-                ];
-              };
-            });
-        in
-        {
-          inherit configurations;
-          default = configurations."aarch64-linux";
-        };
-
-      ##############################
-      # Home Configuration
-      ##############################
-      homeConfigurations = {
-        "geoffrey@apollo" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor "x86_64-linux";
-          modules = [
-            ./nix/network.nix
-            ./nix/hosts/apollo.nix
-            ./nix/home/apollo.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
-          extraSpecialArgs = { inherit inputs outputs; };
-        };
-        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor "aarch64-darwin";
-          modules = [
-            ./nix/hosts/artemis.nix
-            ./nix/home/artemis.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
-          extraSpecialArgs = { inherit inputs outputs; };
-
-        };
+      nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
+        pkgs = pkgsFor "aarch64-linux";
+        modules = [
+          ./nix/home/modules/android
+          {
+            networking.hosts = {
+              "100.78.156.17" = [ "pioneer.home" ];
+              "100.116.122.19" = [ "artemis.home" ];
+            };
+          }
+        ];
       };
+    };
 
-      ##############################
-      # Checks Configuration
-      ##############################
-      checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage)
-        self.homeConfigurations // forAllSystems (system: {
-        pre-commit-check = pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          hooks = {
-            nixpkgs-fmt.enable = true;
-            beautysh.enable = true;
-            commitizen.enable = true;
-          };
-        };
-      });
+  #      }
+  #        let
+  #          configurations = nixpkgs.lib.genAttrs systems.android (system:
+  #            {
+  #              config = nix-on-droid.lib.nixOnDroidConfiguration {
+  #                pkgs = pkgsFor system;
+  #                modules = [
+  #                  ./nix/home/modules/android
+  #                  {
+  #                    networking.hosts = {
+  #                      "100.78.156.17" = [ "pioneer.home" ];
+  #                      "100.116.122.19" = [ "artemis.home" ];
+  #                    };
+  #                  }
+  #                ];
+  #              };
+  #            });
+  #        in
+  #        {
+  #          inherit configurations;
+  #          default = configurations."aarch64-linux";
+  #        };
 
-      ##############################
-      # Dev Shell Configuration
-      ##############################
-      devShells = forAllSystems (system: {
-        default = nixpkgs.legacyPackages.${system}.mkShell {
-          buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
-          shellHook = self.checks.${system}.pre-commit-check.shellHook;
-        };
-      });
+  ##############################
+  # Home Configuration
+  ##############################
+  homeConfigurations = {
+    "geoffrey@apollo" = lib.homeManagerConfiguration {
+      pkgs = pkgsFor "x86_64-linux";
+      modules = [
+        ./nix/network.nix
+        ./nix/hosts/apollo.nix
+        ./nix/home/apollo.nix
+        inputs.sops-nix.homeManagerModules.sops
+      ];
+      extraSpecialArgs = { inherit inputs outputs; };
+    };
+    "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
+      pkgs = pkgsFor "aarch64-darwin";
+      modules = [
+        ./nix/hosts/artemis.nix
+        ./nix/home/artemis.nix
+        inputs.sops-nix.homeManagerModules.sops
+      ];
+      extraSpecialArgs = { inherit inputs outputs; };
 
     };
+  };
+
+  ##############################
+  # Checks Configuration
+  ##############################
+  checks = nixpkgs.lib.mapAttrs (name: config: config.activationPackage)
+    self.homeConfigurations // forAllSystems (system: {
+    pre-commit-check = pre-commit-hooks.lib.${system}.run {
+      src = ./.;
+      hooks = {
+        nixpkgs-fmt.enable = true;
+        beautysh.enable = true;
+        commitizen.enable = true;
+      };
+    };
+  });
+
+  ##############################
+  # Dev Shell Configuration
+  ##############################
+  devShells = forAllSystems (system: {
+    default = nixpkgs.legacyPackages.${system}.mkShell {
+      buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
+      shellHook = self.checks.${system}.pre-commit-check.shellHook;
+    };
+  });
+
+};
 }

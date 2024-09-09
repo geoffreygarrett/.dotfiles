@@ -13,6 +13,7 @@ enum AndroidCommand {
     Rollback,
 }
 
+const NIX_ON_DROID: &str = "~/.nix-profile/bin/nix-on-droid";
 const CACHIX: &str = "cachix";
 
 
@@ -51,10 +52,8 @@ pub fn run(args: AndroidArgs) -> Result<(), String> {
 
 fn build(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_args: &[String]) -> Result<(), String> {
     println!("{}", "Building configuration...".yellow());
-    let nix_on_droid = std::env::var("HOME")
-        .map(|home| format!("{}/.nix-profile/bin/nix-on-droid", home))
-        .unwrap_or_else(|_| "nix-on-droid".to_string());
-    let mut cmd = CheckedCommand::new(nix_on_droid)
+
+    let mut cmd = CheckedCommand::new(NIX_ON_DROID)
         .map_err(|e| format!("Failed to create nix-on-droid command: {}", e))?
         .arg("build")
         .arg("--flake")
@@ -84,10 +83,8 @@ fn build(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_arg
 
 fn switch(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_args: &[String]) -> Result<(), String> {
     println!("{}", "Switching to new configuration...".yellow());
-    let nix_on_droid = std::env::var("HOME")
-        .map(|home| format!("{}/.nix-profile/bin/nix-on-droid", home))
-        .unwrap_or_else(|_| "nix-on-droid".to_string());
-    let mut cmd = CheckedCommand::new(nix_on_droid)
+
+    let mut cmd = CheckedCommand::new(NIX_ON_DROID)
         .map_err(|e| format!("Failed to create nix-on-droid command: {}", e))?
         .arg("switch")
         .arg("--flake")
@@ -117,10 +114,8 @@ fn switch(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_ar
 
 fn rollback(cache: bool, extra_args: &[String]) -> Result<(), String> {
     println!("{}", "Rolling back to previous configuration...".yellow());
-    let nix_on_droid = std::env::var("HOME")
-        .map(|home| format!("{}/.nix-profile/bin/nix-on-droid", home))
-        .unwrap_or_else(|_| "nix-on-droid".to_string());
-    let mut cmd = CheckedCommand::new(nix_on_droid)
+
+    let mut cmd = CheckedCommand::new(NIX_ON_DROID)
         .map_err(|e| format!("Failed to create nix-on-droid command: {}", e))?
         .arg("rollback")
         .args(extra_args);
