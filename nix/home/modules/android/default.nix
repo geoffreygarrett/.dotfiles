@@ -201,7 +201,7 @@ in
     useGlobalPkgs = true;
     useUserPackages = true;
     # extraSpecialArgs = { };
-    # sharedModules = [ ];
+    #     sharedModules = [ ];
     #    extraSpecialArgs = { inherit inputs; };
 
     config =

@@ -173,6 +173,7 @@
           }
           {
             home-manager.extraSpecialArgs = { inherit inputs outputs; };
+            home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
           }
         ];
       };
