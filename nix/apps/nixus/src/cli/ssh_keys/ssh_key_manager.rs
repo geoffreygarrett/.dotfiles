@@ -25,7 +25,7 @@ impl SshKeyManager {
             debug!("Using default SSH directory: {:?}", dir);
             dir
         });
-        let sops_file = Self::find_sops_file()?;
+        let sops_file = find_sops_file()?;
         debug!("Using SOPS file: {:?}", sops_file);
         Ok(Self { ssh_dir, sops_file })
     }
