@@ -1,5 +1,19 @@
 {
   description = "General Purpose Configuration for macOS and NixOS";
+
+  nixConfig = {
+    substituters = [
+      "https://nix-community.cachix.org"
+      "https://cache.nixos.org/"
+      "https://geoffreygarrett.cachix.org"
+    ];
+
+    trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "geoffreygarrett.cachix.org-1:3WdQXTf/87KGswkvnb7otJxqz03NOmjGMHftGzqiR88="
+    ];
+  };
   inputs = {
     # Core
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -82,6 +96,8 @@
     let
       inherit (self) outputs;
       # Add a function to build the Nixus app
+      isTermuxNixAndroid = builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
+
       buildNixusApp = system:
         let
           pkgs = import nixpkgs {
@@ -106,6 +122,8 @@
             gnugrep
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          ] ++ pkgs.lib.optionals isTermuxNixAndroid [
+            pkgs.nix-on-droid
           ];
           #         $CACHIX_AUTH_TOKEN
           nativeBuildInputs = with pkgs; [
@@ -164,7 +182,6 @@
       systems.supported = systems.linux ++ systems.darwin;
       forAllSystems = f: nixpkgs.lib.genAttrs (systems.supported) f;
       isLinux = system: builtins.elem system systems.linux;
-      isTermuxNixAndroid = builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
       pkgsFor = system:
         import nixpkgs {
           inherit system nixgl;
