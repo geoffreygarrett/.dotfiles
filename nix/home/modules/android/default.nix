@@ -200,7 +200,7 @@ in
     backupFileExtension = "hm-bak";
     useGlobalPkgs = true;
     useUserPackages = true;
-    extraSpecialArgs = { inherit services; };
+    extraSpecialArgs = { inherit (config) services; };
 
     config =
       { config, lib, pkgs, inputs, services, ... }:
@@ -223,11 +223,21 @@ in
         programs = {
           bash = {
             enable = true;
-            shellAliases = {
-              ll = "ls -l";
-              hw = "echo 'Hello, World!'";
-              switch = "nix-on-droid switch --flake ~/.dotfiles";
-            } // lib.optionalAttrs services.ssh.enable services.ssh.aliases;
+            shellAliases =
+              let
+                sshAliases = if services.ssh.enable then services.ssh.aliases else { };
+                # storageAliases = if services.storage.enable then services.storage.aliases else {};
+                # batteryAliases = if services.battery.enable then services.battery.aliases else {};
+              in
+              {
+                ll = "ls -l";
+                hw = "echo 'Hello, World!'";
+                switch = "nix-on-droid switch --flake ~/.dotfiles";
+              }
+              // sshAliases
+              # // storageAliases
+              # // batteryAliases
+            ;
           };
         };
 
