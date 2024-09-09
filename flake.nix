@@ -335,6 +335,12 @@
           };
         } // (if isLinux system then mkLinuxApps else mkDarwinApps) system
       );
+      # Update the packages output
+      packages = forAllSystems (system: {
+        nixus = buildNixusApp system;
+        default = buildNixusApp system;
+      });
+
       devShells = forAllSystems (system: {
         default = nixpkgs.legacyPackages.${system}.mkShell {
           inherit (self.checks.${system}.pre-commit-check) shellHook;
