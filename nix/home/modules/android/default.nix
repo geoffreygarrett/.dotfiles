@@ -51,10 +51,9 @@ in
 
   # Packages to be installed
   environment.packages = with pkgs; [
-    neovim
+    #    neovim
     git
     openssh
-    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
 
     # Uncomment the packages you want to install
     #procps
