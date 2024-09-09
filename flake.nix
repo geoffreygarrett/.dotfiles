@@ -78,14 +78,15 @@
     let
       inherit (self) outputs;
       user = "geoffreygarrett";
-      lib = nixpkgs.lib // home-manager.lib // {
-        isLinux = system: builtins.elem system nixpkgs.lib.systems.doubles.linux;
-        isDarwin = system: builtins.elem system nixpkgs.lib.systems.doubles.darwin;
-        isTermux = system: builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux" && lib.isLinux system;
-      };
+
       systems.linux = [ "aarch64-linux" "x86_64-linux" ];
       systems.darwin = [ "aarch64-darwin" "x86_64-darwin" ];
       systems.supported = systems.linux ++ systems.darwin;
+      lib = nixpkgs.lib // home-manager.lib // {
+        isLinux = system: builtins.elem system systems.linux;
+        isDarwin = system: builtins.elem system systems.darwin;
+        isTermux = system: builtins.elem system systems.linux && builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux";
+      };
       forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
       pkgsFor = system: import nixpkgs {
         inherit system;
@@ -93,9 +94,8 @@
           (final: prev: {
             nix-on-droid = nix-on-droid.packages.${system};
           })
-          (if lib.isTermux system then nix-on-droid.overlays.default else (_: _: { }))
-          (if lib.isLinux system then nixgl.overlay else (_: _: { }))
-        ];
+        ] ++ lib.optional (lib.isTermux system) nix-on-droid.overlays.default
+        ++ lib.optional (lib.isLinux system) nixgl.overlay;
       };
     in
     {
@@ -109,7 +109,7 @@
         in
         {
           nixus = import ./nix/apps/nixus {
-            inherit system pkgs rust-overlay;
+            inherit system pkgs rust-overlay lib;
           };
         });
 

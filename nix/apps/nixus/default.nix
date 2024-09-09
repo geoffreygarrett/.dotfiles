@@ -1,4 +1,4 @@
-{ system, pkgs, rust-overlay }:
+{ system, pkgs, lib, rust-overlay }:
 
 let
   rustPkgs = pkgs.rustPlatform;
@@ -28,9 +28,9 @@ rustPkgs.buildRustPackage {
     nix
     jq
     gnugrep
-  ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+  ] ++ pkgs.lib.optionals (lib.isDarwin system) [
     pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-  ] ++ pkgs.lib.optionals (system == "aarch64-linux") [
+  ] ++ pkgs.lib.optionals (lib.isTermux system) [
     pkgs.nix-on-droid
   ];
 
