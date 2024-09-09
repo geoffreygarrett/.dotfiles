@@ -96,7 +96,7 @@
     let
       inherit (self) outputs;
       # Add a function to build the Nixus app
-      isTermuxNixAndroid = builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
+      isAndroid = builtins.getEnv "TERMUX_APP__PACKAGE_NAME" == "com.termux.nix";
 
       buildNixusApp = system:
         let
@@ -122,7 +122,7 @@
             gnugrep
           ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
-          ] ++ pkgs.lib.optionals isTermuxNixAndroid [
+          ] ++ pkgs.lib.optionals isAndroid [
             nix-on-droid.packages.${system}.nix-on-droid
           ];
           nativeBuildInputs = with pkgs; [
@@ -132,15 +132,14 @@
 
           postInstall = ''
             wrapProgram $out/bin/nixus \
-              --prefix PATH : ${pkgs.lib.makeBinPath [
-                pkgs.cachix
-                pkgs.nix
-                pkgs.jq
-                pkgs.gnugrep
-
-              ] ++ pkgs.lib.optionals isTermuxNixAndroid [
-                nix-on-droid.packages.${system}.nix-on-droid
-              ]};
+                    --prefix PATH : ${pkgs.lib.makeBinPath ([
+                      pkgs.cachix
+                      pkgs.nix
+                      pkgs.jq
+                      pkgs.gnugrep
+                    ] ++ pkgs.lib.optionals isAndroid [
+                      nix-on-droid.packages.${system}.nix-on-droid
+                    ])}
           '';
           meta = with pkgs.lib; {
             description = "Nixus - A Nix-based system management tool";
