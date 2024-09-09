@@ -171,6 +171,9 @@
               "100.116.122.19" = [ "artemis.home" ];
             };
           }
+          {
+            home-manager.extraSpecialArgs = { inherit inputs outputs; };
+          }
         ];
       };
 
@@ -220,7 +223,6 @@
             inputs.sops-nix.homeManagerModules.sops
           ];
           extraSpecialArgs = { inherit inputs outputs; };
-
         };
       };
 
