@@ -209,7 +209,10 @@ in
         imports = [
           #          ../shared/home-manager/programs
           # Uncomment the modules you want to import
-          # ../shared/home-manager/programs/git.nix
+          ../shared/home-manager/programs/git.nix
+          # TODO: The neovim should have a dependency on this,
+          #       or more accurately, the GH neovim plugin.
+          ../shared/home-manager/programs/gh.nix
           ../shared/home-manager/programs/nushell.nix
           ../shared/home-manager/programs/nvim.nix
           ../shared/home-manager/programs/starship.nix

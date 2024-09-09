@@ -8,7 +8,7 @@
   # SECRETS
   pkgs.age
   pkgs.micromamba
-  pkgs.nixfmt
+  pkgs.nixfmt-rfc-style
   # RUST-SCRIPT
   pkgs.cargo
   pkgs.rustc
