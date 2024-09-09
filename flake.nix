@@ -100,6 +100,13 @@
           buildInputs = with pkgs; [
             openssl
             pkg-config
+          ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            pkgs.darwin.apple_sdk.frameworks.SystemConfiguration
+          ];
+
+          nativeBuildInputs = with pkgs; [
+            #            rustPkgs.cargoSetupHook
+            pkg-config
           ];
         };
       users = {

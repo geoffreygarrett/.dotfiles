@@ -43,6 +43,7 @@ enum Commands {
     #[clap(name = "nixos")]
     NixOS(cli::nixos::NixOSArgs),
     Home(cli::home::HomeArgs),
+    SshKeys(cli::ssh_keys::SshKeysArgs),
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -139,6 +140,10 @@ fn main() {
         Commands::Home(args) => {
             info!("Running Home command");
             cli::home::run(args)
+        }
+        Commands::SshKeys(args) => {
+            info!("Running SSH keys command");
+            cli::ssh_keys::run_ssh_keys(args)
         }
     };
 
