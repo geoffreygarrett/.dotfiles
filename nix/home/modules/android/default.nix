@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, services, ... }:
 let
   #  # Load the cachix configuration but do not immediately incorporate it into the system configuration
   #  cachixConfig = import ../shared/cachix { inherit pkgs lib; };
