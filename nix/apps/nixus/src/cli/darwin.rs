@@ -23,6 +23,14 @@ pub struct DarwinArgs {
     #[arg(short, long)]
     flake: Option<PathBuf>,
 
+    /// Enable or disable caching (default: true)
+    #[arg(long, default_value = "true")]
+    cache: bool,
+
+    /// Name of the Cachix cache to use (default: "geoffreygarrett")
+    #[arg(long, default_value = "geoffreygarrett")]
+    cachix_cache: String,
+
     /// Additional arguments to pass to nix
     #[arg(last = true)]
     args: Vec<String>,
@@ -35,85 +43,90 @@ pub fn run(args: DarwinArgs) -> Result<(), String> {
     let system_type = crate::config::determine_system_type();
 
     match args.command {
-        DarwinCommand::Build => build(&flake_dir, &system_type, &args.args),
+        DarwinCommand::Build => build(&flake_dir, &system_type, args.cache, &args.cachix_cache, &args.args),
         DarwinCommand::Switch => {
-            build(&flake_dir, &system_type, &args.args)?;
-            switch(&flake_dir, &system_type, &args.args)
+            build(&flake_dir, &system_type, args.cache, &args.cachix_cache, &args.args)?;
+            switch(&flake_dir, &system_type, args.cache, &args.cachix_cache, &args.args)
         }
-        DarwinCommand::Rollback => rollback(&flake_dir, &system_type, &args.args)
+        DarwinCommand::Rollback => rollback(&flake_dir, &system_type, args.cache, &args.args),
     }
 }
 
-fn forward_command(flake_dir: &PathBuf, command: &str, extra_args: &[String]) -> Result<(), String> {
-    println!("{}", format!("Forwarding '{}' command to darwin-rebuild...", command).yellow());
-
-    CheckedCommand::new("/run/current-system/sw/bin/darwin-rebuild")
-        .map_err(|e| format!("Failed to create darwin-rebuild command: {}", e))?
-        .arg(command)  // Use the forwarded command
-        .args(extra_args)
-        .current_dir(flake_dir)
-        .status()
-        .map_err(|e| format!("Failed to forward command: {}", e))
-        .and_then(|status| {
-            if status.success() {
-                println!("{}", "Command forwarded successfully.".green());
-                Ok(())
-            } else {
-                Err("Forwarded command failed".into())
-            }
-        })
-}
-
-fn build(flake_dir: &PathBuf, system_type: &str, extra_args: &[String]) -> Result<(), String> {
+fn build(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &str, extra_args: &[String]) -> Result<(), String> {
     println!("{}", "Building configuration...".yellow());
-    CheckedCommand::new("nix")
+
+    let mut cmd = CheckedCommand::new("nix")
         .map_err(|e| format!("Failed to create nix command: {}", e))?
         .arg("build")
         .arg(format!(".#darwinConfigurations.{}.system", system_type))
         .arg("--extra-experimental-features")
         .arg("nix-command flakes")
         .args(extra_args)
-        .current_dir(flake_dir)
-        .status()
-        .map_err(|e| format!("Failed to execute build command: {}", e))
-        .and_then(|status| {
-            if status.success() {
-                println!("{}", "Build completed successfully.".green());
-                Ok(())
-            } else {
-                Err("Build failed".into())
-            }
-        })
+        .current_dir(flake_dir);
+
+    if !cache {
+        cmd = cmd.arg("--no-link");
+    }
+
+    let build_status = cmd.status()
+        .map_err(|e| format!("Failed to execute build command: {}", e))?;
+
+    if !build_status.success() {
+        return Err("Build failed".into());
+    }
+
+    println!("{}", "Build completed successfully.".green());
+
+    if !cachix_cache.is_empty() {
+        // Get all the paths that were built
+        let store_paths = get_build_paths()?;
+        push_to_cachix(&cachix_cache, store_paths)?;
+    }
+
+    Ok(())
 }
 
-fn switch(flake_dir: &PathBuf, system_type: &str, extra_args: &[String]) -> Result<(), String> {
+fn switch(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &str, extra_args: &[String]) -> Result<(), String> {
     println!("{}", "Switching to new configuration...".yellow());
-    CheckedCommand::new("./result/sw/bin/darwin-rebuild")
+
+    let mut cmd = CheckedCommand::new("./result/sw/bin/darwin-rebuild")
         .map_err(|e| format!("Failed to create darwin-rebuild command: {}", e))?
         .arg("switch")
         .arg("--flake")
         .arg(format!(".#{}", system_type))
         .args(extra_args)
+        .current_dir(flake_dir);
+
+    if !cache {
+        cmd = cmd.arg("--no-build-nix");
+    }
+
+    let switch_status = cmd.status()
+        .map_err(|e| format!("Failed to execute switch command: {}", e))?;
+
+    if !switch_status.success() {
+        return Err("Switch failed".into());
+    }
+
+    println!("{}", "Switch to new configuration complete!".green());
+
+    if !cachix_cache.is_empty() {
+        // Get all the paths that were switched
+        let store_paths = get_build_paths()?;
+        push_to_cachix(&cachix_cache, store_paths)?;
+    }
+
+    // Cleanup
+    let _ = CheckedCommand::new("unlink")
+        .map_err(|e| format!("Failed to create unlink command: {}", e))?
+        .arg("./result")
         .current_dir(flake_dir)
-        .status()
-        .map_err(|e| format!("Failed to execute switch command: {}", e))
-        .and_then(|status| {
-            if status.success() {
-                println!("{}", "Switch to new configuration complete!".green());
-                // Cleanup
-                let _ = CheckedCommand::new("unlink")
-                    .map_err(|e| format!("Failed to create unlink command: {}", e))?
-                    .arg("./result")
-                    .current_dir(flake_dir)
-                    .status();
-                Ok(())
-            } else {
-                Err("Switch failed".into())
-            }
-        })
+        .status();
+
+    Ok(())
 }
 
-fn rollback(flake_dir: &PathBuf, system_type: &str, extra_args: &[String]) -> Result<(), String> {
+fn rollback(flake_dir: &PathBuf, system_type: &str, cache: bool, extra_args: &[String]) -> Result<(), String> {
     println!("{}", "Preparing for rollback...".yellow());
 
     // List available generations
@@ -137,7 +150,7 @@ fn rollback(flake_dir: &PathBuf, system_type: &str, extra_args: &[String]) -> Re
 
     println!("{}", format!("Rolling back to generation {}...", gen_num).yellow());
 
-    CheckedCommand::new("/run/current-system/sw/bin/darwin-rebuild")
+    let mut cmd = CheckedCommand::new("/run/current-system/sw/bin/darwin-rebuild")
         .map_err(|e| format!("Failed to create darwin-rebuild command: {}", e))?
         .arg("switch")
         .arg("--flake")
@@ -145,15 +158,57 @@ fn rollback(flake_dir: &PathBuf, system_type: &str, extra_args: &[String]) -> Re
         .arg("--switch-generation")
         .arg(gen_num)
         .args(extra_args)
-        .current_dir(flake_dir)
-        .status()
-        .map_err(|e| format!("Failed to execute rollback command: {}", e))
-        .and_then(|status| {
-            if status.success() {
-                println!("{}", format!("Rollback to generation {} complete!", gen_num).green());
-                Ok(())
-            } else {
-                Err(format!("Rollback to generation {} failed", gen_num))
-            }
-        })
+        .current_dir(flake_dir);
+
+    if !cache {
+        cmd = cmd.arg("--no-build-nix");
+    }
+
+    let rollback_status = cmd.status()
+        .map_err(|e| format!("Failed to execute rollback command: {}", e))?;
+
+    if !rollback_status.success() {
+        return Err(format!("Rollback to generation {} failed", gen_num));
+    }
+
+    println!("{}", format!("Rollback to generation {} complete!", gen_num).green());
+    Ok(())
+}
+
+fn push_to_cachix(cache_name: &str, store_paths: Vec<String>) -> Result<(), String> {
+    println!("{}", format!("Pushing store paths to Cachix cache: {}...", cache_name).yellow());
+    let mut cmd = CheckedCommand::new("cachix")
+        .map_err(|e| format!("Failed to create cachix command: {}", e))?
+        .arg("push")
+        .arg(cache_name)
+        .stdin(std::process::Stdio::piped())
+        .spawn()
+        .map_err(|e| format!("Failed to spawn cachix process: {}", e))?;
+
+    let stdin = cmd.stdin.as_mut().ok_or("Failed to open stdin")?;
+
+    for path in store_paths {
+        writeln!(stdin, "{}", path).map_err(|e| format!("Failed to write to cachix stdin: {}", e))?;
+    }
+
+    cmd.wait()
+        .map_err(|e| format!("Failed to wait for cachix process: {}", e))?;
+
+    Ok(())
+}
+
+fn get_build_paths() -> Result<Vec<String>, String> {
+    let output = CheckedCommand::new("nix-store")
+        .map_err(|e| format!("Failed to create nix-store command: {}", e))?
+        .arg("-qR")
+        .output()
+        .map_err(|e| format!("Failed to execute nix-store command: {}", e))?;
+
+    let paths = String::from_utf8(output.stdout)
+        .map_err(|e| format!("Failed to parse nix-store output: {}", e))?
+        .lines()
+        .map(|line| line.to_string())
+        .collect::<Vec<_>>();
+
+    Ok(paths)
 }
