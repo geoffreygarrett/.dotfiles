@@ -10,7 +10,6 @@
 
 {
   imports = [
-    ../../modules/android/home-manager.nix
     ../../modules/shared/cachix
     ../../modules/android
   ];
