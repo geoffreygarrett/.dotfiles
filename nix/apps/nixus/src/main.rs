@@ -7,14 +7,13 @@ use clap_complete::{generate, Generator};
 use clap_complete_nushell::Nushell;
 use colored::*;
 use env_logger::Builder;
-#[allow(unused_imports)]
-use log::{debug, error, info, Level, LevelFilter, warn};
+use log::{debug, error, info, LevelFilter};
 
 mod cli;
 mod config;
 mod utils;
-// #[allow(unused_imports)]
-// mod styles;
+
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Clone, Debug)]
 struct SopsConfig {
@@ -34,18 +33,22 @@ impl FromStr for SopsConfig {
         Ok(SopsConfig {
             file: parts[0].to_string(),
             key_path: parts[1].to_string(),
-            env_var: parts.get(2).map(|&s| s.to_string()),
+            env_var: parts.get(2).map(ToString::to_string),
         })
     }
 }
 
 #[derive(Parser)]
-#[clap(name = "nixus", styles = crate::cli::styles::get_styles())]
-#[clap(about = "A CLI tool for managing Nix configurations")]
+#[command(
+    name = "nixus", about = "A CLI tool for managing Nix configurations", styles = crate::cli::styles::get_styles()
+)]
+#[command(version = VERSION)]
 struct Cli {
+    /// Set the log level
     #[arg(short, long, default_value = "off")]
     log_level: LevelFilter,
 
+    /// SOPS configuration
     #[arg(
         long = "sops",
         number_of_values = 1,
@@ -73,7 +76,7 @@ enum Commands {
     },
     Darwin(cli::darwin::DarwinArgs),
     Android(cli::android::AndroidArgs),
-    #[clap(name = "nixos")]
+    #[command(name = "nixos")]
     NixOS(cli::nixos::NixOSArgs),
     Home(cli::home::HomeArgs),
     SshKeys(cli::ssh_keys::SshKeysArgs),
@@ -123,35 +126,13 @@ impl Shell {
             Shell::Fish => format!("echo \"source (COMPLETE=fish {} | psub)\" >> ~/.config/fish/config.fish", program_name),
             Shell::PowerShell => format!("echo \"COMPLETE=powershell {} | Invoke-Expression\" >> $PROFILE", program_name),
             Shell::Zsh => format!("echo \"source <(COMPLETE=zsh {})\" >> ~/.zshrc", program_name),
-            Shell::Nushell => format!("mkdir ~/.cache/nixus; COMPLETE=nushell {} > ~/.cache/nixus/nixus.nu; echo 'source ~/.cache/nixus/nixus.nu' >> ~/.config/nushell/config.nu", program_name),
+            Shell::Nushell => format!("mkdir -p ~/.cache/nixus; COMPLETE=nushell {} > ~/.cache/nixus/nixus.nu; echo 'source ~/.cache/nixus/nixus.nu' >> ~/.config/nushell/config.nu", program_name),
         }
     }
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
-
-    // // NOTE: Temporary, we will set for each call's scope later.
-    // // Handle SOPS configurations
-    // for config in &cli.sops_configs {
-    //     match utils::get_sops_secret(&config.file, &config.key_path) {
-    //         Ok(secret) => unsafe {
-    //             // TODO: Must update this and use scoped env vars for the Command call.
-    //             //       Will require some thinking and refactoring. #75%Rule
-    //             if let Some(env_var) = &config.env_var {
-    //                 std::env::set_var(env_var, &secret);
-    //                 debug!("Set environment variable {} with SOPS secret from {}", env_var, config.file);
-    //             } else {
-    //                 debug!("Retrieved SOPS secret from {}, but no environment variable name was provided", config.file);
-    //             }
-    //         }
-    //         Err(e) => {
-    //             error!("Failed to retrieve SOPS secret from {}: {}", config.file, e);
-    //             eprintln!("{}: Failed to retrieve SOPS secret from {}: {}", "Error".red().bold(), config.file, e);
-    //             std::process::exit(1);
-    //         }
-    //     }
-    // }
 
     // Initialize the logger with custom formatting
     Builder::new()
@@ -166,14 +147,13 @@ fn main() {
         .filter_level(cli.log_level)
         .init();
 
-    debug!("Starting Nixus with log level: {:?}", cli.log_level);
+    debug!("Starting Nixus v{} with log level: {:?}", VERSION, cli.log_level);
 
-    let result = match cli.command {
+    match cli.command {
         Commands::Completions { shell } => {
             info!("Generating completions for {}", shell);
             let mut cmd = Cli::command();
             shell.generate_completion(&mut cmd, "nixus", &mut io::stdout());
-            Ok(())
         }
         Commands::InstallCompletions { shell } => {
             info!("Generating install command for {} completions", shell);
@@ -183,43 +163,37 @@ fn main() {
                 shell.to_string().green()
             );
             println!("{}", install_command);
-            Ok(())
         }
         Commands::Darwin(args) => {
             info!("Running Darwin command");
-            cli::darwin::run(args)
+            cli::darwin::run(args)?;
         }
         Commands::Android(args) => {
             info!("Running Android command");
-            cli::android::run(args)
+            cli::android::run(args)?;
         }
         Commands::NixOS(args) => {
             info!("Running NixOS command");
-            cli::nixos::run(args)
+            cli::nixos::run(args)?;
         }
         Commands::Home(args) => {
             info!("Running Home command");
-            cli::home::run(args)
+            cli::home::run(args)?;
         }
         Commands::SshKeys(args) => {
             info!("Running SSH keys command");
-            cli::ssh_keys::run_ssh_keys(args)
+            cli::ssh_keys::run_ssh_keys(args)?;
         }
         Commands::Cachix(args) => {
             info!("Running Cachix command");
-            cli::cachix::run(args)
+            cli::cachix::run(args)?;
         }
         Commands::Secrets(args) => {
             info!("Running Secrets command");
-            cli::secrets::run_secrets(args).map_err(|e| e.to_string())
+            cli::secrets::run_secrets(args)?;
         }
-    };
-
-    if let Err(e) = result {
-        error!("An error occurred: {}", e);
-        eprintln!("{}: {}", "Error".red().bold(), e);
-        std::process::exit(1);
     }
 
     debug!("Nixus completed successfully");
+    Ok(())
 }
