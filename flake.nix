@@ -232,7 +232,7 @@
           }
           {
             home-manager.extraSpecialArgs = {
-              inherit inputs outputs;
+              inherit self inputs user;
             };
             home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
           }
