@@ -26,6 +26,7 @@ with pkgs;
   # DEVELOPMENT
   lazygit
   micromamba
+  zig # also needed for cc compiler for lazy in neovim
 
   # Security
   gnupg
