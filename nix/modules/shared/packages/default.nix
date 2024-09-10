@@ -5,6 +5,7 @@ with pkgs;
   rust-analyzer
   sops
   fastfetch
+  nixus
 
   # SECRETS
   age

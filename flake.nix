@@ -123,6 +123,7 @@
             [
               (final: prev: {
                 nix-on-droid = nix-on-droid.packages.${system};
+                nixus = self.packages.${system}.nixus;
               })
             ]
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
