@@ -17,18 +17,6 @@
   # System Configuration
   system.stateVersion = "24.05";
 
-  # Nix Configuration
-  nix = {
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-    # package = pkgs.nix;
-    # nixPath = [ ];
-    # registry = { };
-    # substituters = [ ];
-    # trustedPublicKeys = [ ];
-  };
-
   # Nixpkgs Configuration
   # nixpkgs.config = { };
   # nixpkgs.overlays = [ ];

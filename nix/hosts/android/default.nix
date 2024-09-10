@@ -10,12 +10,24 @@
 
 {
   imports = [
-    ../../modules/shared/cachix
     ../../modules/android
   ];
 
   # User Configuration
   user.shell = "${pkgs.zsh}/bin/zsh";
+
+  # Nix Configuration
+  nix = {
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+    # package = pkgs.nix;
+    # nixPath = [ ];
+    # registry = { };
+    substituters = (import ../../modules/shared/cachix { inherit pkgs lib; }).nix.settings.substituters;
+    trustedPublicKeys =
+      (import ../../modules/shared/cachix { inherit pkgs lib; }).nix.settings.trusted-public-keys;
+  };
 
   # Environment Configuration
   environment = {
