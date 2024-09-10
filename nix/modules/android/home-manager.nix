@@ -19,7 +19,7 @@
     ../shared/home-manager/programs/starship.nix
     ../shared/home-manager/programs/zellij.nix
     ../shared/home-manager/programs/zsh.nix
-    ./secrets.nix
+    ../shared/secrets.nix
   ];
 
   programs.bash = {

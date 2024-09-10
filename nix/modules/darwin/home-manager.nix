@@ -22,7 +22,7 @@
       }:
       {
         imports = [
-          ./secrets.nix
+          ../shared/secrets.nix
           ../shared/home-manager/programs
         ];
         home = {
