@@ -11,15 +11,11 @@
 {
   imports = [
     ../../modules/darwin/home-manager.nix
-    #        ../../modules/shared
     ../../modules/shared/cachix
     ../../modules/darwin
   ];
 
   services.nix-daemon.enable = true;
-
-  # Set the user
-  #  users.primaryUser.name = user;
 
   # Environment packages
   environment.systemPackages =

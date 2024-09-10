@@ -29,6 +29,7 @@ in
     (importModule ./nushell.nix)
     (importModule ./nvim.nix)
     (importModule ./starship.nix)
+    (importModule ./htop.nix)
     #    (importModule ./qemu.nix)
   ];
 }

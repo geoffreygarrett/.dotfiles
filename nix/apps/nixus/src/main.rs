@@ -8,7 +8,7 @@ use clap_complete_nushell::Nushell;
 use colored::*;
 use env_logger::Builder;
 #[allow(unused_imports)]
-use log::{debug, error, info, warn, Level, LevelFilter};
+use log::{debug, error, info, Level, LevelFilter, warn};
 
 mod cli;
 mod config;
@@ -78,6 +78,7 @@ enum Commands {
     Home(cli::home::HomeArgs),
     SshKeys(cli::ssh_keys::SshKeysArgs),
     Cachix(cli::cachix::CachixArgs),
+    Secrets(cli::secrets::SecretsArgs),
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
@@ -207,6 +208,10 @@ fn main() {
         Commands::Cachix(args) => {
             info!("Running Cachix command");
             cli::cachix::run(args)
+        }
+        Commands::Secrets(args) => {
+            info!("Running Secrets command");
+            cli::secrets::run_secrets(args).map_err(|e| e.to_string())
         }
     };
 

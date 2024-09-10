@@ -69,9 +69,9 @@ sleep 5 # Give tailscaled some time to start
 
 # Step 6: Get Tailscale login link
 print_color "$YELLOW" "Getting Tailscale login link..."
-LOGIN_CMD=$(./tailscale up --qr)
+LOGIN_CMD="./tailscale up --qr --accept-dns=false --netfilter-mode=off --snat-subnet-routes=false"
 print_color "$GREEN" "Tailscale login command: $LOGIN_CMD"
-print_color "$YELLOW" "Please run the above command on your computer to log in and attach the NAS to your account."
+print_color "$YELLOW" "Please run the above command in the current directory to log in and attach the NAS to your account."
 
 # Step 7: Modify startup script
 print_color "$YELLOW" "Modifying startup script..."
@@ -94,7 +94,8 @@ cat <<EOT >>"$STARTUP_SCRIPT"
 ln -sf /mnt/HD/HD_a2/$TAILSCALE_DIR/tailscale_lib /var/lib/tailscale
 cd /mnt/HD/HD_a2/$TAILSCALE_DIR
 ./tailscaled &
-./tailscale up
+sleep 5
+./tailscale up --accept-dns=false --netfilter-mode=off --snat-subnet-routes=false
 EOT
 print_color "$GREEN" "Startup script modified successfully"
 

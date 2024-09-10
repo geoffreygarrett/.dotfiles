@@ -18,15 +18,13 @@ print_color() {
 
 # Function to prompt for SSH credentials
 prompt_credentials() {
-    print_color "$BLUE" "Please enter your NAS credentials:"
+    print_color "$BLUE" "Please enter your NAS connection details:"
     read -p "Enter NAS username: " NAS_USER
     read -p "Enter NAS hostname or IP address: " NAS_HOST
     read -p "Enter NAS SSH port (default 22): " NAS_PORT
     NAS_PORT=${NAS_PORT:-22}
-    read -s -p "Enter NAS password: " NAS_PASSWORD
-    echo ""
 
-    print_color "$YELLOW" "Debug: Credentials entered:"
+    print_color "$YELLOW" "Debug: Connection details entered:"
     print_color "$YELLOW" "Username: $NAS_USER"
     print_color "$YELLOW" "Hostname: $NAS_HOST"
     print_color "$YELLOW" "Port: $NAS_PORT"
@@ -35,7 +33,7 @@ prompt_credentials() {
 # Function to check SSH connection
 check_ssh_connection() {
     print_color "$YELLOW" "Checking SSH connection..."
-    if ! sshpass -p "$NAS_PASSWORD" ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no "$NAS_USER@$NAS_HOST" -p "$NAS_PORT" 'echo "SSH connection successful"'; then
+    if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -p "$NAS_PORT" "$NAS_USER@$NAS_HOST" 'echo "SSH connection successful"'; then
         print_color "$RED" "Error: Unable to connect to NAS. Please check your credentials and try again."
         exit 1
     fi
@@ -45,7 +43,7 @@ check_ssh_connection() {
 execute_remote_command() {
     local command="$1"
     local error_message="$2"
-    if ! sshpass -p "$NAS_PASSWORD" ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no "$NAS_USER@$NAS_HOST" -p "$NAS_PORT" "$command"; then
+    if ! ssh -p "$NAS_PORT" "$NAS_USER@$NAS_HOST" "$command"; then
         print_color "$RED" "Error: $error_message"
         exit 1
     fi
@@ -108,7 +106,7 @@ print_color "$GREEN" "Nix installed and verified successfully"
 rm -rf $CERT_DIR
 EOF
 
-    if ! sshpass -p "$NAS_PASSWORD" scp -P "$NAS_PORT" /tmp/install_nix_remote.sh "$NAS_USER@$NAS_HOST:/tmp/nix_install/install_nix_remote.sh"; then
+    if ! scp -P "$NAS_PORT" /tmp/install_nix_remote.sh "$NAS_USER@$NAS_HOST:/tmp/nix_install/install_nix_remote.sh"; then
         print_color "$RED" "Error: Failed to upload installation script to NAS."
         exit 1
     fi

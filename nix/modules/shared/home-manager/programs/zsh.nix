@@ -56,12 +56,6 @@ in
       #          emacsclient -t "$@"
       #      }
 
-            # Laravel Artisan
-            alias art='php artisan'
-
-            # PHP Deployer
-            alias deploy='dep deploy'
-
             alias watch="tmux new-session -d -s watch-session 'bash ./bin/watch.sh'"
             alias unwatch='tmux kill-session -t watch-session'
 

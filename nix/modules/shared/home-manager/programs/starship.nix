@@ -20,15 +20,22 @@ in
     config.programs.bash.enable && config.programs.starship.enable
   ) ''eval "$(${starshipInit "bash"})"'';
 
-  programs.zsh.initExtra = lib.mkIf (
-    config.programs.zsh.enable && config.programs.starship.enable
-  ) ''eval "$(${starshipInit "zsh"})"'';
+  programs.zsh.initExtra = lib.mkIf (config.programs.zsh.enable && config.programs.starship.enable) ''
+    eval "$(${starshipInit "zsh"})"
+    # Workaround for the missing starship_zle-keymap-select function issue.
+    # See https://github.com/starship/starship/issues/3418 for more details.
+    type starship_zle-keymap-select >/dev/null || {
+      echo "Loading starship explicitly due to the known issue with zle-keymap-select"
+      eval "$(/usr/local/bin/starship init zsh)"
+    }
+  '';
 
   programs.fish.interactiveShellInit = lib.mkIf (
     config.programs.fish.enable && config.programs.starship.enable
   ) "${starshipInit "fish"} | source";
 
-  #  programs.nushell.extraConfig = lib.mkIf (
-  #    config.programs.nushell.enable && config.programs.starship.enable
-  #  ) "${starshipInit "nu"} | save -f ~/.cache/starship/init.nu; source ~/.cache/starship/init.nu";
+  # Example for extending the configuration to nushell, if needed in the future.
+  # programs.nushell.extraConfig = lib.mkIf (
+  #   config.programs.nushell.enable && config.programs.starship.enable
+  # ) "${starshipInit "nu"} | save -f ~/.cache/starship/init.nu; source ~/.cache/starship/init.nu";
 }

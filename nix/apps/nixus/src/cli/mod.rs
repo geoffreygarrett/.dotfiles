@@ -9,6 +9,7 @@ pub mod nixos;
 pub mod services;
 pub mod ssh_keys;
 pub mod styles;
+pub mod secrets;
 
 #[derive(Subcommand)]
 pub enum Commands {
@@ -18,4 +19,5 @@ pub enum Commands {
     Home(home::HomeArgs),
     SshKeys(ssh_keys::SshKeysArgs),
     Cachix(cachix::CachixArgs),
+    Secrets(secrets::SecretsArgs),
 }
