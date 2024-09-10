@@ -4,7 +4,7 @@ set -e
 # Function to get the flake directory
 get_flake_dir() {
     local dir="$PWD"
-    while [[ "$dir" != "/" ]]; do
+    while [[ $dir != "/" ]]; do
         if [[ -e "$dir/flake.nix" ]]; then
             echo "$dir"
             return 0
@@ -26,7 +26,7 @@ FULL_CONFIG="$USERNAME@$HOSTNAME"
 echo "Running Home Manager switch for $FULL_CONFIG..."
 
 # Run the nix command with the determined flake directory
-if nix run --quiet "$FLAKE_DIR#homeConfigurations.$FULL_CONFIG.activationPackage" > /dev/null 2>&1; then
+if nix run --quiet "$FLAKE_DIR#homeConfigurations.$FULL_CONFIG.activationPackage" >/dev/null 2>&1; then
     echo "Home Manager switch completed successfully."
 else
     echo "Error occurred during Home Manager switch. Full output:"

@@ -18,9 +18,7 @@ unlink ./result
 
 echo "${GREEN}Switch to new generation complete!${NC}"
 
-
 -------
-
 
 #!/bin/sh -e
 

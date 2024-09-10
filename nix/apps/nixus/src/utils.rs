@@ -14,7 +14,6 @@ pub struct CheckedCommand {
     sops_env_name: Option<String>,
 }
 
-
 /// Checks if a program is available in the system's PATH
 fn is_program_available(program: &str) -> bool {
     let status = Command::new("sh")
@@ -26,7 +25,6 @@ fn is_program_available(program: &str) -> bool {
 
     status.map_or(false, |s| s.success())
 }
-
 
 impl CheckedCommand {
     pub fn new<S: AsRef<OsStr>>(program: S) -> Result<Self, Error> {
@@ -42,7 +40,10 @@ impl CheckedCommand {
                 sops_env_name: None,
             })
         } else {
-            Err(Error::new(ErrorKind::NotFound, format!("Command '{}' not found", program_str)))
+            Err(Error::new(
+                ErrorKind::NotFound,
+                format!("Command '{}' not found", program_str),
+            ))
         }
     }
 
@@ -50,7 +51,12 @@ impl CheckedCommand {
         self.sops_secret_internal(sops_file, key, None, true)
     }
 
-    pub fn optional_sops_secret_with_name<S: AsRef<str>>(self, sops_file: S, key: S, env_name: S) -> Self {
+    pub fn optional_sops_secret_with_name<S: AsRef<str>>(
+        self,
+        sops_file: S,
+        key: S,
+        env_name: S,
+    ) -> Self {
         self.sops_secret_internal(sops_file, key, Some(env_name), true)
     }
 
@@ -62,11 +68,17 @@ impl CheckedCommand {
         self.sops_secret_internal(sops_file, key, Some(env_name), false)
     }
 
-
-    fn sops_secret_internal<S: AsRef<str>>(mut self, sops_file: S, key: S, env_name: Option<S>, optional: bool) -> Self {
+    fn sops_secret_internal<S: AsRef<str>>(
+        mut self,
+        sops_file: S,
+        key: S,
+        env_name: Option<S>,
+        optional: bool,
+    ) -> Self {
         let sops_file = sops_file.as_ref().to_string();
         let key = key.as_ref().to_string();
-        let env_name = env_name.map(|s| s.as_ref().to_string())
+        let env_name = env_name
+            .map(|s| s.as_ref().to_string())
             .unwrap_or_else(|| key.to_uppercase().replace('-', "_"));
 
         self.sops_file = Some(sops_file);
@@ -77,7 +89,9 @@ impl CheckedCommand {
     }
 
     fn apply_sops_secret(&mut self) -> Result<(), Error> {
-        if let (Some(sops_file), Some(key), Some(env_name)) = (&self.sops_file, &self.sops_key, &self.sops_env_name) {
+        if let (Some(sops_file), Some(key), Some(env_name)) =
+            (&self.sops_file, &self.sops_key, &self.sops_env_name)
+        {
             let output = Command::new("sops")
                 .args(&["-d", sops_file, "--extract", &format!("[\"{}\"]", key)])
                 .output()?;
@@ -87,7 +101,10 @@ impl CheckedCommand {
                     .map_err(|e| Error::new(ErrorKind::InvalidData, e))?
                     .trim()
                     .to_string();
-                println!("Setting environment variable {} with secret from SOPS", env_name);
+                println!(
+                    "Setting environment variable {} with secret from SOPS",
+                    env_name
+                );
                 self.inner.env(env_name, secret);
             } else {
                 eprintln!("Warning: Failed to extract SOPS secret for key: {}", key);
@@ -95,7 +112,6 @@ impl CheckedCommand {
         }
         Ok(())
     }
-
 
     pub fn with_live_output(mut self) -> Self {
         self.live_output = true;
@@ -116,7 +132,7 @@ impl CheckedCommand {
 
     pub fn args<I, S>(mut self, args: I) -> Self
     where
-        I: IntoIterator<Item=S>,
+        I: IntoIterator<Item = S>,
         S: AsRef<OsStr>,
     {
         self.inner.args(args);
@@ -148,7 +164,7 @@ impl CheckedCommand {
 
     pub fn envs<I, K, V>(mut self, vars: I) -> Self
     where
-        I: IntoIterator<Item=(K, V)>,
+        I: IntoIterator<Item = (K, V)>,
         K: AsRef<OsStr>,
         V: AsRef<OsStr>,
     {
@@ -174,7 +190,11 @@ impl CheckedCommand {
     pub fn output(mut self) -> Result<Output, Error> {
         self.apply_sops_secret()?;
         if self.live_output {
-            let mut child = self.inner.stdout(Stdio::piped()).stderr(Stdio::piped()).spawn()?;
+            let mut child = self
+                .inner
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()?;
 
             let stdout = child.stdout.take().unwrap();
             let stderr = child.stderr.take().unwrap();
@@ -214,13 +234,15 @@ impl CheckedCommand {
                     stderr: Vec::new(),
                 })
             } else {
-                Err(Error::new(ErrorKind::Other, format!("Command failed with exit code: {}", status)))
+                Err(Error::new(
+                    ErrorKind::Other,
+                    format!("Command failed with exit code: {}", status),
+                ))
             }
         } else {
             self.inner.output()
         }
     }
-
 
     pub fn status(mut self) -> Result<ExitStatus, Error> {
         self.apply_sops_secret()?;
@@ -253,7 +275,8 @@ pub fn is_git_repo(path: &Path) -> bool {
 
 pub fn find_sops_file() -> Result<PathBuf, String> {
     debug!("Searching for SOPS secrets file");
-    let current_dir = std::env::current_dir().map_err(|e| format!("Failed to get current directory: {}", e))?;
+    let current_dir =
+        std::env::current_dir().map_err(|e| format!("Failed to get current directory: {}", e))?;
     debug!("Starting search from current directory: {:?}", current_dir);
 
     let mut potential_locations = vec![

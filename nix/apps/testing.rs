@@ -68,7 +68,12 @@ fn backup_home_directory() -> Result<(), Box<dyn std::error::Error>> {
     fs::create_dir_all(&backup_dir)?;
 
     let output = std::process::Command::new("rsync")
-        .args(&["-av", "--delete", home_dir.to_str().unwrap(), backup_dir.to_str().unwrap()])
+        .args(&[
+            "-av",
+            "--delete",
+            home_dir.to_str().unwrap(),
+            backup_dir.to_str().unwrap(),
+        ])
         .output()?;
 
     if output.status.success() {
@@ -101,7 +106,10 @@ fn check_package_updates() -> Result<(), Box<dyn std::error::Error>> {
 
         if let Some(latest) = latest.first() {
             if latest.version != package.version {
-                println!("Update available for {}: {} -> {}", package.name, package.version, latest.version);
+                println!(
+                    "Update available for {}: {} -> {}",
+                    package.name, package.version, latest.version
+                );
             }
         }
     }
@@ -116,8 +124,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("NixOS Configuration:");
     let nixos_config = parse_nixos_config()?;
     println!("State Version: {}", nixos_config.system.state_version);
-    println!("Auto Upgrade Enabled: {}", nixos_config.system.auto_upgrade.enable);
-    println!("Auto Upgrade Allow Reboot: {}\n", nixos_config.system.auto_upgrade.allow_reboot);
+    println!(
+        "Auto Upgrade Enabled: {}",
+        nixos_config.system.auto_upgrade.enable
+    );
+    println!(
+        "Auto Upgrade Allow Reboot: {}\n",
+        nixos_config.system.auto_upgrade.allow_reboot
+    );
 
     println!("Backing up home directory...");
     backup_home_directory()?;

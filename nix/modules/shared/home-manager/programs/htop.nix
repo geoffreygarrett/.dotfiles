@@ -1,5 +1,4 @@
 { config, ... }:
-
 {
   imports = [ ./config/os.nix ];
   programs.htop.enable = true;

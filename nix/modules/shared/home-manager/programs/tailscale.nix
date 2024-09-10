@@ -1,6 +1,9 @@
-{ config, pkgs, ... }:
 {
-
+  config,
+  pkgs,
+  ...
+}:
+{
   # Install Tailscale for the user
   home.packages = with pkgs; [ tailscale ];
 
@@ -91,7 +94,6 @@
 #
 #  # Tailscale configuration
 #  environment.systemPackages = [ pkgs.tailscale ];
-
 #  # Tailscale autoconnect service
 #  systemd.services.tailscale-autoconnect = {
 #    description = "Automatic connection to Tailscale";

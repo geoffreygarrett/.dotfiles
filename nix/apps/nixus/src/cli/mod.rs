@@ -1,13 +1,13 @@
 // src/cli/mod.rs
 use clap::Subcommand;
 
-pub mod darwin;
 pub mod android;
-pub mod nixos;
-pub mod home;
-pub mod styles;
-pub mod ssh_keys;
 pub mod cachix;
+pub mod darwin;
+pub mod home;
+pub mod nixos;
+pub mod ssh_keys;
+pub mod styles;
 
 #[derive(Subcommand)]
 pub enum Commands {

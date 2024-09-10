@@ -5,7 +5,7 @@ NEW_TAILDROP_PATH="/path/to/your/new/location"
 BACKUP_SUFFIX=".bak-$(date +%Y%m%d%H%M%S)"
 
 # Detect OS and set default Taildrop path
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ $OSTYPE == "darwin"* ]]; then
     # macOS
     DEFAULT_TAILDROP_PATH="$HOME/Library/Mobile Documents/com~apple~CloudDocs/TailscaleFiles"
     OS_TYPE="macOS"

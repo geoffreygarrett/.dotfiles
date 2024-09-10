@@ -5,7 +5,6 @@
   ...
 }:
 {
-
   sops = {
     # Define the default options for all secrets
     defaultSopsFile = ../../global/secrets.yaml;

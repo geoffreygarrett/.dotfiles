@@ -80,7 +80,6 @@ pub struct UsbDevice {
     pub vendor_id: String,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UsbHub {
     #[serde(rename = "_name")]
@@ -130,16 +129,20 @@ pub enum UsbItem<'a> {
     Device(&'a UsbDevice),
 }
 
-
 impl fmt::Display for UsbDevice {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{} {} - {} - {} - ID {}:{}",
-               get_device_class_emoji(0x08), // Assuming Mass Storage
-               self.name,
-               self.manufacturer,
-               self.media.first().map(|m| m.size.as_str()).unwrap_or("Unknown Size"),
-               self.vendor_id.split_whitespace().next().unwrap_or(""),
-               self.product_id
+        write!(
+            f,
+            "{} {} - {} - {} - ID {}:{}",
+            get_device_class_emoji(0x08), // Assuming Mass Storage
+            self.name,
+            self.manufacturer,
+            self.media
+                .first()
+                .map(|m| m.size.as_str())
+                .unwrap_or("Unknown Size"),
+            self.vendor_id.split_whitespace().next().unwrap_or(""),
+            self.product_id
         )
     }
 }

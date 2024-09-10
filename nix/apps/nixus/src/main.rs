@@ -7,7 +7,7 @@ use clap_complete_nushell::Nushell;
 use colored::*;
 use env_logger::Builder;
 #[allow(unused_imports)]
-use log::{debug, error, info, Level, LevelFilter, warn};
+use log::{debug, error, info, warn, Level, LevelFilter};
 
 mod cli;
 mod config;
@@ -122,7 +122,10 @@ fn main() {
         Commands::InstallCompletions { shell } => {
             info!("Generating install command for {} completions", shell);
             let install_command = shell.get_install_command("nixus");
-            println!("Run the following command to install completions for {}:", shell.to_string().green());
+            println!(
+                "Run the following command to install completions for {}:",
+                shell.to_string().green()
+            );
             println!("{}", install_command);
             Ok(())
         }

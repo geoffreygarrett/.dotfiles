@@ -1,5 +1,4 @@
 { lib, ... }:
-
 {
   options.language-support = lib.mkOption {
     default = [ ];

@@ -1,9 +1,9 @@
-- https://nixos.wiki/wiki/Ubuntu_vs._NixOS
+- https://nixos.wiki/wiki/Ubuntu_vs.\_NixOS
 
 # Ubuntu vs NixOS Comparison
 
 | Task/Concept                      | Ubuntu                                                                                | NixOS (system-wide)                                                         | NixOS (user) / Nix in general                                    |
-|-----------------------------------|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|------------------------------------------------------------------|
+| --------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
 | Package Manager                   | apt (running on top of dpkg)                                                          | nix (with nixos packages for system-wide operations)                        | nix                                                              |
 | Who can install packages          | Only root can install packages (system-wide)                                          | Root installs system-wide packages through /etc/nixos/configuration.nix     | Users can install their own packages and have their own profiles |
 | Package installation location     | Globally in /bin/, /usr/, etc.                                                        | System-wide: /run/current-system/sw/ and /nix/var/nix/profiles/default/bin/ | User packages: ~/.nix-profile/                                   |
@@ -22,18 +22,17 @@
 | Add a user                        | `sudo adduser alice`                                                                  | Configure in /etc/nixos/configuration.nix, then `nixos-rebuild switch`      | N/A                                                              |
 | Get current version               | `cat /etc/debian_version`                                                             | `nixos-version`                                                             | N/A                                                              |
 
-Note: This table provides a high-level comparison and doesn't cover all aspects of both operating systems. For more
-detailed information, please refer to the official documentation of Ubuntu and NixOS.
+Note: This table provides a high-level comparison and doesn't cover all aspects
+of both operating systems. For more detailed information, please refer to the
+official documentation of Ubuntu and NixOS.
 
 ## Secrets
 
 - https://lgug2z.com/articles/handling-secrets-in-nixos-an-overview/
 
-
 ## Articles
 
 - https://fd93.me/nixos-to-ubuntu
-
 
 # Repos
 

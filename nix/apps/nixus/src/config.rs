@@ -24,7 +24,10 @@ pub struct Config {
 #[allow(dead_code)]
 pub enum ConfigError {
     #[snafu(display("Failed to read file at {}: {}", path.display(), source))]
-    ReadFile { source: std::io::Error, path: PathBuf },
+    ReadFile {
+        source: std::io::Error,
+        path: PathBuf,
+    },
 
     #[snafu(display("Failed to parse TOML content: {}", source))]
     ParseToml { source: toml::de::Error },
@@ -100,7 +103,11 @@ pub fn print_flake_info() {
     }
 
     match find_flake_dir() {
-        Ok(dir) => println!("\n{} {}", "Flake directory found at:".green().bold(), dir.display()),
+        Ok(dir) => println!(
+            "\n{} {}",
+            "Flake directory found at:".green().bold(),
+            dir.display()
+        ),
         Err(e) => println!("\n{} {}", "Error finding flake directory:".red().bold(), e),
     }
 }
@@ -111,7 +118,6 @@ pub fn get_flake_dir(flake: Option<PathBuf>) -> Result<PathBuf, String> {
         .or_else(|| config::find_flake_dir().ok())
         .ok_or_else(|| "Failed to determine flake directory. Please specify with --flake or set NIXUS_FLAKE environment variable.".to_string())
 }
-
 
 pub fn determine_system_type() -> String {
     let arch = env::consts::ARCH;
@@ -124,9 +130,9 @@ pub fn determine_system_type() -> String {
         ("aarch64", "macos") => "aarch64-darwin",
         ("aarch64", "android") => "aarch64-android",
         _ => panic!("Unsupported system: {} {}", arch, os),
-    }.to_string()
+    }
+    .to_string()
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -142,15 +148,22 @@ mod tests {
         let dir = tempdir().unwrap();
         let file_path = dir.path().join("test_config.toml");
         let mut file = File::create(&file_path).unwrap();
-        writeln!(file, r#"
+        writeln!(
+            file,
+            r#"
             [keys]
             ssh = ["key1", "key2"]
             wg = ["wg1", "wg2"]
-        "#).unwrap();
+        "#
+        )
+        .unwrap();
 
         let config = Config::from_file(file_path).unwrap();
         assert_eq!(config.keys.ssh, vec!["key1", "key2"]);
-        assert_eq!(config.keys.wg, Some(vec!["wg1".to_string(), "wg2".to_string()]));
+        assert_eq!(
+            config.keys.wg,
+            Some(vec!["wg1".to_string(), "wg2".to_string()])
+        );
     }
 
     #[test]

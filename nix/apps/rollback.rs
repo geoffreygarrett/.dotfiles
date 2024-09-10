@@ -30,20 +30,38 @@ fn main() -> io::Result<()> {
     let gen_num = gen_num.trim();
 
     if gen_num.is_empty() {
-        println!("{}", "No generation number entered. Aborting rollback.".red());
+        println!(
+            "{}",
+            "No generation number entered. Aborting rollback.".red()
+        );
         return Ok(());
     }
 
-    println!("{}", format!("Rolling back to generation {}...", gen_num).yellow());
+    println!(
+        "{}",
+        format!("Rolling back to generation {}...", gen_num).yellow()
+    );
 
     let status = Command::new("/run/current-system/sw/bin/darwin-rebuild")
-        .args(&["switch", "--flake", &format!(".#{}", FLAKE), "--switch-generation", gen_num])
+        .args(&[
+            "switch",
+            "--flake",
+            &format!(".#{}", FLAKE),
+            "--switch-generation",
+            gen_num,
+        ])
         .status()?;
 
     if status.success() {
-        println!("{}", format!("Rollback to generation {} complete!", gen_num).green());
+        println!(
+            "{}",
+            format!("Rollback to generation {} complete!", gen_num).green()
+        );
     } else {
-        println!("{}", format!("Failed to rollback to generation {}.", gen_num).red());
+        println!(
+            "{}",
+            format!("Failed to rollback to generation {}.", gen_num).red()
+        );
     }
 
     Ok(())

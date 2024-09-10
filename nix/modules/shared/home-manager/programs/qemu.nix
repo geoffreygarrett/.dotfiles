@@ -4,9 +4,7 @@
   pkgs,
   ...
 }:
-
 with lib;
-
 let
   cfg = config.programs.qemu;
 
@@ -104,7 +102,6 @@ let
       description = "Whether to enable Kernel Same-page Merging (KSM) on Linux.";
     };
   };
-
 in
 {
   options.programs.qemu =

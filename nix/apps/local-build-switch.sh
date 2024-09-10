@@ -20,16 +20,22 @@ ARCH=$(uname -m)
 case "$OS" in
     Darwin)
         case "$ARCH" in
-            x86_64)  SYSTEM_TYPE="x86_64-darwin" ;;
-            arm64)   SYSTEM_TYPE="aarch64-darwin" ;;
-            *)       echo_color "Unsupported Darwin architecture: $ARCH" "$RED"; exit 1 ;;
+            x86_64) SYSTEM_TYPE="x86_64-darwin" ;;
+            arm64) SYSTEM_TYPE="aarch64-darwin" ;;
+            *)
+                echo_color "Unsupported Darwin architecture: $ARCH" "$RED"
+                exit 1
+                ;;
         esac
         ;;
     Linux)
         case "$ARCH" in
-            x86_64)  SYSTEM_TYPE="x86_64-linux" ;;
+            x86_64) SYSTEM_TYPE="x86_64-linux" ;;
             aarch64) SYSTEM_TYPE="aarch64-linux" ;;
-            *)       echo_color "Unsupported Linux architecture: $ARCH" "$RED"; exit 1 ;;
+            *)
+                echo_color "Unsupported Linux architecture: $ARCH" "$RED"
+                exit 1
+                ;;
         esac
         ;;
     *)
@@ -40,7 +46,7 @@ esac
 
 # Function to check if Nix is installed
 check_nix() {
-    if ! command -v nix &> /dev/null; then
+    if ! command -v nix &>/dev/null; then
         echo_color "Nix is not installed. Please install Nix first." "$RED"
         exit 1
     fi

@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
-
+{
+  pkgs,
+  lib,
+  ...
+}:
 let
   makeWrapper = import ./make-wrapper.nix {
     inherit lib;
@@ -14,7 +17,6 @@ let
       }
     else
       { };
-
 in
 darwinPackages
 // {

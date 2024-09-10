@@ -8,7 +8,9 @@ use chrono::{DateTime, Local};
 use colored::Colorize;
 use log::{debug, error, info, trace, warn};
 
-use crate::utils::{ask_for_confirmation, CheckedCommand, find_sops_file, get_custom_locations, is_git_repo};
+use crate::utils::{
+    ask_for_confirmation, find_sops_file, get_custom_locations, is_git_repo, CheckedCommand,
+};
 
 pub struct SshKeyManager {
     ssh_dir: PathBuf,
@@ -83,11 +85,10 @@ impl SshKeyManager {
         }
 
         let username = whoami::username();
-        let hostname = whoami::fallible::hostname()
-            .unwrap_or_else(|e| {
-                warn!("Failed to get hostname: {}", e);
-                "unknown_host".to_string()
-            });
+        let hostname = whoami::fallible::hostname().unwrap_or_else(|e| {
+            warn!("Failed to get hostname: {}", e);
+            "unknown_host".to_string()
+        });
 
         let identifier = format!("{}@{}", username, hostname);
         debug!("Using identifier: {}", identifier);
@@ -136,7 +137,8 @@ impl SshKeyManager {
         }
 
         let trash_dir = self.ssh_dir.join("trash");
-        fs::create_dir_all(&trash_dir).map_err(|e| format!("Failed to create trash directory: {}", e))?;
+        fs::create_dir_all(&trash_dir)
+            .map_err(|e| format!("Failed to create trash directory: {}", e))?;
 
         if key_path.exists() {
             let trash_path = trash_dir.join(name);
@@ -154,7 +156,10 @@ impl SshKeyManager {
         self.remove_from_sops(name)?;
 
         info!("SSH key '{}' deleted successfully", name);
-        println!("{}", format!("SSH key '{}' deleted successfully.", name).green());
+        println!(
+            "{}",
+            format!("SSH key '{}' deleted successfully.", name).green()
+        );
         Ok(())
     }
 
@@ -174,12 +179,13 @@ impl SshKeyManager {
         }
 
         let decrypted = String::from_utf8_lossy(&output.stdout);
-        let yaml: serde_yaml::Value = serde_yaml::from_str(&decrypted)
-            .map_err(|e| format!("Failed to parse YAML: {}", e))?;
+        let yaml: serde_yaml::Value =
+            serde_yaml::from_str(&decrypted).map_err(|e| format!("Failed to parse YAML: {}", e))?;
 
         match yaml["ssh_keys"].as_mapping() {
             Some(ssh_keys) => {
-                let keys: Vec<String> = ssh_keys.values()
+                let keys: Vec<String> = ssh_keys
+                    .values()
                     .filter_map(|v| v.as_str())
                     .map(String::from)
                     .collect();
@@ -196,11 +202,13 @@ impl SshKeyManager {
 
     fn initialize_sops_file(&self) -> Result<(), String> {
         info!("Initializing SOPS file with empty ssh_keys section");
-        let initial_content = serde_yaml::to_string(&serde_yaml::Value::Mapping(serde_yaml::Mapping::from_iter(
-            vec![(serde_yaml::Value::String("ssh_keys".to_string()),
-                  serde_yaml::Value::Mapping(serde_yaml::Mapping::new()))]
-        )))
-            .map_err(|e| format!("Failed to generate initial YAML: {}", e))?;
+        let initial_content = serde_yaml::to_string(&serde_yaml::Value::Mapping(
+            serde_yaml::Mapping::from_iter(vec![(
+                serde_yaml::Value::String("ssh_keys".to_string()),
+                serde_yaml::Value::Mapping(serde_yaml::Mapping::new()),
+            )]),
+        ))
+        .map_err(|e| format!("Failed to generate initial YAML: {}", e))?;
 
         if let Some(parent) = self.sops_file.parent() {
             fs::create_dir_all(parent)
@@ -219,7 +227,10 @@ impl SshKeyManager {
             .map_err(|e| format!("Failed to run SOPS: {}", e))?;
 
         if !output.status.success() {
-            return Err(format!("SOPS encryption failed: {}", String::from_utf8_lossy(&output.stderr)));
+            return Err(format!(
+                "SOPS encryption failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
         }
 
         info!("SOPS file initialized successfully");
@@ -229,7 +240,9 @@ impl SshKeyManager {
     fn read_local_keys(&self) -> Result<Vec<String>, String> {
         debug!("Reading local SSH keys from: {:?}", self.ssh_dir);
         let mut keys = Vec::new();
-        for entry in fs::read_dir(&self.ssh_dir).map_err(|e| format!("Failed to read SSH directory: {}", e))? {
+        for entry in fs::read_dir(&self.ssh_dir)
+            .map_err(|e| format!("Failed to read SSH directory: {}", e))?
+        {
             let entry = entry.map_err(|e| format!("Failed to read directory entry: {}", e))?;
             let path = entry.path();
             if path.extension().and_then(|s| s.to_str()) == Some("pub") {
@@ -265,7 +278,11 @@ impl SshKeyManager {
             .map_err(|e| format!("Failed to read public key: {}", e))?;
 
         let mut sops_content = self.read_sops_keys()?;
-        sops_content.push(format!("{}{}", pub_key.trim(), description.map(|d| format!(" # {}", d)).unwrap_or_default()));
+        sops_content.push(format!(
+            "{}{}",
+            pub_key.trim(),
+            description.map(|d| format!(" # {}", d)).unwrap_or_default()
+        ));
 
         self.write_sops_keys(&sops_content)
     }
@@ -295,7 +312,8 @@ impl SshKeyManager {
             }
         } else {
             // If there are keys, update or create the ssh_keys section
-            let ssh_keys = yaml.as_mapping_mut()
+            let ssh_keys = yaml
+                .as_mapping_mut()
                 .ok_or("Invalid YAML structure")?
                 .entry(serde_yaml::Value::String("ssh_keys".to_string()))
                 .or_insert(serde_yaml::Value::Mapping(serde_yaml::Mapping::new()))
@@ -311,8 +329,8 @@ impl SshKeyManager {
             }
         }
 
-        let updated_content = serde_yaml::to_string(&yaml)
-            .map_err(|e| format!("Failed to serialize YAML: {}", e))?;
+        let updated_content =
+            serde_yaml::to_string(&yaml).map_err(|e| format!("Failed to serialize YAML: {}", e))?;
 
         self.encrypt_sops_file(&updated_content)
     }
@@ -346,13 +364,17 @@ impl SshKeyManager {
             .map_err(|e| format!("Failed to start SOPS encrypt: {}", e))?;
 
         {
-            let stdin = child.stdin.as_mut()
+            let stdin = child
+                .stdin
+                .as_mut()
                 .ok_or_else(|| "Failed to open stdin".to_string())?;
-            stdin.write_all(content.as_bytes())
+            stdin
+                .write_all(content.as_bytes())
                 .map_err(|e| format!("Failed to write to SOPS stdin: {}", e))?;
         }
 
-        let output = child.wait_with_output()
+        let output = child
+            .wait_with_output()
             .map_err(|e| format!("Failed to wait for SOPS: {}", e))?;
 
         if !output.status.success() {
@@ -370,7 +392,8 @@ impl SshKeyManager {
         let metadata = fs::metadata(path)
             .map_err(|e| format!("Failed to get metadata for {}: {}", path.display(), e))?;
 
-        let modified: DateTime<Local> = metadata.modified()
+        let modified: DateTime<Local> = metadata
+            .modified()
             .map_err(|e| format!("Failed to get modification time: {}", e))?
             .into();
 
@@ -380,7 +403,9 @@ impl SshKeyManager {
     fn get_local_keys_last_modified(&self) -> Result<String, String> {
         let mut latest_modified: Option<DateTime<Local>> = None;
 
-        for entry in fs::read_dir(&self.ssh_dir).map_err(|e| format!("Failed to read SSH directory: {}", e))? {
+        for entry in fs::read_dir(&self.ssh_dir)
+            .map_err(|e| format!("Failed to read SSH directory: {}", e))?
+        {
             let entry = entry.map_err(|e| format!("Failed to read directory entry: {}", e))?;
             let path = entry.path();
             if path.extension().and_then(|s| s.to_str()) == Some("pub") {

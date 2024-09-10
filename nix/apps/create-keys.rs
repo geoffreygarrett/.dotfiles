@@ -15,7 +15,7 @@ use dirs::home_dir;
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
-use std::process::{Command, exit};
+use std::process::{exit, Command};
 use tempfile::NamedTempFile;
 
 #[path = "shared/config.rs"]
@@ -92,16 +92,29 @@ fn generate_ssh_key(ssh_dir: &Path, key_name: &str) -> io::Result<bool> {
         } else {
             Command::new("ssh-keygen")
         }
-            .args(&["-t", "ed25519", "-f", key_path.to_str().unwrap(), "-N", &passphrase])
-            .output()?;
+        .args(&[
+            "-t",
+            "ed25519",
+            "-f",
+            key_path.to_str().unwrap(),
+            "-N",
+            &passphrase,
+        ])
+        .output()?;
 
         if !output.status.success() {
-            return Err(io::Error::new(io::ErrorKind::Other, String::from_utf8_lossy(&output.stderr)));
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                String::from_utf8_lossy(&output.stderr),
+            ));
         }
 
         println!("  {}: {}", "Generated".green(), key_path.display());
         if use_passphrase {
-            println!("  {}", "Remember your passphrase or store it securely.".yellow());
+            println!(
+                "  {}",
+                "Remember your passphrase or store it securely.".yellow()
+            );
         }
         Ok(true)
     } else {
@@ -111,7 +124,11 @@ fn generate_ssh_key(ssh_dir: &Path, key_name: &str) -> io::Result<bool> {
 }
 
 // Generate WireGuard keys using the wg tool
-fn generate_wireguard_keys(wg_dir: &Path, private_key_name: &str, public_key_name: &str) -> io::Result<()> {
+fn generate_wireguard_keys(
+    wg_dir: &Path,
+    private_key_name: &str,
+    public_key_name: &str,
+) -> io::Result<()> {
     // Ensure wg command is available
     check_tool_exists("wg")?;
 
@@ -120,12 +137,13 @@ fn generate_wireguard_keys(wg_dir: &Path, private_key_name: &str, public_key_nam
 
     if prompt_for_key_generation(&private_key_path)? {
         // Generate WireGuard private key
-        let output = Command::new("wg")
-            .arg("genkey")
-            .output()?;
+        let output = Command::new("wg").arg("genkey").output()?;
 
         if !output.status.success() {
-            return Err(io::Error::new(io::ErrorKind::Other, String::from_utf8_lossy(&output.stderr)));
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                String::from_utf8_lossy(&output.stderr),
+            ));
         }
 
         let private_key = String::from_utf8_lossy(&output.stdout).trim().to_string();
@@ -141,13 +159,20 @@ fn generate_wireguard_keys(wg_dir: &Path, private_key_name: &str, public_key_nam
             .output()?;
 
         if !output.status.success() {
-            return Err(io::Error::new(io::ErrorKind::Other, String::from_utf8_lossy(&output.stderr)));
+            return Err(io::Error::new(
+                io::ErrorKind::Other,
+                String::from_utf8_lossy(&output.stderr),
+            ));
         }
 
         let public_key = String::from_utf8_lossy(&output.stdout).trim().to_string();
         fs::write(&public_key_path, public_key)?;
 
-        println!("  {}: {}", "Generated WireGuard keys".green(), private_key_path.display());
+        println!(
+            "  {}: {}",
+            "Generated WireGuard keys".green(),
+            private_key_path.display()
+        );
     } else {
         println!("  {}: {}\n", "Kept".yellow(), private_key_path.display());
     }
@@ -208,10 +233,18 @@ fn main() -> io::Result<()> {
         let wg_private_key_path = wg_dir.join(&wg_keys[0]);
         let wg_public_key_path = wg_dir.join(&wg_keys[1]);
         if wg_private_key_path.exists() {
-            println!("  {}: {}", "WireGuard Private Key Present".green(), wg_keys[0]);
+            println!(
+                "  {}: {}",
+                "WireGuard Private Key Present".green(),
+                wg_keys[0]
+            );
         }
         if wg_public_key_path.exists() {
-            println!("  {}: {}", "WireGuard Public Key Present".green(), wg_keys[1]);
+            println!(
+                "  {}: {}",
+                "WireGuard Public Key Present".green(),
+                wg_keys[1]
+            );
         }
     }
 
@@ -224,7 +257,12 @@ fn main() -> io::Result<()> {
         display_public_keys(&ssh_dir, &config.keys.ssh)?;
     }
 
-    println!("\n{}", "Key generation process completed successfully.".bold().green());
+    println!(
+        "\n{}",
+        "Key generation process completed successfully."
+            .bold()
+            .green()
+    );
 
     Ok(())
 }

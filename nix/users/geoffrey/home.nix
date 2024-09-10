@@ -5,7 +5,6 @@
   pkgs,
   ...
 }:
-
 {
   # Geoffrey-specific configurations
   home.packages = with pkgs; [
@@ -25,5 +24,4 @@
       };
     };
   };
-
 }

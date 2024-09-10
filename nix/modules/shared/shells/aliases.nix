@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
-
+{
+  pkgs,
+  lib,
+  ...
+}:
 let
   toml = builtins.fromTOML (builtins.readFile ./aliases.toml);
 
@@ -21,7 +24,6 @@ let
     lib.listToAttrs (
       lib.filter (alias: builtins.elem shell alias.shells) (lib.mapAttrsToList generateAlias toml.aliases)
     );
-
 in
 {
   shellAliases = {

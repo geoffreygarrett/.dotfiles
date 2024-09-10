@@ -47,7 +47,6 @@ in
     vimAlias = true;
     extraPackages = with pkgs; [
       ripgrep # Requirement for telescope
-
     ];
     extraConfig = ''
       " Any Vimscript configuration can go here
@@ -101,5 +100,4 @@ in
           },
       }
     '';
-
 }

@@ -19,14 +19,9 @@ pub struct Config {
     pub keys: Keys,
 }
 
-pub static FLAKE_LOCATIONS: &[&str] = &[
-    "../../flake.toml",
-    "./flake.toml",
-    "$FLAKE/flake.toml",
-];
+pub static FLAKE_LOCATIONS: &[&str] = &["../../flake.toml", "./flake.toml", "$FLAKE/flake.toml"];
 
 impl Config {
-
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         let content = fs::read_to_string(path)?;
         let config: Config = toml::from_str(&content)?;
@@ -45,7 +40,8 @@ impl Config {
 }
 
 pub fn get_flake_locations() -> Vec<PathBuf> {
-    FLAKE_LOCATIONS.iter()
+    FLAKE_LOCATIONS
+        .iter()
         .map(|&loc| {
             if loc.starts_with("$") {
                 let (env_var, path) = loc.split_at(loc.find('/').unwrap_or(loc.len()));

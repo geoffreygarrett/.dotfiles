@@ -43,16 +43,40 @@ pub fn run(args: DarwinArgs) -> Result<(), String> {
     let system_type = crate::config::determine_system_type();
 
     match args.command {
-        DarwinCommand::Build => build(&flake_dir, &system_type, args.cache, &args.cachix_cache, &args.args),
+        DarwinCommand::Build => build(
+            &flake_dir,
+            &system_type,
+            args.cache,
+            &args.cachix_cache,
+            &args.args,
+        ),
         DarwinCommand::Switch => {
-            build(&flake_dir, &system_type, args.cache, &args.cachix_cache, &args.args)?;
-            switch(&flake_dir, &system_type, args.cache, &args.cachix_cache, &args.args)
+            build(
+                &flake_dir,
+                &system_type,
+                args.cache,
+                &args.cachix_cache,
+                &args.args,
+            )?;
+            switch(
+                &flake_dir,
+                &system_type,
+                args.cache,
+                &args.cachix_cache,
+                &args.args,
+            )
         }
         DarwinCommand::Rollback => rollback(&flake_dir, &system_type, args.cache, &args.args),
     }
 }
 
-fn build(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn build(
+    flake_dir: &PathBuf,
+    system_type: &str,
+    cache: bool,
+    cachix_cache: &str,
+    extra_args: &[String],
+) -> Result<(), String> {
     println!("{}", "Building configuration...".yellow());
 
     let mut cmd = CheckedCommand::new("nix")
@@ -68,7 +92,8 @@ fn build(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &str
         cmd = cmd.arg("--no-link");
     }
 
-    let build_status = cmd.status()
+    let build_status = cmd
+        .status()
         .map_err(|e| format!("Failed to execute build command: {}", e))?;
 
     if !build_status.success() {
@@ -86,7 +111,13 @@ fn build(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &str
     Ok(())
 }
 
-fn switch(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &str, extra_args: &[String]) -> Result<(), String> {
+fn switch(
+    flake_dir: &PathBuf,
+    system_type: &str,
+    cache: bool,
+    cachix_cache: &str,
+    extra_args: &[String],
+) -> Result<(), String> {
     println!("{}", "Switching to new configuration...".yellow());
 
     let mut cmd = CheckedCommand::new("./result/sw/bin/darwin-rebuild")
@@ -101,7 +132,8 @@ fn switch(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &st
         cmd = cmd.arg("--no-build-nix");
     }
 
-    let switch_status = cmd.status()
+    let switch_status = cmd
+        .status()
         .map_err(|e| format!("Failed to execute switch command: {}", e))?;
 
     if !switch_status.success() {
@@ -126,7 +158,12 @@ fn switch(flake_dir: &PathBuf, system_type: &str, cache: bool, cachix_cache: &st
     Ok(())
 }
 
-fn rollback(flake_dir: &PathBuf, system_type: &str, cache: bool, extra_args: &[String]) -> Result<(), String> {
+fn rollback(
+    flake_dir: &PathBuf,
+    system_type: &str,
+    cache: bool,
+    extra_args: &[String],
+) -> Result<(), String> {
     println!("{}", "Preparing for rollback...".yellow());
 
     // List available generations
@@ -139,16 +176,23 @@ fn rollback(flake_dir: &PathBuf, system_type: &str, cache: bool, extra_args: &[S
 
     // Get user input for generation number
     print!("{}", "Enter the generation number for rollback: ".yellow());
-    io::stdout().flush().map_err(|e| format!("Failed to flush stdout: {}", e))?;
+    io::stdout()
+        .flush()
+        .map_err(|e| format!("Failed to flush stdout: {}", e))?;
     let mut gen_num = String::new();
-    io::stdin().read_line(&mut gen_num).map_err(|e| format!("Failed to read input: {}", e))?;
+    io::stdin()
+        .read_line(&mut gen_num)
+        .map_err(|e| format!("Failed to read input: {}", e))?;
     let gen_num = gen_num.trim();
 
     if gen_num.is_empty() {
         return Err("No generation number entered. Aborting rollback.".into());
     }
 
-    println!("{}", format!("Rolling back to generation {}...", gen_num).yellow());
+    println!(
+        "{}",
+        format!("Rolling back to generation {}...", gen_num).yellow()
+    );
 
     let mut cmd = CheckedCommand::new("/run/current-system/sw/bin/darwin-rebuild")
         .map_err(|e| format!("Failed to create darwin-rebuild command: {}", e))?
@@ -164,19 +208,26 @@ fn rollback(flake_dir: &PathBuf, system_type: &str, cache: bool, extra_args: &[S
         cmd = cmd.arg("--no-build-nix");
     }
 
-    let rollback_status = cmd.status()
+    let rollback_status = cmd
+        .status()
         .map_err(|e| format!("Failed to execute rollback command: {}", e))?;
 
     if !rollback_status.success() {
         return Err(format!("Rollback to generation {} failed", gen_num));
     }
 
-    println!("{}", format!("Rollback to generation {} complete!", gen_num).green());
+    println!(
+        "{}",
+        format!("Rollback to generation {} complete!", gen_num).green()
+    );
     Ok(())
 }
 
 fn push_to_cachix(cache_name: &str, store_paths: Vec<String>) -> Result<(), String> {
-    println!("{}", format!("Pushing store paths to Cachix cache: {}...", cache_name).yellow());
+    println!(
+        "{}",
+        format!("Pushing store paths to Cachix cache: {}...", cache_name).yellow()
+    );
     let mut cmd = CheckedCommand::new("cachix")
         .map_err(|e| format!("Failed to create cachix command: {}", e))?
         .arg("push")
@@ -188,7 +239,8 @@ fn push_to_cachix(cache_name: &str, store_paths: Vec<String>) -> Result<(), Stri
     let stdin = cmd.stdin.as_mut().ok_or("Failed to open stdin")?;
 
     for path in store_paths {
-        writeln!(stdin, "{}", path).map_err(|e| format!("Failed to write to cachix stdin: {}", e))?;
+        writeln!(stdin, "{}", path)
+            .map_err(|e| format!("Failed to write to cachix stdin: {}", e))?;
     }
 
     cmd.wait()

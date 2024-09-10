@@ -9,7 +9,6 @@ pub fn detect_usb_devices() -> Vec<UsbDevice> {
     find_usb_storage_devices(usb_controllers.as_slice())
 }
 
-
 fn get_usb_devices() -> Vec<UsbController> {
     let output = Command::new("system_profiler")
         .arg("SPUSBDataType")
@@ -28,9 +27,9 @@ fn get_usb_devices() -> Vec<UsbController> {
 pub fn find_usb_storage_devices(usb_controllers: &[UsbController]) -> Vec<UsbDevice> {
     usb_controllers
         .iter()
-        .filter_map(|controller| controller.items.as_ref())  // Extract hubs from the controller
-        .flat_map(|hubs| hubs.iter())  // Iterate through the hubs
-        .filter_map(|hub| hub.items.as_ref())  // Extract devices from hubs
-        .flat_map(|devices| devices.clone())  // Clone the devices to return owned data
-        .collect()  // Collect the devices into a Vec<UsbDevice>
+        .filter_map(|controller| controller.items.as_ref()) // Extract hubs from the controller
+        .flat_map(|hubs| hubs.iter()) // Iterate through the hubs
+        .filter_map(|hub| hub.items.as_ref()) // Extract devices from hubs
+        .flat_map(|devices| devices.clone()) // Clone the devices to return owned data
+        .collect() // Collect the devices into a Vec<UsbDevice>
 }

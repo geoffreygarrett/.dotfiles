@@ -1,5 +1,8 @@
-{ lib, nixgl, ... }:
-
+{
+  lib,
+  nixgl,
+  ...
+}:
 self: super: {
   tailscale-ui =
     if super.stdenv.isDarwin then

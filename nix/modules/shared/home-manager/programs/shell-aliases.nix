@@ -1,5 +1,8 @@
-{ pkgs, lib, ... }:
-
+{
+  pkgs,
+  lib,
+  ...
+}:
 let
   # Define the mkPkg function
   mkPkg = pkg: bin: { inherit pkg bin; };
@@ -211,7 +214,6 @@ let
       }) filteredAliases
     )
     // (if shell == "nu" then { } else { "alias-info" = bashLikeAliasInfo; });
-
 in
 {
   shellAliases = {

@@ -2,12 +2,12 @@ use colored::*;
 use regex::Regex;
 use rpassword::read_password;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use snafu::{ResultExt, Snafu};
 use std::fs;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use serde_json::Value;
 
 #[derive(Debug, Snafu)]
 pub enum Error {
@@ -75,8 +75,6 @@ pub struct Disk {
     pub extra: Value, // Extra field for unexpected data
 }
 
-
-
 // Data structure to hold multiple disks
 #[derive(Debug, Serialize, Deserialize)]
 struct Disks {
@@ -99,7 +97,13 @@ pub fn select_usb_device() -> Result<(Disk, Option<Partition>)> {
 
     println!("{}", "Available USB devices:".bold().green());
     for (i, device) in devices.iter().enumerate() {
-        println!("{}. {} ({}) - {} partitions", i + 1, device.name, device.model, device.partitions.len());
+        println!(
+            "{}. {} ({}) - {} partitions",
+            i + 1,
+            device.name,
+            device.model,
+            device.partitions.len()
+        );
     }
 
     // Select a disk
@@ -120,7 +124,12 @@ pub fn select_usb_device() -> Result<(Disk, Option<Partition>)> {
 
     // Check if the disk has multiple partitions
     if selected_disk.partitions.len() > 1 {
-        println!("{}", "The selected device has multiple partitions:".bold().yellow());
+        println!(
+            "{}",
+            "The selected device has multiple partitions:"
+                .bold()
+                .yellow()
+        );
         for (i, partition) in selected_disk.partitions.iter().enumerate() {
             println!(
                 "{}. {} - Size: {} - Mountpoint: {:?}",
@@ -132,7 +141,10 @@ pub fn select_usb_device() -> Result<(Disk, Option<Partition>)> {
         }
 
         let partition_selection = loop {
-            print!("Select a partition (1-{}): ", selected_disk.partitions.len());
+            print!(
+                "Select a partition (1-{}): ",
+                selected_disk.partitions.len()
+            );
             io::stdout().flush().context(IoSnafu)?;
             let mut input = String::new();
             io::stdin().read_line(&mut input).context(IoSnafu)?;
@@ -144,7 +156,10 @@ pub fn select_usb_device() -> Result<(Disk, Option<Partition>)> {
             println!("Invalid selection. Please try again.");
         };
 
-        Ok((selected_disk.clone(), Some(selected_disk.partitions[partition_selection].clone())))
+        Ok((
+            selected_disk.clone(),
+            Some(selected_disk.partitions[partition_selection].clone()),
+        ))
     } else {
         Ok((selected_disk.clone(), None))
     }
@@ -172,34 +187,40 @@ fn get_usb_devices_macos() -> Result<Vec<Disk>> {
 
         // Check if the device is a removable media
         if info.contains("Removable Media:") && info.contains("Yes") {
-            let model = info.lines()
+            let model = info
+                .lines()
                 .find(|line| line.contains("Device / Media Name:"))
                 .and_then(|line| line.split(":").nth(1))
                 .map(|s| s.trim().to_string())
                 .unwrap_or("Unknown".to_string());
 
-            let size = info.lines()
+            let size = info
+                .lines()
                 .find(|line| line.contains("Disk Size:"))
                 .and_then(|line| line.split(":").nth(1))
                 .map(|s| s.split_whitespace().next().unwrap_or("").to_string())
                 .unwrap_or("0B".to_string());
 
-            let uuid = info.lines()
+            let uuid = info
+                .lines()
                 .find(|line| line.contains("Volume UUID:"))
                 .and_then(|line| line.split(":").nth(1))
                 .map(|s| s.trim().to_string());
 
-            let mountpoint = info.lines()
+            let mountpoint = info
+                .lines()
                 .find(|line| line.contains("Mount Point:"))
                 .and_then(|line| line.split(":").nth(1))
                 .map(|s| s.trim().to_string());
 
-            let label = info.lines()
+            let label = info
+                .lines()
                 .find(|line| line.contains("Volume Name:"))
                 .and_then(|line| line.split(":").nth(1))
                 .map(|s| s.trim().to_string());
 
-            let fsuse = info.lines()
+            let fsuse = info
+                .lines()
                 .find(|line| line.contains("Capacity Used:"))
                 .and_then(|line| line.split(":").nth(1))
                 .map(|s| s.trim().to_string());
@@ -238,7 +259,8 @@ fn get_usb_devices_macos() -> Result<Vec<Disk>> {
 fn get_disks_linux() -> Result<Disks> {
     let output = Command::new("sh")
         .arg("-c")
-        .arg(r#"lsblk --paths --json -no NAME,MODEL,SIZE,UUID,LABEL,FSUSE%,MOUNTPOINT,TYPE | jq '{
+        .arg(
+            r#"lsblk --paths --json -no NAME,MODEL,SIZE,UUID,LABEL,FSUSE%,MOUNTPOINT,TYPE | jq '{
             disks: [.blockdevices[] | select(.type=="disk") | {
                 name: .name,
                 model: .model,
@@ -257,7 +279,8 @@ fn get_disks_linux() -> Result<Disks> {
                     type: .type
                 }]
             }]
-        }'"#)
+        }'"#,
+        )
         .output()
         .context(IoSnafu)?;
 
@@ -271,7 +294,6 @@ fn get_disks_linux() -> Result<Disks> {
     let parsed: Disks = serde_json::from_slice(&output.stdout).context(ParseSnafu)?;
     Ok(parsed)
 }
-
 
 pub fn get_password(prompt: &str) -> Result<String> {
     print!("{}", prompt);

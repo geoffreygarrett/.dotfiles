@@ -6,9 +6,9 @@
 //! console = "0.15.8"
 //! ```
 
-use rusb::{Device, DeviceDescriptor, GlobalContext};
-use dialoguer::{theme::ColorfulTheme, Select};
 use console::Style;
+use dialoguer::{theme::ColorfulTheme, Select};
+use rusb::{Device, DeviceDescriptor, GlobalContext};
 
 fn main() {
     // Scan for USB devices

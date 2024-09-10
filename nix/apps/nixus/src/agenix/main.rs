@@ -3,7 +3,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use console::Term;
-use dialoguer::{Select, theme::ColorfulTheme};
+use dialoguer::{theme::ColorfulTheme, Select};
 use spinners::{Spinner, Spinners};
 
 use dialogs::key_storage::check_key_storage;
@@ -11,9 +11,9 @@ use dialogs::write_confirmation::confirm_write;
 use usb::detection::detect_usb_devices;
 use usb::device::UsbDevice;
 
-mod usb;
 mod dialogs;
 mod encryption;
+mod usb;
 mod utils;
 
 enum UiState {
@@ -31,7 +31,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         loop {
             let devices = detect_usb_devices();
             usb_tx.send(devices).unwrap();
-            thread::sleep(Duration::from_millis(500));  // Poll every 500ms
+            thread::sleep(Duration::from_millis(500)); // Poll every 500ms
         }
     });
 
@@ -53,9 +53,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 term.clear_screen()?;
                 println!("Select a USB device (or wait for changes):");
                 let theme = ColorfulTheme::default();
-                let select = Select::with_theme(&theme)
-                    .items(&devices)
-                    .default(0);
+                let select = Select::with_theme(&theme).items(&devices).default(0);
 
                 let start_time = Instant::now();
                 let timeout = Duration::from_millis(500);
@@ -73,7 +71,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             if new_devices.is_empty() {
                                 term.clear_screen()?;
                                 println!("All devices unplugged. Waiting for new devices...");
-                                spinner = Spinner::new(Spinners::Dots9, "Waiting for USB devices...".into());
+                                spinner = Spinner::new(
+                                    Spinners::Dots9,
+                                    "Waiting for USB devices...".into(),
+                                );
                                 ui_state = UiState::WaitingForDevices;
                             } else if new_devices != *devices {
                                 *devices = new_devices;
@@ -111,7 +112,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
 
                 term.clear_screen()?;
-                spinner = Spinner::new(Spinners::Dots9, "Generating and storing encryption key...".into());
+                spinner = Spinner::new(
+                    Spinners::Dots9,
+                    "Generating and storing encryption key...".into(),
+                );
                 thread::sleep(Duration::from_secs(3)); // Simulating key generation and storage
                 spinner.stop();
 
@@ -135,7 +139,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     if new_devices.is_empty() {
                         term.clear_screen()?;
                         println!("All devices unplugged. Waiting for new devices...");
-                        spinner = Spinner::new(Spinners::Dots9, "Waiting for USB devices...".into());
+                        spinner =
+                            Spinner::new(Spinners::Dots9, "Waiting for USB devices...".into());
                         ui_state = UiState::WaitingForDevices;
                     } else {
                         ui_state = UiState::DeviceSelection(new_devices);
@@ -145,7 +150,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     if new_devices.is_empty() {
                         term.clear_screen()?;
                         println!("Device unplugged. Waiting for new devices...");
-                        spinner = Spinner::new(Spinners::Dots9, "Waiting for USB devices...".into());
+                        spinner =
+                            Spinner::new(Spinners::Dots9, "Waiting for USB devices...".into());
                         ui_state = UiState::WaitingForDevices;
                     }
                     // If devices are still present, continue processing

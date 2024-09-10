@@ -32,29 +32,29 @@ backup_plist "com.apple.keyboard" "keyboard"
 backup_plist "com.apple.finder" "finder"
 
 # Backup Homebrew packages and casks
-if command -v brew &> /dev/null; then
+if command -v brew &>/dev/null; then
     echo "Backing up Homebrew package list..."
-    brew list > "$BACKUP_DIR/brew-packages.txt"
-    brew list --cask > "$BACKUP_DIR/brew-cask-apps.txt"
+    brew list >"$BACKUP_DIR/brew-packages.txt"
+    brew list --cask >"$BACKUP_DIR/brew-cask-apps.txt"
 else
     echo "Homebrew not found, skipping package backup."
 fi
 
 # Backup network and Wi-Fi settings
 echo "Backing up network and Wi-Fi settings..."
-networksetup -listallhardwareports > "$BACKUP_DIR/network-info.txt"
-networksetup -listpreferredwirelessnetworks en0 > "$BACKUP_DIR/wifi-networks.txt"
+networksetup -listallhardwareports >"$BACKUP_DIR/network-info.txt"
+networksetup -listpreferredwirelessnetworks en0 >"$BACKUP_DIR/wifi-networks.txt"
 
 # Backup various system settings
 echo "Backing up system settings..."
-pmset -g > "$BACKUP_DIR/energy-saver.txt"
-defaults read /Library/Preferences/com.apple.Bluetooth > "$BACKUP_DIR/bluetooth-settings.plist"
-defaults read com.apple.controlstrip > "$BACKUP_DIR/touchbar-settings.txt"
-system_profiler SPAudioDataType > "$BACKUP_DIR/sound-settings.txt"
-system_profiler SPDisplaysDataType > "$BACKUP_DIR/display-settings.txt"
-tmutil destinationinfo > "$BACKUP_DIR/timemachine-settings.txt"
-defaults read > "$BACKUP_DIR/system-defaults.txt"
-system_profiler SPHardwareDataType > "$BACKUP_DIR/hardware-info.txt"
+pmset -g >"$BACKUP_DIR/energy-saver.txt"
+defaults read /Library/Preferences/com.apple.Bluetooth >"$BACKUP_DIR/bluetooth-settings.plist"
+defaults read com.apple.controlstrip >"$BACKUP_DIR/touchbar-settings.txt"
+system_profiler SPAudioDataType >"$BACKUP_DIR/sound-settings.txt"
+system_profiler SPDisplaysDataType >"$BACKUP_DIR/display-settings.txt"
+tmutil destinationinfo >"$BACKUP_DIR/timemachine-settings.txt"
+defaults read >"$BACKUP_DIR/system-defaults.txt"
+system_profiler SPHardwareDataType >"$BACKUP_DIR/hardware-info.txt"
 
 # Backup user configuration files
 echo "Backing up user configuration files..."
@@ -90,11 +90,11 @@ cp -r ~/Library/Application\ Support/AddressBook "$BACKUP_DIR/contacts_backup" 2
 
 # Backup Dock applications
 echo "Backing up Dock applications..."
-defaults read com.apple.dock persistent-apps > "$BACKUP_DIR/dock-apps.txt"
+defaults read com.apple.dock persistent-apps >"$BACKUP_DIR/dock-apps.txt"
 
 # Backup Installed Applications
 echo "Listing installed applications in /Applications..."
-ls /Applications > "$BACKUP_DIR/installed-applications.txt"
+ls /Applications >"$BACKUP_DIR/installed-applications.txt"
 
 # Backup browser settings
 if [ "$ENABLE_CHROME_BACKUP" = true ]; then

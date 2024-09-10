@@ -33,9 +33,7 @@ fn main() -> std::io::Result<()> {
     args.extend(env::args().skip(1));
 
     // Execute nix build command
-    let status = Command::new("nix")
-        .args(&args)
-        .status()?;
+    let status = Command::new("nix").args(&args).status()?;
 
     if !status.success() {
         eprintln!("{}", "Build failed!".red());
@@ -46,7 +44,10 @@ fn main() -> std::io::Result<()> {
 
     // Remove the result symlink
     if let Err(e) = fs::remove_file("./result") {
-        eprintln!("{}", format!("Failed to remove result symlink: {}", e).red());
+        eprintln!(
+            "{}",
+            format!("Failed to remove result symlink: {}", e).red()
+        );
     }
 
     println!("{}", "Switch to new generation complete!".green());

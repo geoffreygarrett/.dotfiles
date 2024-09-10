@@ -5,7 +5,6 @@
   inputs,
   ...
 }:
-
 let
   starshipInit = shell: ''
     ${config.programs.starship.package}/bin/starship init ${shell}

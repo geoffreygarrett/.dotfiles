@@ -1,5 +1,4 @@
 { lib, ... }:
-
 self: super: {
   tailscale-ui =
     if super.stdenv.isDarwin then

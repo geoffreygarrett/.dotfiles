@@ -4,9 +4,7 @@
   pkgs,
   ...
 }:
-
 with lib;
-
 let
   cfg = config.services.storage;
 in

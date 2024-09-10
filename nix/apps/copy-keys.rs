@@ -26,7 +26,10 @@ mod shared;
 
 fn handle_no_usb() {
     eprintln!("{}", "No USB drive found or mounted.".red());
-    println!("{}", "If you have not yet set up your keys, run the script to generate new SSH keys.".yellow());
+    println!(
+        "{}",
+        "If you have not yet set up your keys, run the script to generate new SSH keys.".yellow()
+    );
     exit(1);
 }
 
@@ -57,7 +60,8 @@ fn mount_usb_macos() -> Option<PathBuf> {
             .expect("Failed to execute diskutil info command");
 
         let info = String::from_utf8_lossy(&info_output.stdout);
-        if let Some(mount_point) = info.lines()
+        if let Some(mount_point) = info
+            .lines()
             .find(|line| line.contains("Mount Point"))
             .and_then(|line| line.split(':').nth(1))
             .map(|s| s.trim().to_string())
@@ -92,7 +96,6 @@ fn mount_usb_linux() -> Option<PathBuf> {
     None
 }
 
-
 fn copy_keys(mount_path: &Path, ssh_dir: &Path) -> std::io::Result<Vec<String>> {
     let config = match shared::Config::load() {
         Ok(config) => config,
@@ -119,8 +122,15 @@ fn copy_keys(mount_path: &Path, ssh_dir: &Path) -> std::io::Result<Vec<String>> 
                 copied_files.push(key.to_string());
 
                 let permissions = if key.ends_with(".pub") { 0o644 } else { 0o600 };
-                if let Err(e) = fs::set_permissions(&dest_path, fs::Permissions::from_mode(permissions)) {
-                    println!("  {}: Failed to set permissions for {}: {}", "Warning".yellow(), key, e);
+                if let Err(e) =
+                    fs::set_permissions(&dest_path, fs::Permissions::from_mode(permissions))
+                {
+                    println!(
+                        "  {}: Failed to set permissions for {}: {}",
+                        "Warning".yellow(),
+                        key,
+                        e
+                    );
                 }
             }
             Err(e) => println!("  {}: Failed to copy {}: {}", "Error".red(), key, e),
@@ -185,7 +195,12 @@ fn main() -> std::io::Result<()> {
         copy_keys(&mount_path, &ssh_dir)?;
         change_ownership(&ssh_dir, &username)?;
 
-        println!("\n{}", "SSH keys setup process completed successfully.".bold().green());
+        println!(
+            "\n{}",
+            "SSH keys setup process completed successfully."
+                .bold()
+                .green()
+        );
         println!("Your keys should now be set up in: {}", ssh_dir.display());
     } else {
         handle_no_usb();

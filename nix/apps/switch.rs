@@ -27,7 +27,10 @@ fn get_flake_dir() -> Result<String, String> {
 fn run_command(cmd: &mut Command) -> Result<(), String> {
     let output = cmd.output().map_err(|e| e.to_string())?;
     if !output.status.success() {
-        return Err(format!("Error executing command: {}", String::from_utf8_lossy(&output.stderr)));
+        return Err(format!(
+            "Error executing command: {}",
+            String::from_utf8_lossy(&output.stderr)
+        ));
     }
     println!("{}", "Command executed successfully.".green().bold());
     Ok(())
@@ -36,33 +39,57 @@ fn run_command(cmd: &mut Command) -> Result<(), String> {
 fn main() -> Result<(), String> {
     let flake_dir = get_flake_dir()?;
     let username = env::var("USER").unwrap_or_else(|_| "unknown".to_string());
-    let hostname = hostname::get().unwrap_or_else(|_| "unknown".into()).to_string_lossy().replace(".local", "").to_lowercase();
+    let hostname = hostname::get()
+        .unwrap_or_else(|_| "unknown".into())
+        .to_string_lossy()
+        .replace(".local", "")
+        .to_lowercase();
     let full_config = format!("{}@{}", username, hostname);
 
-    println!("{}", format!("Running Home Manager switch for {}...", full_config).blue().bold());
+    println!(
+        "{}",
+        format!("Running Home Manager switch for {}...", full_config)
+            .blue()
+            .bold()
+    );
 
     let mut hm_cmd = Command::new("nix");
     hm_cmd.args(&[
         "run",
         "--quiet",
-        &format!("{}#homeConfigurations.{}.activationPackage", flake_dir, full_config),
+        &format!(
+            "{}#homeConfigurations.{}.activationPackage",
+            flake_dir, full_config
+        ),
     ]);
 
     match run_command(&mut hm_cmd) {
-        Ok(_) => println!("{}", "Home Manager switch executed successfully.".green().bold()),
+        Ok(_) => println!(
+            "{}",
+            "Home Manager switch executed successfully.".green().bold()
+        ),
         Err(e) => {
-            eprintln!("{}", format!("Error occurred during Home Manager switch: {}", e).red());
+            eprintln!(
+                "{}",
+                format!("Error occurred during Home Manager switch: {}", e).red()
+            );
             // Try running with --impure flag
             println!("{}", "Attempting to run with --impure flag...".yellow());
             let mut impure_cmd = Command::new("nix");
             impure_cmd.args(&[
                 "run",
                 "--impure",
-                &format!("{}#homeConfigurations.{}.activationPackage", flake_dir, full_config),
+                &format!(
+                    "{}#homeConfigurations.{}.activationPackage",
+                    flake_dir, full_config
+                ),
             ]);
 
             if let Err(e) = run_command(&mut impure_cmd) {
-                eprintln!("{}", format!("Error occurred during impure Home Manager switch: {}", e).red());
+                eprintln!(
+                    "{}",
+                    format!("Error occurred during impure Home Manager switch: {}", e).red()
+                );
                 return Err("Home Manager switch failed".into());
             }
         }

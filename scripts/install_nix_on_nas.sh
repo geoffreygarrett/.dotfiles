@@ -57,7 +57,7 @@ run_remote_script() {
     execute_remote_command "mkdir -p /tmp/nix_install" "Failed to create temporary directory on NAS."
 
     print_color "$YELLOW" "Uploading the installation script to the NAS..."
-    cat <<'EOF' > /tmp/install_nix_remote.sh
+    cat <<'EOF' >/tmp/install_nix_remote.sh
 #!/bin/sh
 set -e
 

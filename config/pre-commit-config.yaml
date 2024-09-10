@@ -5,13 +5,11 @@ repos:
       - id: nixfmt
         name: nixfmt-rfc-style
         files: \.nix$
-
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v3.18.4
     hooks:
       - id: commitizen
-        stages: [ commit-msg ]
-
+        stages: [commit-msg]
   - repo: https://github.com/doublify/pre-commit-rust
     rev: v1.0
     hooks:

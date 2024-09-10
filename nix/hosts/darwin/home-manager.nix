@@ -6,7 +6,6 @@
   user,
   ...
 }:
-
 let
 in
 # Define the content of your file as a derivation

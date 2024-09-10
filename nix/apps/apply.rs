@@ -17,7 +17,7 @@ use std::env;
 use std::fs;
 use std::io::{self};
 use std::path::Path;
-use std::process::{Command, exit};
+use std::process::{exit, Command};
 
 fn is_darwin() -> bool {
     env::consts::OS == "macos"
@@ -40,9 +40,15 @@ fn ask_for_star() {
 
     if response {
         if is_darwin() {
-            Command::new("open").arg("https://github.com/geoffreygarrett/celestial-blueprint").spawn().ok();
+            Command::new("open")
+                .arg("https://github.com/geoffreygarrett/celestial-blueprint")
+                .spawn()
+                .ok();
         } else {
-            Command::new("xdg-open").arg("https://github.com/geoffreygarrett/celestial-blueprint").spawn().ok();
+            Command::new("xdg-open")
+                .arg("https://github.com/geoffreygarrett/celestial-blueprint")
+                .spawn()
+                .ok();
         }
     }
 }
@@ -50,7 +56,12 @@ fn ask_for_star() {
 fn get_username() -> String {
     let username = env::var("USER").unwrap_or_else(|_| String::from("unknown"));
     if username == "nixos" || username == "root" {
-        _prompt("You're running as root. Please enter your desired username:".yellow().to_string().as_str())
+        _prompt(
+            "You're running as root. Please enter your desired username:"
+                .yellow()
+                .to_string()
+                .as_str(),
+        )
     } else {
         username
     }
@@ -82,7 +93,10 @@ fn insert_secrets_input(github_user: &str, github_secrets_repo: &str) {
     let file_path = "flake.nix";
     let content = fs::read_to_string(file_path).expect("Unable to read file");
 
-    if content.contains(&format!("url = \"git+ssh://git@github.com/{}/{}.git\"", github_user, github_secrets_repo)) {
+    if content.contains(&format!(
+        "url = \"git+ssh://git@github.com/{}/{}.git\"",
+        github_user, github_secrets_repo
+    )) {
         println!("The 'secrets' block already exists in the file.");
         return;
     }
@@ -112,7 +126,10 @@ fn select_boot_disk() -> String {
     let disks = String::from_utf8_lossy(&output.stdout);
     println!("{}", disks);
 
-    println!("{}", "WARNING: All data on the chosen disk will be erased during the installation!".red());
+    println!(
+        "{}",
+        "WARNING: All data on the chosen disk will be erased during the installation!".red()
+    );
     let boot_disk = _prompt("Please enter the name of your boot disk (e.g., sda, nvme0n1). Do not include the full path (\"/dev/\"):".yellow().to_string().as_str());
 
     let confirmation = Confirm::new()
@@ -128,14 +145,44 @@ fn select_boot_disk() -> String {
     }
 }
 
-fn confirm_details(username: &str, git_email: &str, git_name: &str, primary_iface: &str, boot_disk: &str, host_name: &str, github_user: &str, github_secrets_repo: &str) {
-    println!("{}", format!("Username: {}\nEmail: {}\nName: {}", username, git_email, git_name).green());
+fn confirm_details(
+    username: &str,
+    git_email: &str,
+    git_name: &str,
+    primary_iface: &str,
+    boot_disk: &str,
+    host_name: &str,
+    github_user: &str,
+    github_secrets_repo: &str,
+) {
+    println!(
+        "{}",
+        format!(
+            "Username: {}\nEmail: {}\nName: {}",
+            username, git_email, git_name
+        )
+        .green()
+    );
 
     if !is_darwin() {
-        println!("{}", format!("Primary interface: {}\nBoot disk: {}\nHostname: {}", primary_iface, boot_disk, host_name).green());
+        println!(
+            "{}",
+            format!(
+                "Primary interface: {}\nBoot disk: {}\nHostname: {}",
+                primary_iface, boot_disk, host_name
+            )
+            .green()
+        );
     }
 
-    println!("{}", format!("Secrets repository: {}/{}", github_user, github_secrets_repo).green());
+    println!(
+        "{}",
+        format!(
+            "Secrets repository: {}/{}",
+            github_user, github_secrets_repo
+        )
+        .green()
+    );
 
     let confirmation = Confirm::new()
         .with_prompt("Is this correct?")
@@ -148,7 +195,17 @@ fn confirm_details(username: &str, git_email: &str, git_name: &str, primary_ifac
     }
 }
 
-fn replace_tokens(file: &Path, username: &str, git_email: &str, git_name: &str, primary_iface: &str, boot_disk: &str, host_name: &str, github_user: &str, github_secrets_repo: &str) {
+fn replace_tokens(
+    file: &Path,
+    username: &str,
+    git_email: &str,
+    git_name: &str,
+    primary_iface: &str,
+    boot_disk: &str,
+    host_name: &str,
+    github_user: &str,
+    github_secrets_repo: &str,
+) {
     if file.file_name().unwrap() != "apply" {
         let content = fs::read_to_string(file).expect("Unable to read file");
         let new_content = content
@@ -171,13 +228,24 @@ fn setup_yubikey_sops() -> io::Result<()> {
 
     // Check if YubiKey is inserted
     if !Command::new("ykman").arg("list").status()?.success() {
-        return Err(io::Error::new(io::ErrorKind::Other, "YubiKey not detected. Please insert your YubiKey and try again."));
+        return Err(io::Error::new(
+            io::ErrorKind::Other,
+            "YubiKey not detected. Please insert your YubiKey and try again.",
+        ));
     }
 
     // Generate GPG key on YubiKey
     println!("Generating GPG key on YubiKey...");
     Command::new("gpg")
-        .args(&["--card-edit", "--command", "admin", "--command", "generate", "--command", "quit"])
+        .args(&[
+            "--card-edit",
+            "--command",
+            "admin",
+            "--command",
+            "generate",
+            "--command",
+            "quit",
+        ])
         .status()?;
 
     // Export public key
@@ -192,7 +260,8 @@ fn setup_yubikey_sops() -> io::Result<()> {
 
     // Configure nix-sops
     println!("Configuring nix-sops...");
-    let sops_config = format!(r#"
+    let sops_config = format!(
+        r#"
 keys:
   - &yubikey {}
 creation_rules:
@@ -200,7 +269,9 @@ creation_rules:
     key_groups:
     - pgp:
       - *yubikey
-"#, public_key.trim());
+"#,
+        public_key.trim()
+    );
 
     fs::write(".sops.yaml", sops_config)?;
 
@@ -211,7 +282,10 @@ creation_rules:
 fn update_flake_nix() -> io::Result<()> {
     let content = fs::read_to_string("flake.nix")?;
     let updated_content = content
-        .replace("inputs = {", "inputs = {\n    sops-nix.url = \"github:mic92/sops-nix\";")
+        .replace(
+            "inputs = {",
+            "inputs = {\n    sops-nix.url = \"github:mic92/sops-nix\";",
+        )
         .replace("outputs = {", "outputs = { sops-nix, ... }:");
     fs::write("flake.nix", updated_content)?;
     Ok(())
@@ -221,10 +295,22 @@ fn main() -> io::Result<()> {
     ask_for_star();
 
     let username = get_username();
-    let git_email = get_git_config("user.email").unwrap_or_else(|| _prompt("Please enter your email:".yellow().to_string().as_str()));
-    let git_name = get_git_config("user.name").unwrap_or_else(|| _prompt("Please enter your name:".yellow().to_string().as_str()));
-    let github_user = _prompt("Please enter your Github username:".yellow().to_string().as_str());
-    let github_secrets_repo = _prompt("Please enter your Github secrets repository name:".yellow().to_string().as_str());
+    let git_email = get_git_config("user.email")
+        .unwrap_or_else(|| _prompt("Please enter your email:".yellow().to_string().as_str()));
+    let git_name = get_git_config("user.name")
+        .unwrap_or_else(|| _prompt("Please enter your name:".yellow().to_string().as_str()));
+    let github_user = _prompt(
+        "Please enter your Github username:"
+            .yellow()
+            .to_string()
+            .as_str(),
+    );
+    let github_secrets_repo = _prompt(
+        "Please enter your Github secrets repository name:"
+            .yellow()
+            .to_string()
+            .as_str(),
+    );
 
     let (primary_iface, boot_disk, host_name) = if !is_darwin() {
         let iface = Command::new("ip")
@@ -234,16 +320,33 @@ fn main() -> io::Result<()> {
             .and_then(|output| String::from_utf8(output.stdout).ok())
             .and_then(|s| s.split_whitespace().nth(4).map(String::from))
             .unwrap_or_else(|| String::from("eth0"));
-        println!("{}", format!("Found primary network interface {}", iface).green());
+        println!(
+            "{}",
+            format!("Found primary network interface {}", iface).green()
+        );
 
         let disk = select_boot_disk();
-        let host = _prompt("Please enter a hostname for the system:".yellow().to_string().as_str());
+        let host = _prompt(
+            "Please enter a hostname for the system:"
+                .yellow()
+                .to_string()
+                .as_str(),
+        );
         (iface, disk, host)
     } else {
         (String::new(), String::new(), String::new())
     };
 
-    confirm_details(&username, &git_email, &git_name, &primary_iface, &boot_disk, &host_name, &github_user, &github_secrets_repo);
+    confirm_details(
+        &username,
+        &git_email,
+        &git_name,
+        &primary_iface,
+        &boot_disk,
+        &host_name,
+        &github_user,
+        &github_secrets_repo,
+    );
 
     insert_secrets_input(&github_user, &github_secrets_repo);
     insert_secrets_output();
@@ -252,12 +355,25 @@ fn main() -> io::Result<()> {
         let entry = entry?;
         let path = entry.path();
         if path.is_file() {
-            replace_tokens(&path, &username, &git_email, &git_name, &primary_iface, &boot_disk, &host_name, &github_user, &github_secrets_repo);
+            replace_tokens(
+                &path,
+                &username,
+                &git_email,
+                &git_name,
+                &primary_iface,
+                &boot_disk,
+                &host_name,
+                &github_user,
+                &github_secrets_repo,
+            );
         }
     }
 
     fs::write("/tmp/username.txt", &username)?;
-    println!("{}", format!("User {} information applied.", username).green());
+    println!(
+        "{}",
+        format!("User {} information applied.", username).green()
+    );
 
     // YubiKey setup (optional)
     let setup_yubikey = Confirm::new()

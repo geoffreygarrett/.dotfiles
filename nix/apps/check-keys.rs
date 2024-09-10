@@ -65,7 +65,10 @@ fn lint_keys(ssh_dir: &PathBuf, wg_dir: &PathBuf) {
 
     // Summary
     if missing_ssh_keys.is_empty() && missing_wg_keys.is_empty() {
-        println!("\n{}", "All SSH and WireGuard keys are present.".bold().green());
+        println!(
+            "\n{}",
+            "All SSH and WireGuard keys are present.".bold().green()
+        );
     } else {
         println!("\n{}", "Some keys are missing:".bold().red());
         if !missing_ssh_keys.is_empty() {
@@ -80,7 +83,10 @@ fn lint_keys(ssh_dir: &PathBuf, wg_dir: &PathBuf) {
                 println!("  {}", key);
             }
         }
-        println!("\n{}", "Run the create-keys command to generate the missing keys.".yellow());
+        println!(
+            "\n{}",
+            "Run the create-keys command to generate the missing keys.".yellow()
+        );
         std::process::exit(1);
     }
 }

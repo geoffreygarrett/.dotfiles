@@ -4,8 +4,8 @@
 //! yaml-rust = "0.4"
 //! ```
 
-use yaml_rust::{YamlLoader, YamlEmitter, Yaml};
 use std::collections::HashMap;
+use yaml_rust::{Yaml, YamlEmitter, YamlLoader};
 
 #[derive(Debug)]
 struct Config {
@@ -101,7 +101,10 @@ fn main() {
         for rule in creation_rules {
             if let Some(key_groups) = rule["key_groups"].as_vec_mut() {
                 for key_group in key_groups {
-                    key_group["age"].as_vec_mut().unwrap().push(new_key_anchor.clone());
+                    key_group["age"]
+                        .as_vec_mut()
+                        .unwrap()
+                        .push(new_key_anchor.clone());
                 }
             }
         }
@@ -109,24 +112,31 @@ fn main() {
 
     // Create Config struct
     let config = Config {
-        keys: doc["keys"].as_vec().unwrap().iter()
+        keys: doc["keys"]
+            .as_vec()
+            .unwrap()
+            .iter()
             .map(|k| k.as_str().unwrap().to_string())
             .collect(),
-        creation_rules: doc["creation_rules"].as_vec().unwrap().iter()
-            .map(|rule| {
-                CreationRule {
-                    path_regex: rule["path_regex"].as_str().unwrap().to_string(),
-                    key_groups: rule["key_groups"]
-                        .as_vec().unwrap()
-                        .iter()
-                        .map(|kg| KeyGroup {
-                            age: kg["age"].as_vec().unwrap()
-                                .iter()
-                                .map(|a| a.as_str().unwrap().to_string())
-                                .collect(),
-                        })
-                        .collect(),
-                }
+        creation_rules: doc["creation_rules"]
+            .as_vec()
+            .unwrap()
+            .iter()
+            .map(|rule| CreationRule {
+                path_regex: rule["path_regex"].as_str().unwrap().to_string(),
+                key_groups: rule["key_groups"]
+                    .as_vec()
+                    .unwrap()
+                    .iter()
+                    .map(|kg| KeyGroup {
+                        age: kg["age"]
+                            .as_vec()
+                            .unwrap()
+                            .iter()
+                            .map(|a| a.as_str().unwrap().to_string())
+                            .collect(),
+                    })
+                    .collect(),
             })
             .collect(),
     };

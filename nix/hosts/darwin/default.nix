@@ -7,7 +7,6 @@
   home-manager,
   ...
 }:
-
 let
   user = "geoffreygarrett";
   home-manager-config = import ../../modules/darwin/home-manager.nix {
@@ -20,10 +19,8 @@ let
       ;
     inherit user;
   };
-
 in
 {
-
   imports = [
     ../../modules/shared/cachix
   ];
@@ -237,7 +234,7 @@ in
       #    emacs-unstable
       #    agenix.packages."${pkgs.system}".default
     ]
-    ++ (import ../../modules/shared/packages.nix { inherit pkgs; });
+    ++ (import ../../modules/shared/packages { inherit pkgs; });
 
   #  launchd.user.agents.emacs.path = [ config.environment.systemPath ];
   #  launchd.user.agents.emacs.serviceConfig = {
@@ -299,7 +296,6 @@ in
     };
   };
 }
-
 #{ agenix, inputs, config, lib, pkgs, home-manager, ... }:
 #
 #let

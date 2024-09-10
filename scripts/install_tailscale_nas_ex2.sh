@@ -17,7 +17,7 @@ print_color() {
 
 # Tailscale version and architecture
 TAILSCALE_VERSION="1.72.1"
-TAILSCALE_ARCH="arm"  # Change to "arm64" if your NAS supports it
+TAILSCALE_ARCH="arm" # Change to "arm64" if your NAS supports it
 
 # Derived variables
 TAILSCALE_FILE="tailscale_${TAILSCALE_VERSION}_${TAILSCALE_ARCH}.tgz"
@@ -25,29 +25,47 @@ TAILSCALE_URL="https://pkgs.tailscale.com/stable/${TAILSCALE_FILE}"
 TAILSCALE_DIR="tailscale_${TAILSCALE_VERSION}_${TAILSCALE_ARCH}"
 
 # Step 1: Change to persistent storage path
-cd /mnt/HD/HD_a2 || { print_color "$RED" "Failed to change directory to /mnt/HD/HD_a2"; exit 1; }
+cd /mnt/HD/HD_a2 || {
+    print_color "$RED" "Failed to change directory to /mnt/HD/HD_a2"
+    exit 1
+}
 print_color "$GREEN" "Changed to persistent storage path"
 
 # Step 2: Download Tailscale
 print_color "$YELLOW" "Downloading Tailscale version ${TAILSCALE_VERSION} for ${TAILSCALE_ARCH}..."
-wget --no-check-certificate "$TAILSCALE_URL" || { print_color "$RED" "Failed to download Tailscale"; exit 1; }
+wget --no-check-certificate "$TAILSCALE_URL" || {
+    print_color "$RED" "Failed to download Tailscale"
+    exit 1
+}
 print_color "$GREEN" "Tailscale downloaded successfully"
 
 # Step 3: Extract Tailscale
 print_color "$YELLOW" "Extracting Tailscale..."
-tar zxf "$TAILSCALE_FILE" || { print_color "$RED" "Failed to extract Tailscale"; exit 1; }
+tar zxf "$TAILSCALE_FILE" || {
+    print_color "$RED" "Failed to extract Tailscale"
+    exit 1
+}
 print_color "$GREEN" "Tailscale extracted successfully"
 
 # Step 4: Set up Tailscale
-cd "$TAILSCALE_DIR" || { print_color "$RED" "Failed to change directory to $TAILSCALE_DIR"; exit 1; }
-mkdir -p tailscale_lib || { print_color "$RED" "Failed to create tailscale_lib directory"; exit 1; }
-ln -sf "/mnt/HD/HD_a2/$TAILSCALE_DIR/tailscale_lib" /var/lib/tailscale || { print_color "$RED" "Failed to create symbolic link"; exit 1; }
+cd "$TAILSCALE_DIR" || {
+    print_color "$RED" "Failed to change directory to $TAILSCALE_DIR"
+    exit 1
+}
+mkdir -p tailscale_lib || {
+    print_color "$RED" "Failed to create tailscale_lib directory"
+    exit 1
+}
+ln -sf "/mnt/HD/HD_a2/$TAILSCALE_DIR/tailscale_lib" /var/lib/tailscale || {
+    print_color "$RED" "Failed to create symbolic link"
+    exit 1
+}
 print_color "$GREEN" "Tailscale set up successfully"
 
 # Step 5: Start Tailscale daemon
 print_color "$YELLOW" "Starting Tailscale daemon..."
 ./tailscaled &
-sleep 5  # Give tailscaled some time to start
+sleep 5 # Give tailscaled some time to start
 
 # Step 6: Get Tailscale login link
 print_color "$YELLOW" "Getting Tailscale login link..."
@@ -70,7 +88,7 @@ if grep -q "Tailscale startup" "$STARTUP_SCRIPT"; then
 fi
 
 # Add new Tailscale startup entries
-cat <<EOT >> "$STARTUP_SCRIPT"
+cat <<EOT >>"$STARTUP_SCRIPT"
 
 # Tailscale startup
 ln -sf /mnt/HD/HD_a2/$TAILSCALE_DIR/tailscale_lib /var/lib/tailscale

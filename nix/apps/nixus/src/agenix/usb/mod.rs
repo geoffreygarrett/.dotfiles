@@ -1,2 +1,2 @@
-pub mod device;
 pub mod detection;
+pub mod device;

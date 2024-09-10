@@ -30,7 +30,6 @@ use which::which;
 #[allow(dead_code)]
 mod shared;
 
-
 // Structure representing the Interface section in WireGuard config
 #[derive(Debug, Serialize, Deserialize)]
 struct Interface {
@@ -69,14 +68,13 @@ struct WireGuardTomlConfig {
     peers: Vec<Peer>, // Multiple peers as an array
 }
 
-
 // Structure representing a device (used for storing device info)
 #[derive(Debug, Serialize, Deserialize)]
 struct Device {
-    name: String,         // Name of the device (hostname)
-    public_key: String,   // Public key for WireGuard
-    allowed_ips: String,  // Allowed IPs for the device (used in WireGuard)
-    endpoint: String,     // Device's public or local IP with port
+    name: String,        // Name of the device (hostname)
+    public_key: String,  // Public key for WireGuard
+    allowed_ips: String, // Allowed IPs for the device (used in WireGuard)
+    endpoint: String,    // Device's public or local IP with port
 }
 
 // Overall configuration holding all devices (optional for future extension)
@@ -86,11 +84,13 @@ struct WireguardConfig {
     devices: HashMap<String, Device>,
 }
 
-
 // Function to find the secrets file relative to the flake locations
 fn get_secrets_path() -> Option<PathBuf> {
     for flake_location in shared::get_flake_locations() {
-        let secrets_path = flake_location.parent().unwrap().join("nix/home/geoffrey/global/secrets.yaml");
+        let secrets_path = flake_location
+            .parent()
+            .unwrap()
+            .join("nix/home/geoffrey/global/secrets.yaml");
         if secrets_path.exists() {
             return Some(secrets_path);
         }
@@ -118,7 +118,11 @@ fn check_sops_installed() -> io::Result<()> {
 
 fn prompt_overwrite(file_path: &Path) -> io::Result<bool> {
     if file_path.exists() {
-        println!("{} {} exists.", "Notice:".bold().yellow(), file_path.display());
+        println!(
+            "{} {} exists.",
+            "Notice:".bold().yellow(),
+            file_path.display()
+        );
         let overwrite = Confirm::new()
             .with_prompt("Do you want to overwrite the existing key?")
             .default(false)
@@ -165,9 +169,7 @@ fn sops_set(config_path: &Path, hostname: &str, device: &Device) -> io::Result<(
 
 // Generate private key and public key dynamically
 fn generate_private_key() -> io::Result<String> {
-    let output = Command::new("wg")
-        .arg("genkey")
-        .output()?;
+    let output = Command::new("wg").arg("genkey").output()?;
 
     if !output.status.success() {
         return Err(io::Error::new(
@@ -221,14 +223,15 @@ fn write_wireguard_conf(
     let device_ip = format!("{}/24", device.allowed_ips);
 
     // Collect peer configurations
-    let peer_configs: Vec<Peer> = peers.iter().map(|(_, peer_device)| {
-        Peer {
+    let peer_configs: Vec<Peer> = peers
+        .iter()
+        .map(|(_, peer_device)| Peer {
             public_key: peer_device.public_key.clone(),
             endpoint: peer_device.endpoint.clone(),
             allowed_ips: format!("{}/32", peer_device.allowed_ips),
             persistent_keepalive: persist_keepalive,
-        }
-    }).collect();
+        })
+        .collect();
 
     // WireGuard TOML configuration structure
     let wg_conf = WireGuardTomlConfig {
@@ -243,20 +246,30 @@ fn write_wireguard_conf(
     // Serialize to TOML and write to the config file
     let toml_content = toml::to_string(&wg_conf).unwrap();
     fs::write(wg_conf_path, toml_content)?;
-    println!("  {}: WireGuard config written to {}", "Success".green(), wg_conf_path.display());
+    println!(
+        "  {}: WireGuard config written to {}",
+        "Success".green(),
+        wg_conf_path.display()
+    );
     Ok(())
 }
 
 fn sync_wireguard_keys(config_path: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     let private_key = generate_private_key()?;
     let public_key = generate_public_key(&private_key)?;
-    let mut hostname = hostname::get()?.to_str().unwrap_or("unknown-host").to_string();
+    let mut hostname = hostname::get()?
+        .to_str()
+        .unwrap_or("unknown-host")
+        .to_string();
     hostname = sanitize_hostname(&hostname);
     let new_device = Device {
         name: hostname.clone(),
-        public_key: public_key.clone(),  // Store only the public key
+        public_key: public_key.clone(), // Store only the public key
         allowed_ips: "0.0.0.0/0".to_string(),
-        endpoint: format!("{}:51820", local_ip().unwrap_or(IpAddr::V4([0, 0, 0, 0].into()))),
+        endpoint: format!(
+            "{}:51820",
+            local_ip().unwrap_or(IpAddr::V4([0, 0, 0, 0].into()))
+        ),
     };
 
     // Check if the device already exists in the SOPS file, otherwise use `sops set` to add it
@@ -273,14 +286,22 @@ fn sync_wireguard_keys(config_path: &PathBuf) -> Result<(), Box<dyn std::error::
     // Store the private key locally
     if prompt_overwrite(&private_key_path)? {
         fs::write(&private_key_path, &private_key)?;
-        println!("  {}: {}", "Private key synced locally".green(), private_key_path.display());
+        println!(
+            "  {}: {}",
+            "Private key synced locally".green(),
+            private_key_path.display()
+        );
     } else {
         println!("  {}: Skipped private key", "Skipped".yellow());
     }
 
     // Store the public key locally
     fs::write(&public_key_path, &public_key)?;
-    println!("  {}: {}", "Public key synced locally".green(), public_key_path.display());
+    println!(
+        "  {}: {}",
+        "Public key synced locally".green(),
+        public_key_path.display()
+    );
 
     // Write WireGuard TOML configuration
     let wg_conf_path = wg_dir.join(format!("wg0_{}.conf", new_device.name));
@@ -300,9 +321,10 @@ fn sync_wireguard_keys(config_path: &PathBuf) -> Result<(), Box<dyn std::error::
     Ok(())
 }
 
-
 // Function to extract the wireguard configuration from SOPS file
-fn extract_wireguard_config(config_path: &Path) -> Result<WireguardConfig, Box<dyn std::error::Error>> {
+fn extract_wireguard_config(
+    config_path: &Path,
+) -> Result<WireguardConfig, Box<dyn std::error::Error>> {
     let output = Command::new("sops")
         .arg("--decrypt")
         .arg("--extract")
@@ -325,7 +347,6 @@ fn extract_wireguard_config(config_path: &Path) -> Result<WireguardConfig, Box<d
 
     Ok(wireguard_config)
 }
-
 
 fn main() -> io::Result<()> {
     // Ensure `sops` is installed before proceeding

@@ -28,14 +28,12 @@
 #   - License: MIT
 #   - Platforms: x86_64-darwin, aarch64-darwin
 # =============================================================================
-
 {
   lib,
   stdenvNoCC,
   fetchurl,
   unzip,
 }:
-
 stdenvNoCC.mkDerivation (self: {
   pname = "hammerspoon";
   version = "0.9.100";

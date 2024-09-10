@@ -16,7 +16,6 @@ enum AndroidCommand {
 const NIX_ON_DROID: &str = "nix-on-droid";
 const CACHIX: &str = "cachix";
 
-
 #[derive(Args)]
 pub struct AndroidArgs {
     /// The command to run (switch, build, or rollback)
@@ -44,13 +43,28 @@ pub fn run(args: AndroidArgs) -> Result<(), String> {
     println!("{}", "Running Android configuration...".blue().bold());
     let flake_dir = crate::config::get_flake_dir(args.flake)?;
     match args.command {
-        AndroidCommand::Build => build(&flake_dir, args.cache, args.cachix_cache.as_deref(), &args.args),
-        AndroidCommand::Switch => switch(&flake_dir, args.cache, args.cachix_cache.as_deref(), &args.args),
+        AndroidCommand::Build => build(
+            &flake_dir,
+            args.cache,
+            args.cachix_cache.as_deref(),
+            &args.args,
+        ),
+        AndroidCommand::Switch => switch(
+            &flake_dir,
+            args.cache,
+            args.cachix_cache.as_deref(),
+            &args.args,
+        ),
         AndroidCommand::Rollback => rollback(args.cache, &args.args),
     }
 }
 
-fn build(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_args: &[String]) -> Result<(), String> {
+fn build(
+    flake_dir: &PathBuf,
+    cache: bool,
+    cachix_cache: Option<&str>,
+    extra_args: &[String],
+) -> Result<(), String> {
     println!("{}", "Building configuration...".yellow());
 
     let mut cmd = CheckedCommand::new(NIX_ON_DROID)
@@ -64,7 +78,8 @@ fn build(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_arg
         cmd = cmd.arg("--no-link");
     }
 
-    let build_status = cmd.status()
+    let build_status = cmd
+        .status()
         .map_err(|e| format!("Failed to execute build command: {}", e))?;
 
     if !build_status.success() {
@@ -81,7 +96,12 @@ fn build(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_arg
     Ok(())
 }
 
-fn switch(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_args: &[String]) -> Result<(), String> {
+fn switch(
+    flake_dir: &PathBuf,
+    cache: bool,
+    cachix_cache: Option<&str>,
+    extra_args: &[String],
+) -> Result<(), String> {
     println!("{}", "Switching to new configuration...".yellow());
 
     let mut cmd = CheckedCommand::new(NIX_ON_DROID)
@@ -95,7 +115,8 @@ fn switch(flake_dir: &PathBuf, cache: bool, cachix_cache: Option<&str>, extra_ar
         cmd = cmd.arg("--no-build-nix");
     }
 
-    let switch_status = cmd.status()
+    let switch_status = cmd
+        .status()
         .map_err(|e| format!("Failed to execute switch command: {}", e))?;
 
     if !switch_status.success() {
@@ -124,7 +145,8 @@ fn rollback(cache: bool, extra_args: &[String]) -> Result<(), String> {
         cmd = cmd.arg("--no-build-nix");
     }
 
-    let rollback_status = cmd.status()
+    let rollback_status = cmd
+        .status()
         .map_err(|e| format!("Failed to execute rollback command: {}", e))?;
 
     if !rollback_status.success() {
@@ -136,7 +158,10 @@ fn rollback(cache: bool, extra_args: &[String]) -> Result<(), String> {
 }
 
 fn push_to_cachix(cache_name: &str, store_paths: Vec<String>) -> Result<(), String> {
-    println!("{}", format!("Pushing store paths to Cachix cache: {}...", cache_name).yellow());
+    println!(
+        "{}",
+        format!("Pushing store paths to Cachix cache: {}...", cache_name).yellow()
+    );
     let mut cmd = CheckedCommand::new(CACHIX)
         .map_err(|e| format!("Failed to create cachix command: {}", e))?
         .arg("push")
@@ -148,7 +173,8 @@ fn push_to_cachix(cache_name: &str, store_paths: Vec<String>) -> Result<(), Stri
     let stdin = cmd.stdin.as_mut().ok_or("Failed to open stdin")?;
 
     for path in store_paths {
-        writeln!(stdin, "{}", path).map_err(|e| format!("Failed to write to cachix stdin: {}", e))?;
+        writeln!(stdin, "{}", path)
+            .map_err(|e| format!("Failed to write to cachix stdin: {}", e))?;
     }
 
     cmd.wait()

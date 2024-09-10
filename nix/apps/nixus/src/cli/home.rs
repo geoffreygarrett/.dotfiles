@@ -24,9 +24,11 @@ fn get_full_config() -> String {
     format!("{}@{}", username, hostname)
 }
 
-
 pub fn run(args: HomeArgs) -> Result<(), String> {
-    println!("{}", "Running Home Manager configuration switch...".blue().bold());
+    println!(
+        "{}",
+        "Running Home Manager configuration switch...".blue().bold()
+    );
 
     let flake_dir = config::get_flake_dir(args.flake)?;
     let full_config = get_full_config();
@@ -47,4 +49,3 @@ pub fn run(args: HomeArgs) -> Result<(), String> {
     println!("{}", "Switch to new configuration complete!".green());
     Ok(())
 }
-

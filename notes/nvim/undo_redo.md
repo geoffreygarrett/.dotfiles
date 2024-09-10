@@ -1,9 +1,10 @@
-Here's a concise, well-organized summary of the different ways to undo and redo in Neovim, organized by mode:
+Here's a concise, well-organized summary of the different ways to undo and redo
+in Neovim, organized by mode:
 
 ### Neovim Undo & Redo Summary
 
 | **Mode**        | **Command**                     | **Action**                      |
-|-----------------|---------------------------------|---------------------------------|
+| --------------- | ------------------------------- | ------------------------------- |
 | **Normal Mode** | `u`                             | Undo the last change            |
 |                 | `Ctrl + r`                      | Redo the last undone change     |
 |                 | `5u`                            | Undo the last 5 changes         |
@@ -30,4 +31,5 @@ set undodir=~/.config/nvim/undodir
 
 With persistent undo enabled, undo history is saved across sessions.
 
-This summary provides all the key undo/redo commands in a clean and minimal format.
+This summary provides all the key undo/redo commands in a clean and minimal
+format.

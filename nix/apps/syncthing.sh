@@ -3,8 +3,8 @@
 # Set variables
 KEY_FILE="syncthing_key.pem"
 CERT_FILE="syncthing_cert.pem"
-DAYS_VALID=3650  # Certificate validity in days (10 years)
-KEY_SIZE=3072    # RSA key size
+DAYS_VALID=3650 # Certificate validity in days (10 years)
+KEY_SIZE=3072   # RSA key size
 
 # Function to check if a command exists
 command_exists() {

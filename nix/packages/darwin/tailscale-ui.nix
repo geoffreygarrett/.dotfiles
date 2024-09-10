@@ -23,7 +23,6 @@
 #   - License: Proprietary
 #   - Platforms: x86_64-darwin, aarch64-darwin
 # =============================================================================
-
 {
   lib,
   stdenvNoCC,
@@ -32,7 +31,6 @@
   runCommand,
   writeShellScriptBin,
 }:
-
 let
   tailscaleUiCli = writeShellScriptBin "tailscale-ui" ''
     echo "Attempting to open the specific Tailscale.app installed by this derivation..."
@@ -50,7 +48,6 @@ let
 
     echo "Tailscale.app launch attempt complete."
   '';
-
 in
 stdenvNoCC.mkDerivation (finalAttrs: {
   pname = "tailscale-ui";

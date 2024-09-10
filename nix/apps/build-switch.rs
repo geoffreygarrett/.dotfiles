@@ -23,7 +23,8 @@ fn run_command(mut cmd: Command) -> Result<(), String> {
 fn main() -> Result<(), String> {
     // Get system type and flake configuration from environment variables or use defaults
     let system_type = env::var("NIX_SYSTEM_TYPE").unwrap_or_else(|_| String::from("x86_64-linux"));
-    let flake_config = env::var("NIX_FLAKE_CONFIG").unwrap_or_else(|_| format!("nixosConfigurations.{}.config", system_type));
+    let flake_config = env::var("NIX_FLAKE_CONFIG")
+        .unwrap_or_else(|_| format!("nixosConfigurations.{}.config", system_type));
 
     env::set_var("NIXPKGS_ALLOW_UNFREE", "1");
 
@@ -58,11 +59,7 @@ fn main() -> Result<(), String> {
 
     // Switch command
     let mut switch_cmd = Command::new(rebuild_cmd);
-    switch_cmd.args(&[
-        "switch",
-        "--flake",
-        &format!(".#{}", system_type),
-    ]);
+    switch_cmd.args(&["switch", "--flake", &format!(".#{}", system_type)]);
     switch_cmd.args(&args);
 
     if let Err(e) = run_command(switch_cmd) {

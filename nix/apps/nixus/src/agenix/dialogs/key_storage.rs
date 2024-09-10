@@ -3,7 +3,9 @@ use std::path::Path;
 use crate::usb::device::UsbDevice;
 
 pub fn check_key_storage(device: &UsbDevice) -> Result<(), String> {
-    let volume = device.media.first()
+    let volume = device
+        .media
+        .first()
         .and_then(|m| m.volumes.first())
         .ok_or_else(|| "No volume found on the device".to_string())?;
 

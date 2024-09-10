@@ -5,7 +5,6 @@
   secrets,
   ...
 }:
-
 let
   user = "geoffrey";
 in
@@ -51,5 +50,4 @@ in
       };
     };
   };
-
 }

@@ -38,33 +38,33 @@ log() {
 
     local level_priority
     case "$level" in
-        ERROR)   level_priority=0 ;;
+        ERROR) level_priority=0 ;;
         WARNING) level_priority=1 ;;
         SUCCESS) level_priority=2 ;;
-        INFO)    level_priority=3 ;;
-        DEBUG)   level_priority=4 ;;
-        *)       level_priority=5 ;;
+        INFO) level_priority=3 ;;
+        DEBUG) level_priority=4 ;;
+        *) level_priority=5 ;;
     esac
 
     local log_level_priority
     case "$LOG_LEVEL" in
-        ERROR)   log_level_priority=0 ;;
+        ERROR) log_level_priority=0 ;;
         WARNING) log_level_priority=1 ;;
         SUCCESS) log_level_priority=2 ;;
-        INFO)    log_level_priority=3 ;;
-        DEBUG)   log_level_priority=4 ;;
-        *)       log_level_priority=5 ;;
+        INFO) log_level_priority=3 ;;
+        DEBUG) log_level_priority=4 ;;
+        *) log_level_priority=5 ;;
     esac
 
     if [[ $level_priority -le $log_level_priority ]]; then
         local color
         case "$level" in
-            INFO)    color="$BLUE" ;;
+            INFO) color="$BLUE" ;;
             SUCCESS) color="$GREEN" ;;
             WARNING) color="$YELLOW" ;;
-            ERROR)   color="$RED" ;;
-            DEBUG)   color="$GRAY" ;;
-            *)       color="$RESET" ;;
+            ERROR) color="$RED" ;;
+            DEBUG) color="$GRAY" ;;
+            *) color="$RESET" ;;
         esac
 
         echo -e "${BOLD}[$(date '+%Y-%m-%d %H:%M:%S')] ${color}${level}${RESET}: ${message}" >&2
@@ -82,10 +82,10 @@ get_dotfiles_dir() {
         echo "$PWD"
     else
         case "$(uname)" in
-            Darwin|Linux)
+            Darwin | Linux)
                 echo "$HOME/.dotfiles"
                 ;;
-            MINGW*|MSYS*|CYGWIN*)
+            MINGW* | MSYS* | CYGWIN*)
                 echo "${USERPROFILE:?}/.dotfiles"
                 ;;
             *)
@@ -199,7 +199,7 @@ setup_linux_shortcuts() {
     new_bindings=()
 
     for i in "${!KEYBINDINGS_LINUX[@]}"; do
-        IFS=':' read -r key app command <<< "${KEYBINDINGS_LINUX[$i]}"
+        IFS=':' read -r key app command <<<"${KEYBINDINGS_LINUX[$i]}"
 
         # Create a new custom binding path
         new_binding_path="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom$i/"
@@ -221,7 +221,10 @@ setup_linux_shortcuts() {
     done
 
     # Join the array elements with commas
-    all_bindings=$(IFS=,; echo "${new_bindings[*]}")
+    all_bindings=$(
+        IFS=,
+        echo "${new_bindings[*]}"
+    )
 
     # Update the list of custom keybindings
     log "DEBUG" "Setting custom-keybindings to: [$all_bindings]"
@@ -248,7 +251,7 @@ setup_macos_shortcuts() {
     fi
 
     mkdir -p "$HOME/.hammerspoon"
-    cat > "$HOME/.hammerspoon/init.lua" << EOL
+    cat >"$HOME/.hammerspoon/init.lua" <<EOL
 local function bindKey(mod, key, fn)
     hs.hotkey.bind(mod, key, fn)
 end
@@ -256,12 +259,12 @@ end
 EOL
 
     for binding in "${KEYBINDINGS_MACOS[@]}"; do
-        IFS=':' read -r key app command <<< "$binding"
+        IFS=':' read -r key app command <<<"$binding"
         log "DEBUG" "Setting up keybinding: $app ($key) -> $command"
-        echo "bindKey('$key', function() hs.application.launchOrFocus('$app') end)" >> "$HOME/.hammerspoon/init.lua"
+        echo "bindKey('$key', function() hs.application.launchOrFocus('$app') end)" >>"$HOME/.hammerspoon/init.lua"
     done
 
-    echo "hs.alert.show('Hammerspoon config loaded')" >> "$HOME/.hammerspoon/init.lua"
+    echo "hs.alert.show('Hammerspoon config loaded')" >>"$HOME/.hammerspoon/init.lua"
 
     log "SUCCESS" "macOS keyboard shortcuts set up successfully. Please restart Hammerspoon to apply changes."
 }
@@ -275,7 +278,7 @@ setup_shortcuts() {
         Darwin)
             #            setup_macos_shortcuts
             ;;
-        MINGW*|MSYS*|CYGWIN*)
+        MINGW* | MSYS* | CYGWIN*)
             log "WARNING" "Keyboard shortcut setup for Windows is managed in the PowerShell script."
             ;;
         *)
@@ -289,27 +292,27 @@ main() {
     # Parse command line arguments
     while getopts ":vl:dc" opt; do
         case ${opt} in
-            v )
+            v)
                 VERBOSE=true
                 LOG_LEVEL="DEBUG"
                 ;;
-            l )
+            l)
                 LOG_LEVEL="$OPTARG"
                 ;;
-            d )
+            d)
                 LOCAL_DEV=true
                 ;;
-            c )
+            c)
                 CI_MODE=true
                 LOG_LEVEL="DEBUG"
                 ;;
-            \? )
+            \?)
                 log "ERROR" "Invalid Option: -$OPTARG" 1>&2
                 exit 1
                 ;;
         esac
     done
-    shift $((OPTIND -1))
+    shift $((OPTIND - 1))
 
     log "INFO" "Starting setup process..."
     if [ "$LOCAL_DEV" = true ]; then

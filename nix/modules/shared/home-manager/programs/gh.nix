@@ -18,10 +18,8 @@ let
   # Debug print the sops config
   debug_config = builtins.trace "Debug: config = ${builtins.toJSON (removeAttrs config [ "_module" ])}" config;
   debug_sops = builtins.trace "Debug: config.sops = ${builtins.toJSON (config.sops or "sops not found")}" config;
-
 in
 {
-
   # Your existing configuration...
   sops.secrets.github-token = {
     sopsFile = builtins.trace "Debug: sopsFile = ${builtins.toString config.sops.defaultSopsFile}" config.sops.defaultSopsFile;

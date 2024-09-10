@@ -19,20 +19,19 @@
 #[allow(dead_code)]
 mod shared_usb;
 
-
 use aes_gcm::aead::{Aead, KeyInit};
 use chacha20poly1305::ChaCha20Poly1305;
 use colored::*;
 use rand::{rngs::OsRng, RngCore};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
+use shared_usb::{get_password, select_usb_device};
 use snafu::prelude::*;
 use std::fs::{File, OpenOptions};
 use std::io::{self, Read, Write};
-use std::path::{Path};
-use zeroize::Zeroize;
+use std::path::Path;
 use std::process::Command;
-use shared_usb::{select_usb_device, get_password};
+use zeroize::Zeroize;
 
 const MAX_ATTEMPTS: u8 = 5;
 const NONCE_SIZE: usize = 12;
@@ -80,7 +79,6 @@ enum Error {
 
     #[snafu(display("Unsupported operating system"))]
     UnsupportedOS,
-
 }
 impl From<std::io::Error> for Error {
     fn from(source: std::io::Error) -> Self {
@@ -97,7 +95,10 @@ fn main() -> Result<()> {
 
     // Determine the base path from either the partition or the disk itself
     let base_path = match maybe_partition {
-        Some(ref partition) => partition.mountpoint.clone().unwrap_or(usb_device.name.clone()), // Use partition mountpoint if available
+        Some(ref partition) => partition
+            .mountpoint
+            .clone()
+            .unwrap_or(usb_device.name.clone()), // Use partition mountpoint if available
         None => usb_device.name.clone(), // Fallback to the disk name if no partition is selected
     };
 
@@ -120,7 +121,6 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-
 fn run_key_operation(config_path: &Path) -> Result<()> {
     if config_path.exists() {
         decrypt_and_use_key(config_path)
@@ -129,14 +129,25 @@ fn run_key_operation(config_path: &Path) -> Result<()> {
     }
 }
 
-
-fn handle_readonly_filesystem(device: &shared_usb::Disk, maybe_partition: Option<&shared_usb::Partition>) -> Result<bool> {
-    println!("\n{}", "The USB drive is mounted as read-only.".red().bold());
+fn handle_readonly_filesystem(
+    device: &shared_usb::Disk,
+    maybe_partition: Option<&shared_usb::Partition>,
+) -> Result<bool> {
+    println!(
+        "\n{}",
+        "The USB drive is mounted as read-only.".red().bold()
+    );
     println!("{}\n", "Please choose an option:".bold());
 
-    println!("1. {}", "Attempt to remount the USB drive with write permissions".cyan());
+    println!(
+        "1. {}",
+        "Attempt to remount the USB drive with write permissions".cyan()
+    );
     println!("2. {}", "Format the USB drive".cyan());
-    println!("   {}", "WARNING: This will erase all data on the drive".red());
+    println!(
+        "   {}",
+        "WARNING: This will erase all data on the drive".red()
+    );
     println!("3. {}", "Exit the program".cyan());
 
     loop {
@@ -149,14 +160,16 @@ fn handle_readonly_filesystem(device: &shared_usb::Disk, maybe_partition: Option
         match choice.trim() {
             "1" => {
                 // Remount the partition if available, or the disk if not
-                let device_to_remount = maybe_partition.map_or_else(|| &device.name, |partition| &partition.name);
+                let device_to_remount =
+                    maybe_partition.map_or_else(|| &device.name, |partition| &partition.name);
                 provide_remount_instructions(device_to_remount);
                 return Ok(true);
             }
             "2" => {
                 // Format the partition if available, or the disk if not
                 let is_partition = maybe_partition.is_some();
-                let device_name = maybe_partition.map_or_else(|| &device.name, |partition| &partition.name);
+                let device_name =
+                    maybe_partition.map_or_else(|| &device.name, |partition| &partition.name);
                 provide_format_instructions(device_name, is_partition);
                 return Ok(true);
             }
@@ -166,36 +179,70 @@ fn handle_readonly_filesystem(device: &shared_usb::Disk, maybe_partition: Option
     }
 }
 
-
-
 fn provide_format_instructions(device_name: &str, is_partition: bool) {
-    println!("\n{}", "WARNING: Formatting will erase all data on the USB drive.".red().bold());
-    println!("{}\n", "To format the USB drive, follow these steps:".bold());
+    println!(
+        "\n{}",
+        "WARNING: Formatting will erase all data on the USB drive."
+            .red()
+            .bold()
+    );
+    println!(
+        "{}\n",
+        "To format the USB drive, follow these steps:".bold()
+    );
 
     if is_partition {
         // Commands for formatting a partition
         println!("1. Verify the detected partition: {}", device_name.yellow());
         println!("\n2. Format the partition:");
         println!("   {}", format!("sudo umount {}", device_name).yellow());
-        println!("   {}", format!("sudo mkfs.vfat -F 32 {}", device_name).yellow());
+        println!(
+            "   {}",
+            format!("sudo mkfs.vfat -F 32 {}", device_name).yellow()
+        );
         println!("   {}", "sudo mkdir -p /media/usbdrive".yellow());
-        println!("   {}", format!("sudo mount {} /media/usbdrive", device_name).yellow());
+        println!(
+            "   {}",
+            format!("sudo mount {} /media/usbdrive", device_name).yellow()
+        );
     } else {
         // Commands for formatting the entire disk
         println!("1. Verify the detected USB drive: {}", device_name.yellow());
         println!("\n2. Format the drive:");
         println!("   {}", format!("sudo umount {}*", device_name).yellow());
-        println!("   {}", format!("sudo parted {} mklabel msdos", device_name).yellow());
-        println!("   {}", format!("sudo parted {} mkpart primary fat32 1 100%", device_name).yellow());
-        println!("   {}", format!("sudo mkfs.vfat -F 32 {}1", device_name).yellow());
+        println!(
+            "   {}",
+            format!("sudo parted {} mklabel msdos", device_name).yellow()
+        );
+        println!(
+            "   {}",
+            format!("sudo parted {} mkpart primary fat32 1 100%", device_name).yellow()
+        );
+        println!(
+            "   {}",
+            format!("sudo mkfs.vfat -F 32 {}1", device_name).yellow()
+        );
         println!("   {}", "sudo mkdir -p /media/usbdrive".yellow());
-        println!("   {}", format!("sudo mount {}1 /media/usbdrive", device_name).yellow());
+        println!(
+            "   {}",
+            format!("sudo mount {}1 /media/usbdrive", device_name).yellow()
+        );
     }
 
-    println!("\n   {}", "IMPORTANT: Verify that the device is correct before running these commands.".red());
-    println!("   {}", "These commands will erase all data on the device and create a new partition.".red());
+    println!(
+        "\n   {}",
+        "IMPORTANT: Verify that the device is correct before running these commands.".red()
+    );
+    println!(
+        "   {}",
+        "These commands will erase all data on the device and create a new partition.".red()
+    );
 
-    println!("\nAfter formatting, press {} to continue or type {} to quit.", "Enter".green(), "'exit'".red());
+    println!(
+        "\nAfter formatting, press {} to continue or type {} to quit.",
+        "Enter".green(),
+        "'exit'".red()
+    );
 
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap_or_default();
@@ -205,16 +252,31 @@ fn provide_format_instructions(device_name: &str, is_partition: bool) {
 }
 
 fn provide_remount_instructions(device_name: &str) {
-    println!("\n{}", "To remount the USB drive with write permissions, follow these steps:".bold());
+    println!(
+        "\n{}",
+        "To remount the USB drive with write permissions, follow these steps:".bold()
+    );
 
     if cfg!(target_os = "linux") {
         println!("\n1. {}", "Open a terminal.".cyan());
-        println!("2. {}", "Run the following command to remount as read-write:".cyan());
-        println!("   {}", format!("sudo mount -o remount,rw {}", device_name).yellow());
+        println!(
+            "2. {}",
+            "Run the following command to remount as read-write:".cyan()
+        );
+        println!(
+            "   {}",
+            format!("sudo mount -o remount,rw {}", device_name).yellow()
+        );
     } else if cfg!(target_os = "macos") {
         println!("\n1. {}", "Open a terminal.".cyan());
-        println!("2. {}", "Run the following command to remount as read-write:".cyan());
-        println!("   {}", format!("diskutil mountWithOptions readWrite {}", device_name).yellow());
+        println!(
+            "2. {}",
+            "Run the following command to remount as read-write:".cyan()
+        );
+        println!(
+            "   {}",
+            format!("diskutil mountWithOptions readWrite {}", device_name).yellow()
+        );
     }
 
     println!("\nAfter remounting, press Enter to continue or type 'exit' to quit.");
@@ -225,9 +287,6 @@ fn provide_remount_instructions(device_name: &str) {
     }
 }
 
-
-
-
 fn get_device_info(mount_point: &Path) -> Result<(String, String)> {
     if cfg!(target_os = "linux") {
         get_device_info_linux(mount_point)
@@ -237,9 +296,6 @@ fn get_device_info(mount_point: &Path) -> Result<(String, String)> {
         Err(Error::UnsupportedOS)
     }
 }
-
-
-
 
 fn get_device_info_linux(mount_point: &Path) -> Result<(String, String)> {
     let output = Command::new("lsblk")
@@ -288,7 +344,7 @@ fn get_device_info_macos(mount_point: &Path) -> Result<(String, String)> {
     // let cleaned_dev_name = dev_name.trim().trim_matches(|c| c == '<' || c == '>' || c == '/' || c == 's' || c == 't' || c == 'r' || c == 'i' || c == 'n' || c == 'g');
     //
     // if cleaned_dev_name.is_empty() {
-        Err(Error::DeviceNotFound)
+    Err(Error::DeviceNotFound)
     // } else {
     //     Ok(format!("/dev/{}", cleaned_dev_name))
     // }
@@ -302,7 +358,8 @@ fn generate_and_encrypt_key(config_path: &Path) -> Result<()> {
     let mut key = [0u8; KEY_SIZE];
     OsRng.fill_bytes(&mut key);
 
-    let password = get_password("Enter a password to encrypt the master key: ").context(UsbSnafu)?;
+    let password =
+        get_password("Enter a password to encrypt the master key: ").context(UsbSnafu)?;
     let salt = generate_salt();
     let derived_key = derive_key(&password, &salt);
 
@@ -322,7 +379,10 @@ fn generate_and_encrypt_key(config_path: &Path) -> Result<()> {
     };
 
     save_config(config_path, &config)?;
-    println!("{}", "Master key generated and encrypted successfully.".green());
+    println!(
+        "{}",
+        "Master key generated and encrypted successfully.".green()
+    );
     key.zeroize();
 
     Ok(())
@@ -336,11 +396,15 @@ fn decrypt_and_use_key(config_path: &Path) -> Result<()> {
     let mut config = load_config(config_path)?;
 
     if config.attempts >= MAX_ATTEMPTS {
-        eprintln!("{}", "Too many incorrect attempts. USB data will be wiped.".red());
+        eprintln!(
+            "{}",
+            "Too many incorrect attempts. USB data will be wiped.".red()
+        );
         return Err(Error::TooManyAttempts);
     }
 
-    let password = get_password("Enter the password to decrypt the master key: ").context(UsbSnafu)?;
+    let password =
+        get_password("Enter the password to decrypt the master key: ").context(UsbSnafu)?;
     let derived_key = derive_key(&password, &config.salt);
 
     let cipher = ChaCha20Poly1305::new(derived_key.as_ref().into());

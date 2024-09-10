@@ -33,6 +33,10 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # macOS-specific
     nix-homebrew = {
@@ -69,6 +73,7 @@
       nixpkgs,
       home-manager,
       pre-commit-hooks,
+      treefmt-nix,
       nixgl,
       darwin,
       nix-homebrew,
@@ -123,9 +128,11 @@
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
             ++ lib.optional (lib.isLinux system) nixgl.overlay;
         };
+      treefmtEval = forAllSystems (
+        system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
+      );
     in
     {
-
       ##############################
       # Packages Configuration
       ##############################
@@ -278,6 +285,11 @@
         });
 
       ##############################
+      # Formatter Configuration
+      ##############################
+      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+
+      ##############################
       # Dev Shell Configuration
       ##############################
       devShells = forAllSystems (system: {
@@ -286,6 +298,5 @@
           shellHook = self.checks.${system}.pre-commit-check.shellHook;
         };
       });
-
     };
 }

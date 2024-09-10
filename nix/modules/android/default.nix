@@ -5,7 +5,6 @@
   services,
   ...
 }:
-
 {
   imports = [
     ./ssh.nix
@@ -38,30 +37,7 @@
 
   # Environment Configuration
   environment = {
-    packages =
-      with pkgs;
-      [
-        git
-        openssh
-        # procps
-        # killall
-        # diffutils
-        # findutils
-        # utillinux
-        # tzdata
-        # hostname
-        # man
-        # gnugrep
-        # gnupg
-        # gnused
-        # gnutar
-        # bzip2
-        # gzip
-        # xz
-        # zip
-        # unzip
-      ]
-      ++ pkgs.callPackage ./packages.nix { inherit pkgs; };
+    packages = pkgs.callPackage ./packages.nix { inherit pkgs; };
 
     etcBackupExtension = ".bak";
 
@@ -181,53 +157,7 @@
     extraSpecialArgs = {
       inherit (config) services;
     };
-    config =
-      {
-        config,
-        lib,
-        pkgs,
-        inputs,
-        services,
-        ...
-      }:
-      {
-        home.stateVersion = "24.05";
-        system.os = "android";
-        imports = [
-          ../shared/home-manager/programs/git.nix
-          ../shared/home-manager/programs/gh.nix
-          ../shared/home-manager/programs/htop.nix
-          ../shared/home-manager/programs/nushell.nix
-          ../shared/home-manager/programs/nvim.nix
-          ../shared/home-manager/programs/starship.nix
-          ../shared/home-manager/programs/zellij.nix
-          ../shared/home-manager/programs/zsh.nix
-          ./secrets.nix
-        ];
-
-        programs.bash = {
-          enable = true;
-          shellAliases =
-            let
-              sshAliases = if services.ssh.enable then services.ssh.aliases else { };
-            in
-            # storageAliases = if services.storage.enable then services.storage.aliases else {};
-            # batteryAliases = if services.battery.enable then services.battery.aliases else {};
-            {
-              ll = "ls -l";
-              hw = "echo 'Hello, World!'";
-              switch = "nix-on-droid switch --flake ~/.dotfiles";
-            }
-            // sshAliases;
-          # // storageAliases
-          # // batteryAliases;
-        };
-
-        home.packages = with pkgs; [
-          fortune
-          lolcat
-        ];
-      };
+    config = import ./home-manager.nix;
   };
 
   # Build Configuration

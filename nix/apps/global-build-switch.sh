@@ -20,17 +20,23 @@ ARCH=$(uname -m)
 case "$OS" in
     Darwin)
         case "$ARCH" in
-            x86_64)  SYSTEM_TYPE="x86_64-darwin" ;;
-            arm64)   SYSTEM_TYPE="aarch64-darwin" ;;
-            *)       echo_color "Unsupported Darwin architecture: $ARCH" "$RED"; exit 1 ;;
+            x86_64) SYSTEM_TYPE="x86_64-darwin" ;;
+            arm64) SYSTEM_TYPE="aarch64-darwin" ;;
+            *)
+                echo_color "Unsupported Darwin architecture: $ARCH" "$RED"
+                exit 1
+                ;;
         esac
         FLAKE_ATTR="darwinConfigurations.$SYSTEM_TYPE.system"
         ;;
     Linux)
         case "$ARCH" in
-            x86_64)  SYSTEM_TYPE="x86_64-linux" ;;
+            x86_64) SYSTEM_TYPE="x86_64-linux" ;;
             aarch64) SYSTEM_TYPE="aarch64-linux" ;;
-            *)       echo_color "Unsupported Linux architecture: $ARCH" "$RED"; exit 1 ;;
+            *)
+                echo_color "Unsupported Linux architecture: $ARCH" "$RED"
+                exit 1
+                ;;
         esac
         FLAKE_ATTR="nixosConfigurations.$SYSTEM_TYPE.config.system.build.toplevel"
         ;;

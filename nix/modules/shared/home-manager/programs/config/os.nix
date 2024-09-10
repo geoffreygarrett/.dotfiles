@@ -1,5 +1,4 @@
 { lib, ... }:
-
 {
   options.system.os = lib.mkOption {
     default = "nixos";
