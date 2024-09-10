@@ -120,9 +120,9 @@
   };
 
   # Build Configuration
-  # build = {
-  #   activation = { };
-  #   activationBefore = { };
-  #   activationAfter = { };
-  # };
+  #   build = {
+  #     activation = { };
+  #     activationBefore = { };
+  #     activationAfter = { };
+  #   };
 }

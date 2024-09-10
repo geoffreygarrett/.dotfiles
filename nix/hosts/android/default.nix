@@ -52,8 +52,9 @@
     };
 
     motd = ''
-      echo "Welcome to Nix-on-Droid!" | lolcat
-      fortune | lolcat
+      [1;36mWelcome to Nix-on-Droid![0m
+      [0;32mCelestial Blueprint: [0;34mhttps://github.com/geoffreygarrett/celestial-blueprint[0m
+      [0;35mHappy hacking![0m
     '';
   };
 
