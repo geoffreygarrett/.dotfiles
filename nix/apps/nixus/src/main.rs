@@ -1,5 +1,6 @@
 use std::fmt;
 use std::io::{self, Write};
+use std::str::FromStr;
 
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use clap_complete::{generate, Generator};
@@ -13,12 +14,42 @@ mod cli;
 mod config;
 mod utils;
 
+#[derive(Clone, Debug)]
+struct SopsConfig {
+    file: String,
+    key_path: String,
+    env_var: Option<String>,
+}
+
+impl FromStr for SopsConfig {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = s.split(',').collect();
+        if parts.len() < 2 || parts.len() > 3 {
+            return Err("Invalid SOPS config format. Use: file,key_path[,env_var]".to_string());
+        }
+        Ok(SopsConfig {
+            file: parts[0].to_string(),
+            key_path: parts[1].to_string(),
+            env_var: parts.get(2).map(|&s| s.to_string()),
+        })
+    }
+}
+
 #[derive(Parser)]
 #[clap(name = "nixus", styles = crate::cli::styles::get_styles())]
 #[clap(about = "A CLI tool for managing Nix configurations")]
 struct Cli {
     #[arg(short, long, default_value = "off")]
     log_level: LevelFilter,
+
+    #[arg(
+        long = "sops",
+        number_of_values = 1,
+        default_value = "$FLAKE/secrets/default.yaml,cachix-auth-token.value,CACHIX_AUTH_TOKEN"
+    )]
+    sops_configs: Vec<SopsConfig>,
 
     #[command(subcommand)]
     command: Commands,
@@ -96,6 +127,28 @@ impl Shell {
 
 fn main() {
     let cli = Cli::parse();
+
+    // // NOTE: Temporary, we will set for each call's scope later.
+    // // Handle SOPS configurations
+    // for config in &cli.sops_configs {
+    //     match utils::get_sops_secret(&config.file, &config.key_path) {
+    //         Ok(secret) => unsafe {
+    //             // TODO: Must update this and use scoped env vars for the Command call.
+    //             //       Will require some thinking and refactoring. #75%Rule
+    //             if let Some(env_var) = &config.env_var {
+    //                 std::env::set_var(env_var, &secret);
+    //                 debug!("Set environment variable {} with SOPS secret from {}", env_var, config.file);
+    //             } else {
+    //                 debug!("Retrieved SOPS secret from {}, but no environment variable name was provided", config.file);
+    //             }
+    //         }
+    //         Err(e) => {
+    //             error!("Failed to retrieve SOPS secret from {}: {}", config.file, e);
+    //             eprintln!("{}: Failed to retrieve SOPS secret from {}: {}", "Error".red().bold(), config.file, e);
+    //             std::process::exit(1);
+    //         }
+    //     }
+    // }
 
     // Initialize the logger with custom formatting
     Builder::new()

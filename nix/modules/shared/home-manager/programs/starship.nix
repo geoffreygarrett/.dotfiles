@@ -28,7 +28,7 @@ in
     config.programs.fish.enable && config.programs.starship.enable
   ) "${starshipInit "fish"} | source";
 
-  programs.nushell.extraConfig = lib.mkIf (
-    config.programs.nushell.enable && config.programs.starship.enable
-  ) "${starshipInit "nu"} | save -f ~/.cache/starship/init.nu; source ~/.cache/starship/init.nu";
+  #  programs.nushell.extraConfig = lib.mkIf (
+  #    config.programs.nushell.enable && config.programs.starship.enable
+  #  ) "${starshipInit "nu"} | save -f ~/.cache/starship/init.nu; source ~/.cache/starship/init.nu";
 }

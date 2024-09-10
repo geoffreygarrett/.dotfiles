@@ -35,4 +35,7 @@ _: [
 
   # AI
   #  "diffusionbee"
+
+  # Security
+  "yubico-yubikey-manager"
 ]

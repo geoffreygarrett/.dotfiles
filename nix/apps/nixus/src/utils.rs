@@ -317,3 +317,61 @@ pub fn find_sops_file() -> Result<PathBuf, String> {
     error!("SOPS secrets file not found in any of the expected locations");
     Err("SOPS secrets file not found".to_string())
 }
+
+pub fn get_sops_secret(file: &str, key_path: &str) -> Result<String, String> {
+    let output = Command::new("sops")
+        .args(&["-d", file, "--extract", key_path])
+        .output()
+        .map_err(|e| format!("Failed to execute SOPS command: {}", e))?;
+
+    if output.status.success() {
+        let secret = String::from_utf8(output.stdout)
+            .map_err(|e| format!("Failed to parse SOPS output: {}", e))?;
+        Ok(secret.trim().to_string())
+    } else {
+        let error = String::from_utf8(output.stderr)
+            .map_err(|e| format!("Failed to parse SOPS error output: {}", e))?;
+        Err(error)
+    }
+}
+
+//
+// pub fn find_sops_file_with_path(file_path: &str) -> Result<PathBuf, String> {
+//     debug!("Searching for SOPS secrets file: {}", file_path);
+//
+//     // Expand all environment variables in the path
+//     let expanded_path = shellexpand::full(file_path)
+//         .map_err(|e| format!("Failed to expand environment variables: {}", e))?;
+//
+//     let path = PathBuf::from(expanded_path.as_ref());
+//
+//     debug!("Expanded file path: {:?}", path);
+//
+//     if path.exists() {
+//         info!("Found SOPS secrets file at: {:?}", path);
+//         Ok(path)
+//     } else {
+//         error!("SOPS secrets file not found at: {:?}", path);
+//         Err(format!("SOPS secrets file not found: {}", file_path))
+//     }
+// }
+//
+//
+// pub fn get_sops_secret(file: &str, key_path: &str) -> Result<String, String> {
+//     let file_path = find_sops_file(file)?;
+//
+//     let output = Command::new("sops")
+//         .args(&["-d", file_path.to_str().unwrap(), "--extract", key_path])
+//         .output()
+//         .map_err(|e| format!("Failed to execute SOPS command: {}", e))?;
+//
+//     if output.status.success() {
+//         let secret = String::from_utf8(output.stdout)
+//             .map_err(|e| format!("Failed to parse SOPS output: {}", e))?;
+//         Ok(secret.trim().to_string())
+//     } else {
+//         let error = String::from_utf8(output.stderr)
+//             .map_err(|e| format!("Failed to parse SOPS error output: {}", e))?;
+//         Err(error)
+//     }
+// }

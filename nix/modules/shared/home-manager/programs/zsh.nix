@@ -17,10 +17,63 @@ in
   programs.zsh = {
     enable = true;
     autocd = true;
-    dotDir = ".config/zsh";
+    #    dotDir = ".config/zsh";
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+
+    initExtraFirst = ''
+      if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+        . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+      fi
+
+      if [[ "$(uname)" == "Linux" ]]; then
+        alias pbcopy='xclip -selection clipboard'
+      fi
+
+      # Define variables for directories
+      export PATH=$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH
+      export PATH=$HOME/.npm-packages/bin:$HOME/bin:$PATH
+      export PATH=$HOME/.composer/vendor/bin:$PATH
+      export PATH=$HOME/.local/share/bin:$PATH
+
+      export PNPM_HOME=~/.pnpm-packages
+      alias pn=pnpm
+      alias px=pnpx
+
+      # Remove history data we don't want to see
+      export HISTIGNORE="pwd:ls:cd"
+
+      # Ripgrep alias
+      alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*" "$@"'
+
+      # Emacs is my editor
+      export ALTERNATE_EDITOR=""
+      export EDITOR="emacsclient -t"
+      export VISUAL="emacsclient -c -a emacs"
+      e() {
+          emacsclient -t "$@"
+      }
+
+      # Laravel Artisan
+      alias art='php artisan'
+
+      # PHP Deployer
+      alias deploy='dep deploy'
+
+      alias watch="tmux new-session -d -s watch-session 'bash ./bin/watch.sh'"
+      alias unwatch='tmux kill-session -t watch-session'
+
+      # Use difftastic, syntax-aware diffing
+      alias diff=difft
+
+      # Always color ls and group directories
+      alias ls='ls --color=auto'
+
+      # Reboot into my dual boot Windows partition
+      alias windows='systemctl reboot --boot-loader-entry=auto-windows'
+    '';
 
     history = {
       path = "$HOME/.zsh_history";
@@ -61,12 +114,12 @@ in
       FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border";
     };
 
-    initExtraFirst = ''
-      if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-        . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
-      fi
-    '';
+    #    initExtraFirst = ''
+    #      if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+    #        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+    #        . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+    #      fi
+    #    '';
 
     initExtra = ''
       export FLAKE="$HOME/.dotfiles"

@@ -204,15 +204,14 @@
                   "homebrew/homebrew-cask" = homebrew-cask;
                   "homebrew/homebrew-bundle" = homebrew-bundle;
                 };
+                mutableTaps = false;
+                autoMigrate = true;
               };
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
             }
             ./nix/hosts/darwin
           ];
           specialArgs = {
-            inherit inputs self;
+            inherit inputs self user;
           };
         }
       );

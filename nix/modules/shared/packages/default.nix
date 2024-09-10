@@ -1,24 +1,42 @@
 { pkgs, ... }:
+with pkgs;
 [
-  (pkgs.nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  pkgs.rust-analyzer
-  pkgs.sops
-  pkgs.fastfetch
+  (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+  rust-analyzer
+  sops
+  fastfetch
+
   # SECRETS
-  pkgs.age
-  pkgs.micromamba
+  age
+
   # RUST-SCRIPT
-  pkgs.cargo
-  pkgs.rustc
-  pkgs.libiconv
-  pkgs.rust-script
-  pkgs.pcsclite
-  pkgs.gengetopt
-  pkgs.opensc
-  pkgs.pkg-config
-  pkgs.wireguard-tools
-  pkgs.tailscale
-  pkgs.ripgrep # DEPENDANT: Telescope live_grep
+  cargo
+  rustc
+  libiconv
+  rust-script
+  pcsclite
+  gengetopt
+  opensc
+  pkg-config
+  wireguard-tools
+  tailscale
+  ripgrep # DEPENDANT: Telescope live_grep
+
   # DEVELOPMENT
-  pkgs.lazygit
+  lazygit
+  micromamba
+
+  # Security
+  gnupg
+  openssh
+
+  # GUI Secuirty
+  yubikey-manager
+
+  # Encryption and security tools
+  #  _1password
+  age
+  age-plugin-yubikey
+  gnupg
+  libfido2
 ]

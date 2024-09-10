@@ -132,12 +132,19 @@ fn switch(
         cmd = cmd.arg("--no-build-nix");
     }
 
-    let switch_status = cmd
-        .status()
+    let output = cmd
+        .output()
         .map_err(|e| format!("Failed to execute switch command: {}", e))?;
 
-    if !switch_status.success() {
-        return Err("Switch failed".into());
+    if !output.status.success() {
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+
+        return Err(format!(
+            "Switch failed with status {}.\nStdout:\n{}\nStderr:\n{}",
+            output.status, stdout, stderr
+        )
+        .into());
     }
 
     println!("{}", "Switch to new configuration complete!".green());

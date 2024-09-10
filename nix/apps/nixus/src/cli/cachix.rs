@@ -166,6 +166,7 @@ fn push_deps(
     Ok(())
 }
 
+//  nix-store -qR --include-outputs | grep -v '\.drv$' | cachix push $cache
 fn push_shell(
     dir: &PathBuf,
     cache: &str,
@@ -207,6 +208,7 @@ fn push_shell(
     Ok(())
 }
 
+//   nix path-info --all | CACHIX_AUTH_TOKEN=$(sops decrypt --extract '["cachix-auth-token"]["value"]' "$FLAKE/secrets/default.yaml") cachix push geoffreygarrett
 fn push_all(
     dir: &PathBuf,
     cache: &str,
