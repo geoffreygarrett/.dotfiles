@@ -13,8 +13,8 @@ use log::{debug, error, info, Level, LevelFilter, warn};
 mod cli;
 mod config;
 mod utils;
-#[allow(unused_imports)]
-mod styles;
+// #[allow(unused_imports)]
+// mod styles;
 
 #[derive(Clone, Debug)]
 struct SopsConfig {
