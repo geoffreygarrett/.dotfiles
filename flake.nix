@@ -101,8 +101,8 @@
       ];
       systems.android = [
         "aarch64-linux"
-        "armv7-linux"
-        "armv8-linux"
+        #        "armv7-linux"
+        #        "armv8-linux"
         "x86_64-linux"
       ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
@@ -242,47 +242,47 @@
       ##############################
       # Home Configuration
       ##############################
-      homeConfigurations = {
-        "geoffrey@apollo" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor "x86_64-linux";
-          modules = [
-            ./nix/network.nix
-            ./nix/hosts/apollo.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
-          extraSpecialArgs = {
-            inherit inputs outputs;
-          };
-        };
-        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor "aarch64-darwin";
-          modules = [
-            ./nix/hosts/artemis.nix
-            ./nix/home/artemis.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
-          extraSpecialArgs = {
-            inherit inputs outputs;
-          };
-        };
-      };
+      #      homeConfigurations = {
+      #        "geoffrey@apollo" = lib.homeManagerConfiguration {
+      #          pkgs = pkgsFor "x86_64-linux";
+      #          modules = [
+      ##            ./nix/network.nix
+      #            ./nix/hosts/apollo.nix
+      #            inputs.sops-nix.homeManagerModules.sops
+      #          ];
+      #          extraSpecialArgs = {
+      #            inherit inputs outputs;
+      #          };
+      #        };
+      #        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
+      #          pkgs = pkgsFor "aarch64-darwin";
+      #          modules = [
+      #            ./nix/hosts/artemis.nix
+      #            ./nix/home/artemis.nix
+      #            inputs.sops-nix.homeManagerModules.sops
+      #          ];
+      #          extraSpecialArgs = {
+      #            inherit inputs outputs;
+      #          };
+      #        };
+      #      };
 
       ##############################
       # Checks Configuration
       ##############################
-      checks =
-        nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
-        // forAllSystems (system: {
-          pre-commit-check = pre-commit-hooks.lib.${system}.run {
-            src = ./.;
-            hooks = {
-              nixfmt-rfc-style.enable = true;
-              beautysh.enable = true;
-              rustfmt.enable = true;
-              commitizen.enable = true;
-            };
-          };
-        });
+      #      checks =
+      #        nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
+      #        // forAllSystems (system: {
+      #          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+      #            src = ./.;
+      #            hooks = {
+      #              nixfmt-rfc-style.enable = true;
+      #              beautysh.enable = true;
+      #              rustfmt.enable = true;
+      #              commitizen.enable = true;
+      #            };
+      #          };
+      #        });
 
       ##############################
       # Formatter Configuration

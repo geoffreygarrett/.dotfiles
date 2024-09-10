@@ -79,8 +79,9 @@ enum Commands {
     #[command(name = "nixos")]
     NixOS(cli::nixos::NixOSArgs),
     Home(cli::home::HomeArgs),
-    SshKeys(cli::ssh_keys::SshKeysArgs),
+    // SshKeys(cli::ssh_keys::SshKeysArgs),
     Cachix(cli::cachix::CachixArgs),
+
     Secrets(cli::secrets::SecretsArgs),
 }
 
@@ -180,10 +181,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             info!("Running Home command");
             cli::home::run(args)?;
         }
-        Commands::SshKeys(args) => {
-            info!("Running SSH keys command");
-            cli::ssh_keys::run_ssh_keys(args)?;
-        }
+        // Commands::SshKeys(args) => {
+        //     info!("Running SSH keys command");
+        //     cli::ssh_keys::run_ssh_keys(args)?;
+        // }
         Commands::Cachix(args) => {
             info!("Running Cachix command");
             cli::cachix::run(args)?;
