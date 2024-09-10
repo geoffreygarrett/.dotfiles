@@ -33,6 +33,7 @@
         ll = "ls -l";
         hw = "echo 'Hello, World!'";
         switch = "nix-on-droid switch --flake ~/.dotfiles";
+        cdf = "cd ~/.dotfiles";
       }
       // sshAliases;
   };
