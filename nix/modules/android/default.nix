@@ -33,6 +33,7 @@
       sshd-stop = "pkill sshd";
       sshd-restart = "sshd-stop && sshd-start";
       ssh-keygen = "ssh-keygen -t ed25519";
+      cdf = "cd ~/.dotfiles";
     };
   };
 
