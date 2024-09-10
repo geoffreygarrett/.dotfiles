@@ -6,9 +6,9 @@ pub mod cachix;
 pub mod darwin;
 pub mod home;
 pub mod nixos;
+pub mod services;
 pub mod ssh_keys;
 pub mod styles;
-pub mod services;
 
 #[derive(Subcommand)]
 pub enum Commands {

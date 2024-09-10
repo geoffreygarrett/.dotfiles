@@ -223,7 +223,7 @@
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
         pkgs = pkgsFor "aarch64-linux";
         modules = [
-          ./nix/modules/android
+          ./nix/hosts/android
           {
             networking.hosts = {
               "100.78.156.17" = [ "pioneer.home" ];

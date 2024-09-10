@@ -8,7 +8,7 @@ use clap_complete_nushell::Nushell;
 use colored::*;
 use env_logger::Builder;
 #[allow(unused_imports)]
-use log::{debug, error, info, Level, LevelFilter, warn};
+use log::{debug, error, info, warn, Level, LevelFilter};
 
 mod cli;
 mod config;
