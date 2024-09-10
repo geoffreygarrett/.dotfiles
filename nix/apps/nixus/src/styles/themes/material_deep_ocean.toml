@@ -1,0 +1,67 @@
+# Material Deep Ocean Theme
+
+name = "Material Deep Ocean"
+
+[background]
+value = "#0F111A"
+description = "Primary background color"
+
+[foreground]
+value = "#8F93A2"
+description = "Primary foreground color"
+
+[text]
+value = "#4B526D"
+description = "General text color"
+
+[selection]
+background = { value = "#717CB4", description = "Selection background color" }
+foreground = { value = "#FFFFFF", description = "Selection foreground color" }
+
+[cursor]
+background = { value = "#FFFFFF", description = "Cursor background color" }
+foreground = { value = "#0F111A", description = "Cursor foreground color" }
+
+[normal]
+black = { value = "#090B10", description = "Normal black" }
+red = { value = "#F07178", description = "Normal red" }
+green = { value = "#C3E88D", description = "Normal green" }
+yellow = { value = "#FFCB6B", description = "Normal yellow" }
+blue = { value = "#82AAFF", description = "Normal blue" }
+magenta = { value = "#C792EA", description = "Normal magenta/purple" }
+cyan = { value = "#89DDFF", description = "Normal cyan" }
+white = { value = "#EEFFFF", description = "Normal white" }
+
+[bright]
+black = { value = "#464B5D", description = "Bright black / gray" }
+red = { value = "#FF5370", description = "Bright red / error color" }
+green = { value = "#C3E88D", description = "Bright green (same as normal)" }
+yellow = { value = "#FFCB6B", description = "Bright yellow (same as normal)" }
+blue = { value = "#82AAFF", description = "Bright blue (same as normal)" }
+magenta = { value = "#C792EA", description = "Bright magenta (same as normal)" }
+cyan = { value = "#89DDFF", description = "Bright cyan (same as normal)" }
+white = { value = "#FFFFFF", description = "Bright white" }
+
+[accent]
+value = "#84FFFF"
+description = "Accent color"
+
+[orange]
+value = "#F78C6C"
+description = "Orange color"
+
+[ui]
+background = { value = "#1A1C25", description = "UI background color" }
+border = { value = "#0F111A", description = "Border color" }
+selection = { value = "#717CB4", description = "UI selection color" }
+
+[syntax]
+comments = { value = "#717CB4", description = "Comments color" }
+variables = { value = "#EEFFFF", description = "Variables color" }
+functions = { value = "#82AAFF", description = "Functions color" }
+keywords = { value = "#C792EA", description = "Keywords color" }
+strings = { value = "#C3E88D", description = "Strings color" }
+operators = { value = "#89DDFF", description = "Operators color" }
+attributes = { value = "#FFCB6B", description = "Attributes color" }
+numbers = { value = "#F78C6C", description = "Numbers color" }
+parameters = { value = "#F78C6C", description = "Parameters color" }

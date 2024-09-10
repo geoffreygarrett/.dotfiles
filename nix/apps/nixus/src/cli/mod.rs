@@ -8,6 +8,7 @@ pub mod home;
 pub mod nixos;
 pub mod ssh_keys;
 pub mod styles;
+pub mod services;
 
 #[derive(Subcommand)]
 pub enum Commands {

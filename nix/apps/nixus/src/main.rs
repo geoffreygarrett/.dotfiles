@@ -8,11 +8,13 @@ use clap_complete_nushell::Nushell;
 use colored::*;
 use env_logger::Builder;
 #[allow(unused_imports)]
-use log::{debug, error, info, warn, Level, LevelFilter};
+use log::{debug, error, info, Level, LevelFilter, warn};
 
 mod cli;
 mod config;
 mod utils;
+#[allow(unused_imports)]
+mod styles;
 
 #[derive(Clone, Debug)]
 struct SopsConfig {
