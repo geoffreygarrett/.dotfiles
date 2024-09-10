@@ -81,7 +81,11 @@
     }@inputs:
     let
       inherit (self) outputs;
-      user = "geoffreygarrett";
+      user =
+        let
+          envUser = builtins.getEnv "USER";
+        in
+        if envUser != "" then envUser else "geoffreygarrett";
       systems.linux = [
         "aarch64-linux"
         "x86_64-linux"
