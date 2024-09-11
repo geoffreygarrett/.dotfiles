@@ -6,11 +6,17 @@
   ...
 }:
 let
-  # Wrapper for gh that includes the GitHub token
+  #  # Wrapper for gh that includes the GitHub token
+  #  gh-wrapped = pkgs.writeShellScriptBin "gh" ''
+  #    if ! GITHUB_TOKEN=$(cat ${config.sops.secrets.github-token.path} 2>/dev/null); then
+  #      echo -e "\033[1;90m[!] GitHub token retrieval failed from SOPS...\033[0m" >&2
+  #    fi
+  #    export GITHUB_TOKEN
+  #    ${pkgs.gh}/bin/gh "$@"
+  #  '';
+
   gh-wrapped = pkgs.writeShellScriptBin "gh" ''
-    if ! GITHUB_TOKEN=$(cat ${config.sops.secrets.github-token.path} 2>/dev/null); then
-      echo -e "\033[1;90m[!] GitHub token retrieval failed from SOPS...\033[0m" >&2
-    fi
+    GITHUB_TOKEN=$(cat ${config.sops.secrets.github-token.path})
     export GITHUB_TOKEN
     ${pkgs.gh}/bin/gh "$@"
   '';
