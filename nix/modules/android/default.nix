@@ -143,11 +143,12 @@ in
   };
 
   # Build Configuration
-  build.activation.sops-nix = lib.mkIf (sops-config.secrets != { }) ''
-    $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
-    ${script}
-  '';
-
+  build.activation.sops-nix = lib.mkIf (sops-config.secrets != { }) (
+    lib.noDepEntry ''
+      $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
+      ${script}
+    ''
+  );
   environment.packages = lib.mkIf (sops-config.secrets != { }) [
     (pkgs.writeScriptBin "sops-nix-run" ''
       #!${pkgs.runtimeShell}
