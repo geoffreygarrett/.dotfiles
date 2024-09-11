@@ -6,6 +6,28 @@
   services,
   ...
 }:
+let
+  sops-config = config.home-manager.config.sops;
+  sops-install-secrets = pkgs.sops-install-secrets;
+  manifest = pkgs.writeTextFile {
+    name = "manifest.json";
+    text = builtins.toJSON {
+      secrets = builtins.attrValues sops-config.secrets;
+      secretsMountPoint = sops-config.defaultSecretsMountPoint;
+      symlinkPath = sops-config.defaultSymlinkPath;
+    };
+  };
+  script = pkgs.writeShellScript "sops-nix-user" ''
+    ${lib.optionalString sops-config.age.generateKey ''
+      if [[ ! -f ${lib.escapeShellArg sops-config.age.keyFile} ]]; then
+        echo "Generating machine-specific age key..."
+        ${pkgs.coreutils}/bin/mkdir -p $(${pkgs.coreutils}/bin/dirname ${lib.escapeShellArg sops-config.age.keyFile})
+        ${pkgs.age}/bin/age-keygen -o ${lib.escapeShellArg sops-config.age.keyFile}
+      fi
+    ''}
+    ${sops-install-secrets}/bin/sops-install-secrets -ignore-passwd ${manifest}
+  '';
+in
 {
   imports = [
     ./ssh.nix
@@ -13,8 +35,6 @@
     # ./battery.nix
     # ./font.nix
     #    ./sops-nix.nix
-    ./sops-nix-bridge.nix
-
   ];
 
   # System Configuration
@@ -116,23 +136,25 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
-      inherit (config) services environment build;
+      inherit (config) services;
       inherit self;
     };
-    config =
-      { config, ... }:
-      {
-        imports = [ ./home-manager.nix ];
-
-        # Pass sops configuration to the top-level
-        nix-on-droid.sops = {
-          secrets = config.sops.secrets;
-          defaultSecretsMountPoint = config.sops.defaultSecretsMountPoint;
-          defaultSymlinkPath = config.sops.defaultSymlinkPath;
-          age = config.sops.age;
-        };
-      };
+    config = import ./home-manager.nix;
   };
+
+  # Build Configuration
+  build.activation.sops-nix = lib.mkIf (sops-config.secrets != { }) ''
+    $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
+    ${script}
+  '';
+
+  environment.packages = lib.mkIf (sops-config.secrets != { }) [
+    (pkgs.writeScriptBin "sops-nix-run" ''
+      #!${pkgs.runtimeShell}
+      echo "Running sops-nix manually..."
+      ${script}
+    '')
+  ];
 
   # Build Configuration
   # build = {

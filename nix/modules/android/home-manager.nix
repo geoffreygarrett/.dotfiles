@@ -21,7 +21,6 @@
     ../shared/home-manager/programs/zellij.nix
     ../shared/home-manager/programs/zsh.nix
     ../shared/secrets.nix
-    #    ./sops-nix.nix
   ];
   programs.bash = {
     enable = true;
