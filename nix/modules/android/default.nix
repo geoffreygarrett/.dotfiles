@@ -51,7 +51,7 @@ let
           fi
         ''
         + ''
-          ${sops-install-secrets}/bin/sops-install-secrets -ignore-passwd ${manifest}
+          ${sops-install-secrets}/bin/sops-install-secrets -ignore-passwd ${manifestFor sops-config.secrets}
         ''
       )
     )
