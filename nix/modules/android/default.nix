@@ -114,8 +114,8 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
-      inherit (config) services;
-      inherit self environment build;
+      inherit (config) services environment build;
+      inherit self;
     };
     config = import ./home-manager.nix;
   };
