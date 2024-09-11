@@ -6,7 +6,7 @@ foreach ($config in $configs) {
   if (-not (Test-Path $config)) {
     Write-Error "Configuration file $config is missing."
     exit 1
-  } else {
+    } else {
     Write-Output "Configuration file $config is set up correctly."
   }
 }

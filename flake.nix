@@ -1,18 +1,5 @@
 {
   description = "General Purpose Configuration for macOS and NixOS";
-  nixConfig = {
-    substituters = [
-      "https://nix-community.cachix.org"
-      "https://cache.nixos.org/"
-      "https://geoffreygarrett.cachix.org"
-    ];
-
-    trusted-public-keys = [
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
-      "geoffreygarrett.cachix.org-1:3WdQXTf/87KGswkvnb7otJxqz03NOmjGMHftGzqiR88="
-    ];
-  };
   inputs = {
     # Core
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -28,11 +15,14 @@
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
+    };
+    linux = {
+      url = "github:numtide/system-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Security
@@ -104,7 +94,7 @@
         let
           envUser = builtins.getEnv "USER";
         in
-        if envUser != "" then envUser else "geoffreygarrett";
+        if envUser != "" then envUser else "geoffrey";
       systems.linux = [
         "aarch64-linux"
         "x86_64-linux"
@@ -115,9 +105,10 @@
       ];
       systems.android = [
         "aarch64-linux"
-        #        "armv7-linux"
-        #        "armv8-linux"
-        "x86_64-linux"
+        # Nix-on-Droid does not support the following systems
+        # "armv7-linux"
+        # "armv8-linux"
+        # "x86_64-linux"
       ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
       lib =
@@ -266,12 +257,29 @@
         system:
         lib.homeManagerConfiguration {
           pkgs = pkgsFor system;
-          modules = [
-            (if lib.isDarwin system then ./nix/modules/darwin/default.nix else ./nix/modules/linux/default.nix)
-            inputs.sops-nix.homeManagerModules.sops
-          ];
+          modules =
+            [
+              inputs.sops-nix.homeManagerModules.sops
+              {
+                nixpkgs.config.allowUnfreePredicate =
+                  pkg:
+                  builtins.elem (lib.getName pkg) [
+                    "nvidia"
+                  ];
+              }
+
+            ]
+            ++ lib.filter (m: m != null) [
+              (if lib.isDarwin system then ./nix/modules/darwin/default.nix else null)
+              (if lib.isLinux system then ./nix/modules/linux/default.nix else null)
+            ];
           extraSpecialArgs = {
-            inherit inputs outputs;
+            inherit
+              self
+              inputs
+              user
+              outputs
+              ;
           };
         }
       );

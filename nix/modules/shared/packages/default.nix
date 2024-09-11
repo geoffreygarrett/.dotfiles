@@ -41,6 +41,9 @@ with pkgs;
   gnupg
   libfido2
 
+  # Nix
+  home-manager
+
   # CC essential
   #      cc-essential = mkPackageSet [
   #        gcc  # or clang, depending on your preference

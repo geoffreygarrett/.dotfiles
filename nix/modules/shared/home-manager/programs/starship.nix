@@ -21,15 +21,14 @@ in
   ) ''eval "$(${starshipInit "bash"})"'';
 
   programs.zsh.initExtra = lib.mkIf (config.programs.zsh.enable && config.programs.starship.enable) ''
-    eval "$(${starshipInit "zsh"})"
     # Workaround for the missing starship_zle-keymap-select function issue.
     # See https://github.com/starship/starship/issues/3418 for more details.
-    type starship_zle-keymap-select >/dev/null || {
-      echo "Loading starship explicitly due to the known issue with zle-keymap-select"
-      eval "$(/usr/local/bin/starship init zsh)"
-    }
-  '';
 
+  '';
+  #    type starship_zle-keymap-select >/dev/null || {
+  #      echo "Loading starship explicitly due to the known issue with zle-keymap-select"
+  #      eval "$(${starshipInit "zsh"})"
+  #    }
   programs.fish.interactiveShellInit = lib.mkIf (
     config.programs.fish.enable && config.programs.starship.enable
   ) "${starshipInit "fish"} | source";

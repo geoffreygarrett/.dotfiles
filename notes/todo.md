@@ -10,3 +10,5 @@
   plugin\]
 
 - \[ \] Add backup to all switches, to force backup any files in the way
+
+- [ ] Key-repeat for ubuntu/linux & NixOS
