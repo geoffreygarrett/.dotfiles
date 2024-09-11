@@ -32,8 +32,6 @@ let
 
 in
 {
-  # Override the default secrets mount point for Nix-on-Droid
-  sops.defaultSecretsMountPoint = mkForce "/data/data/com.termux.nix/files/home/.run/secrets";
 
   # Add the build activation script
   build.activation.sops-nix = ''
