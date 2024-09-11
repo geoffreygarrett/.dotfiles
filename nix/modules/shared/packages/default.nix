@@ -42,4 +42,9 @@ with pkgs;
   age-plugin-yubikey
   gnupg
   libfido2
+
+  # Utility
+  qrcp # Transfer files over wifi by scanning a QR code from your terminal
+  qrtool # Generate QR codes from the command line
+
 ]
