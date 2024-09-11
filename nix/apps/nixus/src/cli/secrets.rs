@@ -78,6 +78,38 @@ fn generate_ssh_key(key_path: &Path) -> Result<(), SopsError> {
     Ok(())
 }
 
+// When decrypting a file with the corresponding identity, SOPS will look for a text file named keys.txt
+// located in a sops subdirectory of your user configuration directory.
+// On Linux, this would be $XDG_CONFIG_HOME/sops/age/keys.txt. If $XDG_CONFIG_HOME is not set $HOME/.config/sops/age/keys.txt is used instead.
+// On macOS, this would be $HOME/Library/Application Support/sops/age/keys.txt.
+// On Windows, this would be %AppData%\sops\age\keys.txt.
+// You can specify the location of this file manually by setting the environment variable SOPS_AGE_KEY_FILE.
+// Alternatively, you can provide the key(s) directly by setting the SOPS_AGE_KEY environment variable.
+// For more information, see: https://github.com/getsops/sops?tab=readme-ov-file#22encrypting-using-age
+
+fn get_age_key_path() -> PathBuf {
+    if let Ok(path) = std::env::var("SOPS_AGE_KEY_FILE") {
+        PathBuf::from(path)
+    } else {
+        let base_path = if cfg!(target_os = "windows") {
+            dirs::data_local_dir().expect("Could not determine AppData directory")
+        } else if cfg!(target_os = "macos") {
+            dirs::home_dir()
+                .expect("Could not determine home directory")
+                .join("Library")
+                .join("Application Support")
+        } else {
+            // Linux and other Unix-like systems
+            dirs::config_dir().unwrap_or_else(|| {
+                dirs::home_dir()
+                    .expect("Could not determine home directory")
+                    .join(".config")
+            })
+        };
+        base_path.join("sops").join("age").join("keys.txt")
+    }
+}
+
 fn generate_or_get_age_key(ssh_key_path: &Path, age_key_path: &Path) -> Result<(String, String), SopsError> {
     // Ensure the directory exists
     if let Some(parent) = age_key_path.parent() {
@@ -175,9 +207,8 @@ pub fn run_secrets(args: SecretsArgs) -> Result<()> {
             let ssh_key_path = ssh_key_path.unwrap_or_else(|| default_ssh_dir.join("id_ed25519"));
             let sops_config_path = config_path.unwrap_or_else(|| PathBuf::from(".sops.yaml"));
 
-            // Define the path for the age key
-            let age_key_dir = home_dir.join(".config").join("sops").join("age");
-            let age_key_path = age_key_dir.join("keys.txt");
+            // Get the correct age key path based on the operating system
+            let age_key_path = get_age_key_path();
 
             generate_ssh_key(&ssh_key_path)?;
 
