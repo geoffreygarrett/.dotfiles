@@ -174,7 +174,7 @@ in
   # Build Configuration
   build.activation.sops-nix = ''
     $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
-    ${config.systemd.user.services.sops-nix.Service.ExecStart}
+    ${script}
   '';
 
   #  environment.packages = lib.mkIf (sops-config.secrets != { }) [
