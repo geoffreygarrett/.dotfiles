@@ -36,8 +36,6 @@
     };
   };
 
-  services.sops-nix.enable = true;
-
   # services.storage = {
   #   enable = true;
   #   showInfoOnStartup = true;
