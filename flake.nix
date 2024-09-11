@@ -73,6 +73,7 @@
       nixpkgs,
       home-manager,
       pre-commit-hooks,
+      sops-nix,
       treefmt-nix,
       nixgl,
       darwin,
