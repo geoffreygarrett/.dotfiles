@@ -23,7 +23,7 @@
     ../shared/secrets.nix
   ];
   # Override the default secrets mount point for Nix-on-Droid
-  sops.defaultSecretsMountPoint = mkForce "/data/data/com.termux.nix/files/home/.run/secrets";
+  sops.defaultSecretsMountPoint = lib.mkForce "/data/data/com.termux.nix/files/home/.run/secrets";
   programs.bash = {
     enable = true;
     shellAliases =
