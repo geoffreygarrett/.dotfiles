@@ -35,9 +35,6 @@ in
   # Override the default secrets mount point for Nix-on-Droid
   sops.defaultSecretsMountPoint = mkForce "/data/data/com.termux.nix/files/home/.run/secrets";
 
-  # Ensure the secrets directory exists
-  home.file.".run/secrets/.keep".text = "";
-
   # Add the build activation script
   build.activation.sops-nix = ''
     $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
