@@ -52,9 +52,9 @@ in
     };
 
     motd = ''
-      ${"\x1b"}[1;36mWelcome to Nix-on-Droid!${"\x1b"}[0m
-      ${"\x1b"}[0;32mCelestial Blueprint: ${"\x1b"}[0;34mhttps://github.com/geoffreygarrett/celestial-blueprint${"\x1b"}[0m
-      ${"\x1b"}[0;35mHappy hacking!${"\x1b"}[0m
+      Welcome to Celestial Blueprint's Nix-on-Droid!
+      Celestial Blueprint: https://github.com/geoffreygarrett/celestial-blueprint
+      Happy hacking!
     '';
   };
 
