@@ -11,20 +11,20 @@ let
   manifest = pkgs.writeTextFile {
     name = "manifest.json";
     text = builtins.toJSON {
-      secrets = builtins.attrValues cfg.secrets;
-      secretsMountPoint = cfg.defaultSecretsMountPoint;
-      symlinkPath = cfg.defaultSymlinkPath;
+      secrets = builtins.attrValues config.sops.secrets;
+      secretsMountPoint = config.sops.defaultSecretsMountPoint;
+      symlinkPath = config.sops.defaultSymlinkPath;
     };
   };
   script = pkgs.writeShellScript "sops-nix-user" ''
-    ${optionalString (cfg.gnupg.home != null) ''
+    ${optionalString (config.sops.gnupg.home != null) ''
       export SOPS_GPG_EXEC=${pkgs.gnupg}/bin/gpg
     ''}
-    ${optionalString cfg.age.generateKey ''
-      if [[ ! -f ${escapeShellArg cfg.age.keyFile} ]]; then
+    ${optionalString config.sops.age.generateKey ''
+      if [[ ! -f ${escapeShellArg config.sops.age.keyFile} ]]; then
         echo "Generating machine-specific age key..."
-        ${pkgs.coreutils}/bin/mkdir -p $(${pkgs.coreutils}/bin/dirname ${escapeShellArg cfg.age.keyFile})
-        ${pkgs.age}/bin/age-keygen -o ${escapeShellArg cfg.age.keyFile}
+        ${pkgs.coreutils}/bin/mkdir -p $(${pkgs.coreutils}/bin/dirname ${escapeShellArg config.sops.age.keyFile})
+        ${pkgs.age}/bin/age-keygen -o ${escapeShellArg config.sops.age.keyFile}
       fi
     ''}
     ${sops-install-secrets}/bin/sops-install-secrets -ignore-passwd ${manifest}
