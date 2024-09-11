@@ -4,6 +4,17 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+--  NOTE: Custom tab settings
+-- Set up 4 spaces for indentation
+vim.opt.expandtab = true -- Use spaces instead of tabs
+vim.opt.tabstop = 4 -- Number of spaces that a tab represents
+vim.opt.shiftwidth = 4 -- Number of spaces to use for autoindent
+vim.opt.softtabstop = 4 -- Number of spaces when hitting <Tab>
+vim.opt.autoindent = true -- Automatically indent the next line
+
+-- Command to convert all tabs to spaces
+vim.cmd([[ command! RetabAll :%retab ]])
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -136,7 +147,8 @@ vim.cmd([[
   nnoremap <C-f> :Neotree float reveal_file=<cfile> reveal_force_cwd<CR>
 ]])
 -- NOTE: Stuff for Copilot (CUSTOM)
-vim.keymap.set("i", "<C-J>", 'copilot#Accept("\\<CR>")', {
+--
+vim.keymap.set("i", "<C-y>", 'copilot#Accept("<CR>")', {
 	expr = true,
 	silent = true,
 	desc = "Accept Copilot suggestion",
@@ -180,11 +192,46 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 
 -- NOTE: Here is where you install your plugins.
-require("lazy").setup({
-    require("plugins.chatgpt"),
+require("lazy").setup({ -- NOTE: lazy_setup
+	require("plugins.browser-bookmarks"),
+	require("plugins.treesitter"),
+	require("plugins.chatgpt"),
+	require("plugins.telescope-undo"),
+	{
+		"epwalsh/obsidian.nvim",
+		version = "*", -- recommended, use latest release instead of latest commit
+		lazy = true,
+		ft = "markdown",
+		-- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+		-- event = {
+		--   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+		--   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
+		--   -- refer to `:h file-pattern` for more examples
+		--   "BufReadPre path/to/my-vault/*.md",
+		--   "BufNewFile path/to/my-vault/*.md",
+		-- },
+		dependencies = {
+			-- Required.
+			"nvim-lua/plenary.nvim",
+		},
+		opts = {
+			workspaces = {
+				{
+					name = "personal",
+					path = "~/vaults/personal",
+				},
+				{
+					name = "work",
+					path = "~/vaults/work",
+				},
+			},
+		},
+	},
+	-- require("plugins.treesitte^
 	-- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
 	"tpope/vim-sleuth", -- Detect tabstop and shiftwidth automatically
 	"folke/zen-mode.nvim", -- Distraction-free coding
+
 	-- NOTE: Plugins can also be added by using a table,
 	-- with the first argument being the link and the following
 	-- keys can be used to configure plugin behavior/loading/etc.
@@ -1163,43 +1210,6 @@ require("lazy").setup({
 			-- ... and there is more!
 			--  Check out: https://github.com/echasnovski/mini.nvim
 		end,
-	},
-	{ -- Highlight, edit, and navigate code
-		"nvim-treesitter/nvim-treesitter",
-		build = ":TSUpdate",
-		main = "nvim-treesitter.configs", -- Sets main module to use for opts
-		-- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-		opts = {
-			ensure_installed = {
-				"bash",
-				"c",
-				"diff",
-				"html",
-				"lua",
-				"luadoc",
-				"markdown",
-				"markdown_inline",
-				"query",
-				"vim",
-				"vimdoc",
-			},
-			-- Autoinstall languages that are not installed
-			auto_install = true,
-			highlight = {
-				enable = true,
-				-- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-				--  If you are experiencing weird indenting issues, add the language to
-				--  the list of additional_vim_regex_highlighting and disabled languages for indent.
-				additional_vim_regex_highlighting = { "ruby" },
-			},
-			indent = { enable = true, disable = { "ruby" } },
-		},
-		-- There are additional nvim-treesitter modules that you can use to interact
-		-- with nvim-treesitter. You should go explore a few and see what interests you:
-		--
-		--    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-		--    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-		--    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
 	},
 
 	-- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the

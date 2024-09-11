@@ -1,17 +1,42 @@
-import = [
-    "~/.config/alacritty/themes/material_deep_ocean.toml"
-]
+# Import additional configuration files
+import = ["~/.config/alacritty/themes/material_deep_ocean.toml"]
+
+# Any items in the `env` entry below will be added as environment variables.
+# Some entries may override variables set by alacritty itself.
+# [env]
+# TERM = "alacritty"
 
 [window]
 dimensions = { columns = 80, lines = 24 }
-padding = { x = 2, y = 2 }
+padding = { x = 10, y = 10 }
 dynamic_padding = false
 decorations = "full"
-opacity = 1.0
+opacity = 0.99
 startup_mode = "Windowed"
 title = "Alacritty"
 dynamic_title = true
-option_as_alt = "Both" # NOTE: Needed for macOS
+option_as_alt = "Both"  # NOTE: Needed for macOS
+
+# Window class (Linux/BSD only):
+# class = { instance = "Alacritty", general = "Alacritty" }
+
+# Window position (changes require restart)
+# position = { x = 0, y = 0 }
+
+# Allow terminal applications to change Alacritty's window title.
+# dynamic_title = true
+
+# Window decorations
+# decorations = "full"
+
+# Background opacity
+# opacity = 1.0
+
+# Startup Mode (changes require restart)
+# startup_mode = "Windowed"
+
+# GTK theme variant (Linux/BSD only)
+# decorations_theme_variant = "None"
 
 [scrolling]
 history = 10000
@@ -26,12 +51,49 @@ size = 12.0
 offset = { x = 0, y = 0 }
 glyph_offset = { x = 0, y = 0 }
 
+# Font configuration
+# normal = { family = "monospace", style = "Regular" }
+# bold = { family = "monospace", style = "Bold" }
+# italic = { family = "monospace", style = "Italic" }
+# bold_italic = { family = "monospace", style = "Bold Italic" }
+
+# Point size
+# size = 11.0
+
+# Offset is the extra space around each character. `offset.y` can be thought of
+# as modifying the line spacing, and `offset.x` as modifying the letter spacing.
+# offset = { x = 0, y = 0 }
+
+# Glyph offset determines the locations of the glyphs within their cells with
+# the default being at the bottom. Increasing `x` moves the glyph to the right,
+# increasing `y` moves the glyph upwards.
+# glyph_offset = { x = 0, y = 0 }
+
+# Use built-in font for box drawing characters.
+# builtin_box_drawing = true
+
 [bell]
 animation = "EaseOutExpo"
 duration = 0
 
+# Visual Bell Animation
+# animation = "Linear"
+
+# Duration of the visual bell flash. A `duration` of `0` will disable the
+# visual bell animation.
+# duration = 0
+
+# Visual bell animation color.
+# color = "#ffffff"
+
+# Command executed when the bell is rung.
+# command = "None"
+
 [selection]
 save_to_clipboard = false
+
+# This string contains all characters that are used as separators for "semantic words" in Alacritty.
+# semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 
 [cursor]
 style = { shape = "Block", blinking = "Off" }
@@ -40,6 +102,28 @@ blink_interval = 750
 unfocused_hollow = true
 thickness = 0.15
 
+# Cursor style
+# style:
+#   shape = "Block"
+#   blinking = "Off"
+
+# Vi mode cursor style
+# vi_mode_style = "None"
+
+# Cursor blinking interval in milliseconds.
+# blink_interval = 750
+
+# Time after which the cursor stops blinking, in seconds.
+# blink_timeout = 5
+
+# If this is `true`, the cursor will be rendered as a hollow box when the
+# window is not focused.
+# unfocused_hollow = true
+
+# Thickness of the cursor relative to the cell width as floating point number
+# from `0.0` to `1.0`.
+# thickness = 0.15
+
 [shell]
 program = "/bin/zsh"
 args = ["--login"]
@@ -47,6 +131,17 @@ args = ["--login"]
 [mouse]
 hide_when_typing = false
 
+# Click settings
+# clicks = { threshold = 300 }
+
+# Scroll settings
+# scroll = { lines = 3, multiplier = 1.0 }
+
+# Mouse bindings
+# [mouse.bindings]
+# { mouse = "Middle", action = "PasteSelection" }
+
+[keyboard]
 [[keyboard.bindings]]
 key = "V"
 mods = "Control|Shift"
@@ -77,8 +172,42 @@ key = "Minus"
 mods = "Control"
 action = "DecreaseFontSize"
 
+# More default bindings here...
+# See alacritty-bindings(5) for default bindings
+
 [debug]
 render_timer = false
 persistent_logging = false
 log_level = "Warn"
 print_events = false
+
+# Highlight window damage information
+# highlight_damage = false
+
+# Log level
+# Possible values are "Off", "Error", "Warn", "Info", "Debug", "Trace"
+# log_level = "Warn"
+
+# Print all received window events.
+# print_events = false
+
+# Display the time it takes to redraw each frame.
+# render_timer = false
+
+# Keep the log file after quitting Alacritty.
+# persistent_logging = false
+
+# Draw the time it takes to redraw each frame.
+# render_timer = false
+
+# Renderer
+# renderer = "None"
+
+# Prefer EGL over GLX when available
+# prefer_egl = false
+
+# [colors]
+# See alacritty-theme for color schemes and configuration options
+
+# [hints]
+# Configuration for hyperlinks and semantic tokens

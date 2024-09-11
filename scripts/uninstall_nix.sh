@@ -31,8 +31,8 @@ log() {
     local level=$1
     local message=$2
     case $level in
-        INFO)  echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] [INFO]${NC} $message" ;;
-        WARN)  echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] [WARN]${NC} $message" ;;
+        INFO) echo -e "${GREEN}[$(date '+%Y-%m-%d %H:%M:%S')] [INFO]${NC} $message" ;;
+        WARN) echo -e "${YELLOW}[$(date '+%Y-%m-%d %H:%M:%S')] [WARN]${NC} $message" ;;
         ERROR) echo -e "${RED}[$(date '+%Y-%m-%d %H:%M:%S')] [ERROR]${NC} $message" ;;
     esac
 }
@@ -47,7 +47,7 @@ check_root() {
 
 # Function to safely remove a file or directory
 safe_remove() {
-    if [[ -e "$1" ]]; then
+    if [[ -e $1 ]]; then
         # shellcheck disable=SC2015
         rm -rf "$1" && log INFO "Removed: $1" || log WARN "Failed to remove: $1"
     fi
@@ -56,10 +56,10 @@ safe_remove() {
 # Function to remove Nix-related lines from a file
 remove_nix_lines() {
     local file="$1"
-    if [[ -f "$file" ]]; then
+    if [[ -f $file ]]; then
         # shellcheck disable=SC2155
         local temp_file=$(mktemp)
-        sed '/^# Nix$/,/^# End Nix$/d' "$file" > "$temp_file"
+        sed '/^# Nix$/,/^# End Nix$/d' "$file" >"$temp_file"
         if ! diff "$file" "$temp_file" >/dev/null 2>&1; then
             mv "$temp_file" "$file"
             log INFO "Removed Nix-related lines from $file"
@@ -83,7 +83,6 @@ remove_fish_config() {
     log INFO "Removed Nix-related Fish shell configurations"
 }
 
-
 # Function to handle backup files
 # Function to handle backup files
 handle_backup() {
@@ -92,7 +91,7 @@ handle_backup() {
     # shellcheck disable=SC2155
     local timestamp=$(date +%Y%m%d%H%M%S)
 
-    if [[ -f "$backup" ]]; then
+    if [[ -f $backup ]]; then
         log INFO "Found existing backup for $file"
 
         # Rename the existing backup
@@ -115,7 +114,6 @@ handle_backup() {
         remove_nix_lines "$file"
     fi
 }
-
 
 # Function to clean up shell configuration files
 clean_shell_configs() {

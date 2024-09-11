@@ -1,0 +1,42 @@
+name: Build Nix-on-Droid Bootstrap
+on:
+  push:
+    branches:
+      - develop # Trigger on pushes to the develop branch
+  workflow_dispatch: # Allow manual triggers
+jobs:
+  build-bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install Nix
+        uses: cachix/install-nix-action@v22
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+      - name: Build bootstrap zip
+        run: |
+          nix build .#bootstrapZip-aarch64 --impure
+          cp result/bootstrap.zip ./nix-on-droid-bootstrap.zip
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: nix-on-droid-bootstrap-${{ github.sha }}
+          release_name: Nix-on-Droid Bootstrap ${{ github.sha }}
+          draft: false
+          prerelease: false
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./nix-on-droid-bootstrap.zip
+          asset_name: nix-on-droid-bootstrap.zip
+          asset_content_type: application/zip
+      - name: Output Download URL
+        run: |
+          echo "Bootstrap zip available at: https://github.com/${{ github.repository }}/releases/download/nix-on-droid-bootstrap-${{ github.sha }}/nix-on-droid-bootstrap.zip"

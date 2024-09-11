@@ -1,11 +1,9 @@
 name: Nix Setup Testing
-
 on:
   push:
-    branches: [ '*' ]
+    branches: ["*"]
   pull_request:
-    branches: [ '*' ]
-
+    branches: ["*"]
 jobs:
   test-unix:
     name: Test on ${{ matrix.os }}
@@ -16,12 +14,10 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Nix
         uses: cachix/install-nix-action@v24
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-
       - name: Debug before setup
         run: |
           echo "HOME: $HOME"
@@ -32,11 +28,9 @@ jobs:
           ls -la $HOME/.nix-profile/etc/profile.d || true
           ls -la /nix/var/nix/profiles/default/etc/profile.d || true
           env | grep NIX
-
       - name: Run setup script
         run: |
           bash -x setup.sh -c
-
       - name: Debug after setup
         run: |
           echo "PATH after setup: $PATH"
@@ -45,7 +39,6 @@ jobs:
           ls -la $HOME/.dotfiles || true
           echo "Environment variables after setup:"
           env | sort
-
       - name: Source Nix environment and run tests
         run: |
           # Source Nix environment
@@ -55,25 +48,23 @@ jobs:
           if [ -e "$HOME/.nix-profile/etc/profile.d/nix.sh" ]; then
             . "$HOME/.nix-profile/etc/profile.d/nix.sh"
           fi
-          
+
           # Add Nix bin directories to PATH
           export PATH="/nix/var/nix/profiles/default/bin:$HOME/.nix-profile/bin:$PATH"
-          
+
           # Debug: Print PATH and Nix version
           echo "PATH before tests: $PATH"
           nix --version
-          
+
           # Run tests
           bash tests/unix/test_install.sh
           bash tests/unix/test_env.sh
           bash tests/unix/test_config.sh
-
   test-windows:
     name: Test on Windows
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install Nix
         uses: cachix/install-nix-action@v24
         with:
@@ -82,7 +73,6 @@ jobs:
           install_options: --no-daemon
           extra_nix_config: |
             experimental-features = nix-command flakes
-
       - name: Debug Nix installation
         shell: pwsh
         run: |
@@ -93,36 +83,32 @@ jobs:
           Get-ChildItem $env:USERPROFILE\.nix-profile\etc\profile.d
           Get-ChildItem C:\nix\var\nix\profiles\default\etc\profile.d
           Get-ChildItem env: | Where-Object { $_.Name -like "NIX*" }
-
       - name: Run setup script
         shell: pwsh
         run: |
           .\setup.ps1 -CI_MODE
-
       - name: Debug after setup
         shell: pwsh
         run: |
           echo "PATH after setup: $env:PATH"
           Get-Command nix
           nix --version
-
       - name: Source Nix environment and run tests
         shell: pwsh
         run: |
           # Source Nix environment
           $env:PATH = "C:\nix\var\nix\profiles\default\bin;$env:USERPROFILE\.nix-profile\bin;$env:PATH"
-          
+
           # Debug: Print PATH and Nix version
           echo "PATH before tests: $env:PATH"
           nix --version
-          
+
           # Run tests
           .\tests\windows\test_install.ps1
           .\tests\windows\test_env.ps1
           .\tests\windows\test_config.ps1
-
   all-tests-passed:
-    needs: [ test-unix, test-windows ]
+    needs: [test-unix, test-windows]
     runs-on: ubuntu-latest
     steps:
       - run: echo "All setup tests passed successfully!"

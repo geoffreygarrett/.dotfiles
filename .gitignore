@@ -1,2 +1,6 @@
 .idea
 .pre-commit-config.yaml
+target/
+result
+result-*
+.direnv

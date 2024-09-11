@@ -6,7 +6,7 @@ foreach ($tool in $tools) {
   if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) {
     Write-Error "$tool is not installed"
     exit 1
-  } else {
+    } else {
     Write-Output "$tool is installed correctly"
   }
 }
