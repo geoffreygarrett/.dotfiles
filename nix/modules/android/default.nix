@@ -13,6 +13,8 @@
     # ./battery.nix
     # ./font.nix
     #    ./sops-nix.nix
+    ./sops-nix-bridge.nix
+
   ];
 
   # System Configuration
@@ -117,7 +119,19 @@
       inherit (config) services environment build;
       inherit self;
     };
-    config = import ./home-manager.nix;
+    config =
+      { config, ... }:
+      {
+        imports = [ ./home-manager.nix ];
+
+        # Pass sops configuration to the top-level
+        nix-on-droid.sops = {
+          secrets = config.sops.secrets;
+          defaultSecretsMountPoint = config.sops.defaultSecretsMountPoint;
+          defaultSymlinkPath = config.sops.defaultSymlinkPath;
+          age = config.sops.age;
+        };
+      };
   };
 
   # Build Configuration
