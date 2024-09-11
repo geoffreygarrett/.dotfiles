@@ -154,6 +154,7 @@
               nix-on-droid
               ;
           };
+          hosts = pkgs.writeShellScriptBin "hosts" (builtins.readFile ./scripts/print_hosts.sh);
         }
       );
 
@@ -176,12 +177,6 @@
             type = "app";
             program = "${nixusApp}/bin/nixus";
           };
-
-          hosts = {
-            type = "app";
-            program = "${./scripts/print_hosts.sh}";
-          };
-
           check = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "run-checks" ''
