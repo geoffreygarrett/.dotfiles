@@ -12,7 +12,7 @@ let
 in
 {
   imports = [
-    "${self}/nix/modules/android"
+    "../../modules/android"
   ];
 
   # User Configuration
@@ -32,7 +32,7 @@ in
 
   # Environment Configuration
   environment = {
-    packages = pkgs.callPackage "${self}/nix/modules/android/packages.nix" { inherit pkgs; };
+    packages = pkgs.callPackage "../../modules/android/packages.nix" { inherit pkgs; };
     etcBackupExtension = ".bak";
 
     # etc = {
