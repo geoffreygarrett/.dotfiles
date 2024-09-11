@@ -34,7 +34,7 @@ let
         } "$out"
       '';
     };
-
+  manifest = manifestFor "" sops-config.secrets;
   escapedAgeKeyFile = lib.escapeShellArg sops-config.age.keyFile;
   script = toString (
     pkgs.writeShellScript "sops-nix-user" (
@@ -51,7 +51,7 @@ let
           fi
         ''
         + ''
-          ${sops-install-secrets}/bin/sops-install-secrets -ignore-passwd ${manifestFor sops-config.secrets}
+          ${sops-install-secrets}/bin/sops-install-secrets -ignore-passwd ${manifest}
         ''
       )
     )
