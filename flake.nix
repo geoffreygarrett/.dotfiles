@@ -127,6 +127,7 @@
               })
             ]
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
+            ++ lib.optional (lib.isAndroid system) sops-nix.overlays.default
             ++ lib.optional (lib.isLinux system) nixgl.overlay;
         };
       treefmtEval = forAllSystems (

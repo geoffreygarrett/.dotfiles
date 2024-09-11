@@ -9,6 +9,7 @@
 {
   imports = [
     ./ssh.nix
+    ./sops-nix.nix
     # ./storage.nix
     # ./battery.nix
     # ./font.nix
@@ -35,6 +36,8 @@
       ssh-keygen = "ssh-keygen -t ed25519";
     };
   };
+
+  services.sops-nix.enable = true;
 
   # services.storage = {
   #   enable = true;
@@ -120,9 +123,9 @@
   };
 
   # Build Configuration
-  #   build = {
-  #     activation = { };
-  #     activationBefore = { };
-  #     activationAfter = { };
-  #   };
+  # build = {
+  #   activation = { };
+  #   activationBefore = { };
+  #   activationAfter = { };
+  # };
 }
