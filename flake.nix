@@ -24,6 +24,7 @@
 
     # Security
     sops-nix = {
+      #      url = "/Users/geoffreygarrett/Repositories/sops-nix";
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };

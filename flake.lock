@@ -547,17 +547,16 @@
         "nixpkgs-stable": "nixpkgs-stable_2"
       },
       "locked": {
+        "dirtyRev": "cede1a08039178ac12957733e97ab1006c6b6892-dirty",
+        "dirtyShortRev": "cede1a0-dirty",
         "lastModified": 1725922448,
-        "narHash": "sha256-ruvh8tlEflRPifs5tlpa0gkttzq4UtgXkJQS7FusgFE=",
-        "owner": "Mic92",
-        "repo": "sops-nix",
-        "rev": "cede1a08039178ac12957733e97ab1006c6b6892",
-        "type": "github"
+        "narHash": "sha256-GZrYioK9446wW03LbELvAQwrXxdYRssiQP45eufvH9U=",
+        "type": "git",
+        "url": "file:///Users/geoffreygarrett/Repositories/sops-nix"
       },
       "original": {
-        "owner": "Mic92",
-        "repo": "sops-nix",
-        "type": "github"
+        "type": "git",
+        "url": "file:///Users/geoffreygarrett/Repositories/sops-nix"
       }
     },
     "systems": {
