@@ -49,6 +49,8 @@ in
       XDG_CONFIG_HOME = "$HOME/.config";
       XDG_DATA_HOME = "$HOME/.local/share";
       XDG_CACHE_HOME = "$HOME/.cache";
+      XDG_RUNTIME_DIR = "$HOME/.run";
+      XDG_RUNTIME_DIR_FALLBACK = "$HOME/.run";
     };
 
     motd = ''
