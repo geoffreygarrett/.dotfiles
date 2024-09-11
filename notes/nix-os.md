@@ -37,3 +37,11 @@ official documentation of Ubuntu and NixOS.
 # Repos
 
 - https://github.com/numtide/system-manager
+
+# Nix-on-Droid
+
+- https://media.ccc.de/v/camp2023-57129-the_nix_phone_and_the_end_of_android
+
+# Robitnix
+
+- https://github.com/nix-community/robotnix?tab=readme-ov-file

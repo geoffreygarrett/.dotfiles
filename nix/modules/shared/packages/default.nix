@@ -28,6 +28,7 @@ with pkgs;
   micromamba
   zig # also needed for cc compiler for lazy in neovim
   difftastic
+  jq
 
   # Security
   gnupg

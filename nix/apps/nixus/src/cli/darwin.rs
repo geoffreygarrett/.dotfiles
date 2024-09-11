@@ -140,11 +140,7 @@ fn switch(
         let stdout = String::from_utf8_lossy(&output.stdout);
         let stderr = String::from_utf8_lossy(&output.stderr);
 
-        return Err(format!(
-            "Switch failed with status {}.\nStdout:\n{}\nStderr:\n{}",
-            output.status, stdout, stderr
-        )
-        .into());
+        return Err(stderr.into());
     }
 
     println!("{}", "Switch to new configuration complete!".green());

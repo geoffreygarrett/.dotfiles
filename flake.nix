@@ -177,6 +177,11 @@
             program = "${nixusApp}/bin/nixus";
           };
 
+          hosts = {
+            type = "app";
+            program = "${./scripts/print_hosts.sh}";
+          };
+
           check = {
             type = "app";
             program = "${pkgs.writeShellScriptBin "run-checks" ''
@@ -228,8 +233,14 @@
           ./nix/hosts/android
           {
             networking.hosts = {
-              "100.78.156.17" = [ "pioneer.home" ];
-              "100.116.122.19" = [ "artemis.home" ];
+              "100.116.122.19" = [ "artemis.tail" ];
+              "100.64.241.11" = [ "crazy-diamond.tail" ];
+              "100.92.233.30" = [ "crazy-phone.tail" ];
+              "100.111.132.9" = [ "dodo-iphone.tail" ];
+              "100.91.33.40" = [ "google-chromecast.tail" ];
+              "100.98.196.120" = [ "nimbus.tail" ];
+              "100.78.156.17" = [ "pioneer.tail" ];
+              "100.112.193.127" = [ "voyager.tail" ];
             };
           }
           {
@@ -244,47 +255,46 @@
       ##############################
       # Home Configuration
       ##############################
-      #      homeConfigurations = {
-      #        "geoffrey@apollo" = lib.homeManagerConfiguration {
-      #          pkgs = pkgsFor "x86_64-linux";
-      #          modules = [
-      ##            ./nix/network.nix
-      #            ./nix/hosts/apollo.nix
-      #            inputs.sops-nix.homeManagerModules.sops
-      #          ];
-      #          extraSpecialArgs = {
-      #            inherit inputs outputs;
-      #          };
-      #        };
-      #        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
-      #          pkgs = pkgsFor "aarch64-darwin";
-      #          modules = [
-      #            ./nix/hosts/artemis.nix
-      #            ./nix/home/artemis.nix
-      #            inputs.sops-nix.homeManagerModules.sops
-      #          ];
-      #          extraSpecialArgs = {
-      #            inherit inputs outputs;
-      #          };
-      #        };
-      #      };
+      homeConfigurations = {
+        "geoffrey@apollo" = lib.homeManagerConfiguration {
+          pkgs = pkgsFor "x86_64-linux";
+          modules = [
+            #            ./nix/network.nix
+            ./nix/hosts/apollo.nix
+            inputs.sops-nix.homeManagerModules.sops
+          ];
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
+        };
+        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
+          pkgs = pkgsFor "aarch64-darwin";
+          modules = [
+            ./nix/hosts/artemis.nix
+            ./nix/home/artemis.nix
+            inputs.sops-nix.homeManagerModules.sops
+          ];
+          extraSpecialArgs = {
+            inherit inputs outputs;
+          };
+        };
+      };
 
       ##############################
       # Checks Configuration
       ##############################
-      #      checks =
-      #        nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
-      #        // forAllSystems (system: {
-      #          pre-commit-check = pre-commit-hooks.lib.${system}.run {
-      #            src = ./.;
-      #            hooks = {
-      #              nixfmt-rfc-style.enable = true;
-      #              beautysh.enable = true;
-      #              rustfmt.enable = true;
-      #              commitizen.enable = true;
-      #            };
-      #          };
-      #        });
+      checks =
+        nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
+        // forAllSystems (system: {
+          pre-commit-check = pre-commit-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              nixfmt-rfc-style.enable = true;
+              beautysh.enable = true;
+              commitizen.enable = true;
+            };
+          };
+        });
 
       ##############################
       # Formatter Configuration
