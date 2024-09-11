@@ -9,7 +9,6 @@
 {
   imports = [
     ./ssh.nix
-    ./sops-nix.nix
     # ./storage.nix
     # ./battery.nix
     # ./font.nix
