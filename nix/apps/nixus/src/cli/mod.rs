@@ -6,10 +6,10 @@ pub mod cachix;
 pub mod darwin;
 pub mod home;
 pub mod nixos;
+pub mod secrets;
 pub mod services;
 pub mod ssh_keys;
 pub mod styles;
-pub mod secrets;
 //
 // #[derive(Subcommand)]
 // pub enum Commands {

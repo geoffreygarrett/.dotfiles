@@ -110,14 +110,20 @@ fn get_age_key_path() -> PathBuf {
     }
 }
 
-fn generate_or_get_age_key(ssh_key_path: &Path, age_key_path: &Path) -> Result<(String, String), SopsError> {
+fn generate_or_get_age_key(
+    ssh_key_path: &Path,
+    age_key_path: &Path,
+) -> Result<(String, String), SopsError> {
     // Ensure the directory exists
     if let Some(parent) = age_key_path.parent() {
         fs::create_dir_all(parent).map_err(|_| SopsError::DirectoryCreation)?;
     }
 
     if age_key_path.exists() {
-        println!("{}", "Age key already exists. Reading existing key...".yellow());
+        println!(
+            "{}",
+            "Age key already exists. Reading existing key...".yellow()
+        );
         let age_key = fs::read_to_string(age_key_path).map_err(|_| SopsError::SopsConfigIO)?;
         let public_key = extract_public_key(&age_key)?;
         return Ok((age_key, public_key));
@@ -156,7 +162,8 @@ fn update_sops_config(config_path: &Path, age_public_key: &str) -> Result<(), So
     let config = if config_path.exists() {
         let mut file = File::open(config_path).map_err(|_| SopsError::SopsConfigIO)?;
         let mut contents = String::new();
-        file.read_to_string(&mut contents).map_err(|_| SopsError::SopsConfigIO)?;
+        file.read_to_string(&mut contents)
+            .map_err(|_| SopsError::SopsConfigIO)?;
         serde_yaml::from_str(&contents).map_err(|_| SopsError::SopsConfigParse)?
     } else {
         SopsConfig {
@@ -181,7 +188,8 @@ fn update_sops_config(config_path: &Path, age_public_key: &str) -> Result<(), So
     }
 
     if updated {
-        let updated_contents = serde_yaml::to_string(&config).map_err(|_| SopsError::SopsConfigParse)?;
+        let updated_contents =
+            serde_yaml::to_string(&config).map_err(|_| SopsError::SopsConfigParse)?;
 
         let mut file = OpenOptions::new()
             .write(true)
@@ -190,10 +198,14 @@ fn update_sops_config(config_path: &Path, age_public_key: &str) -> Result<(), So
             .open(config_path)
             .map_err(|_| SopsError::SopsConfigIO)?;
 
-        file.write_all(updated_contents.as_bytes()).map_err(|_| SopsError::SopsConfigIO)?;
+        file.write_all(updated_contents.as_bytes())
+            .map_err(|_| SopsError::SopsConfigIO)?;
         println!("{}", "SOPS config updated successfully.".green());
     } else {
-        println!("{}", "Age key already exists in SOPS config. No changes made.".yellow());
+        println!(
+            "{}",
+            "Age key already exists in SOPS config. No changes made.".yellow()
+        );
     }
 
     Ok(())
@@ -201,7 +213,10 @@ fn update_sops_config(config_path: &Path, age_public_key: &str) -> Result<(), So
 
 pub fn run_secrets(args: SecretsArgs) -> Result<()> {
     match args.command {
-        SecretsCommands::SyncPublicKeys { ssh_key_path, config_path } => {
+        SecretsCommands::SyncPublicKeys {
+            ssh_key_path,
+            config_path,
+        } => {
             let home_dir = dirs::home_dir().context("Could not determine home directory")?;
             let default_ssh_dir = home_dir.join(".ssh");
             let ssh_key_path = ssh_key_path.unwrap_or_else(|| default_ssh_dir.join("id_ed25519"));
@@ -217,7 +232,11 @@ pub fn run_secrets(args: SecretsArgs) -> Result<()> {
             println!("{} {}", "Age public key:".green(), age_public_key);
 
             update_sops_config(&sops_config_path, &age_public_key)?;
-            println!("{} {:?}", "Updated SOPS config at".green(), sops_config_path);
+            println!(
+                "{} {:?}",
+                "Updated SOPS config at".green(),
+                sops_config_path
+            );
             println!("{} {:?}", "Age private key saved at".green(), age_key_path);
 
             Ok(())

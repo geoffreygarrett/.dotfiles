@@ -9,4 +9,4 @@
 - \[ \] neovim nix module should have a dependency on gh module via gh lua
   plugin\]
 
-- [ ] Add backup to all switches, to force backup any  files in the way
+- \[ \] Add backup to all switches, to force backup any files in the way

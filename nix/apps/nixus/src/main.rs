@@ -148,7 +148,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter_level(cli.log_level)
         .init();
 
-    debug!("Starting Nixus v{} with log level: {:?}", VERSION, cli.log_level);
+    debug!(
+        "Starting Nixus v{} with log level: {:?}",
+        VERSION, cli.log_level
+    );
 
     match cli.command {
         Commands::Completions { shell } => {
