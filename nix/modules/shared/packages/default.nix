@@ -20,7 +20,7 @@ with pkgs;
   opensc
   pkg-config
   wireguard-tools
-  tailscale
+  tailscale # (Reqires root, breaks NixOnDroid), no access to netif's.
   ripgrep # DEPENDANT: Telescope live_grep
 
   # DEVELOPMENT
@@ -34,9 +34,6 @@ with pkgs;
   gnupg
   openssh
 
-  # GUI Secuirty
-  yubikey-manager
-
   # Encryption and security tools
   #  _1password
   age
@@ -44,8 +41,17 @@ with pkgs;
   gnupg
   libfido2
 
+  # CC essential
+  #      cc-essential = mkPackageSet [
+  #        gcc  # or clang, depending on your preference
+  #        binutils  # Provides essential tools like 'ld' (linker)
+  #        gnumake  # Common build tool, often needed alongside gcc
+  #      ];
+
+  gcc
+
   # Utility
-  qrcp # Transfer files over wifi by scanning a QR code from your terminal
+  qrcp # Transfer files over wifi by scanning a QR code from your terminal (Reqires root, breaks NixOnDroid)
   qrtool # Generate QR codes from the command line
 
 ]

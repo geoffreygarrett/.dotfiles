@@ -172,7 +172,6 @@
             type = "app";
             program = "${nixusApp}/bin/nixus";
           };
-
           nixus = {
             type = "app";
             program = "${nixusApp}/bin/nixus";

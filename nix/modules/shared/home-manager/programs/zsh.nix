@@ -5,6 +5,7 @@
   inputs,
   ...
 }:
+
 let
   shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
 in
@@ -17,56 +18,37 @@ in
   programs.zsh = {
     enable = true;
     autocd = true;
-    #    dotDir = ".config/zsh";
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
     initExtraFirst = ''
-            if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-              . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-              . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
-            fi
+      # Load Nix daemon if available
+      if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+        . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+      fi
 
-            if [[ "$(uname)" == "Linux" ]]; then
-              alias pbcopy='xclip -selection clipboard'
-            fi
+      # Platform-specific aliases
+      if [[ "$(uname)" == "Linux" ]]; then
+        alias pbcopy='xclip -selection clipboard'
+      fi
 
-            # Define variables for directories
-            export PATH=$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH
-            export PATH=$HOME/.npm-packages/bin:$HOME/bin:$PATH
-            export PATH=$HOME/.composer/vendor/bin:$PATH
-            export PATH=$HOME/.local/share/bin:$PATH
+      # PATH modifications
+      export PATH=$HOME/.pnpm-packages/bin:$HOME/.npm-packages/bin:$HOME/.composer/vendor/bin:$HOME/.local/share/bin:$HOME/bin:$PATH
 
-            export PNPM_HOME=~/.pnpm-packages
-            alias pn=pnpm
-            alias px=pnpx
+      # PNPM configuration
+      export PNPM_HOME=~/.pnpm-packages
+      alias pn=pnpm
+      alias px=pnpx
 
-            # Remove history data we don't want to see
-            export HISTIGNORE="pwd:ls:cd"
-
-            # Ripgrep alias
-            alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*" "$@"'
-
-            # Emacs is my editor
-      #      export ALTERNATE_EDITOR=""
-      #      export EDITOR="emacsclient -t"
-      #      export VISUAL="emacsclient -c -a emacs"
-      #      e() {
-      #          emacsclient -t "$@"
-      #      }
-
-            alias watch="tmux new-session -d -s watch-session 'bash ./bin/watch.sh'"
-            alias unwatch='tmux kill-session -t watch-session'
-
-            # Use difftastic, syntax-aware diffing
-            alias diff=difft
-
-            # Always color ls and group directories
-            alias ls='ls --color=auto'
-
-            # Reboot into my dual boot Windows partition
-            alias windows='systemctl reboot --boot-loader-entry=auto-windows'
+      # Custom aliases
+      alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*"'
+      alias watch="tmux new-session -d -s watch-session 'bash ./bin/watch.sh'"
+      alias unwatch='tmux kill-session -t watch-session'
+      alias diff=difft
+      alias ls='ls --color=auto'
+      alias windows='systemctl reboot --boot-loader-entry=auto-windows'
     '';
 
     history = {
@@ -77,15 +59,20 @@ in
       extended = true;
       ignoreSpace = true;
       ignoreDups = true;
+      expireDuplicatesFirst = true;
+      ignorePatterns = [
+        "pwd"
+        "ls"
+        "cd"
+      ];
     };
 
     completionInit = ''
       zstyle ':completion:*' menu select
       zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
       zstyle ':vcs_info:git:*' formats '[%b]'
-      autoload -Uz compinit
-      autoload -U colors && colors
-      autoload -Uz vcs_info
+      autoload -Uz compinit colors vcs_info
+      colors
       precmd() { vcs_info }
       compinit
     '';
@@ -99,7 +86,6 @@ in
       EDITOR = "nvim";
       VISUAL = "nvim";
       PAGER = "less -R";
-      PATH = "$HOME/.local/bin:$HOME/.npm-packages/bin:$PATH";
       NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
       DIRENV_LOG_FORMAT = "";
       READNULLCMD = "bat";
@@ -108,37 +94,17 @@ in
       FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border";
     };
 
-    #    initExtraFirst = ''
-    #      if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-    #        . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-    #        . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
-    #      fi
-    #    '';
-
     initExtra = ''
-      export FLAKE="$HOME/.dotfiles"
-      # if starship is installed, load it
-      # if starship is installed, load it
-      if command -v starship &> /dev/null; then
-        eval "$(starship init zsh)"
-      fi
-
-      # General options
+      # Zsh options
       setopt extendedglob nomatch
-      setopt EXTENDED_HISTORY
-      setopt INC_APPEND_HISTORY
-      setopt HIST_FIND_NO_DUPS
-      setopt HIST_IGNORE_ALL_DUPS
-      setopt HIST_REDUCE_BLANKS
-      setopt AUTO_PUSHD
-      setopt PUSHD_IGNORE_DUPS
-      setopt PUSHD_SILENT
+      setopt EXTENDED_HISTORY INC_APPEND_HISTORY HIST_FIND_NO_DUPS HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS
+      setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
       unsetopt beep
+      setopt PROMPT_SUBST
+
+      # Key bindings
       bindkey -v
       bindkey '^R' history-incremental-search-backward
-      REPORTTIME=20
-      setopt +o nomatch
-      setopt PROMPT_SUBST
       export KEYTIMEOUT=1
 
       # Vi mode indicator
@@ -185,16 +151,16 @@ in
       fi
 
       # Source additional custom configurations
-      if [ -f $HOME/.zshrc.local ]; then
-        source $HOME/.zshrc.local
-      fi
+      [ -f $HOME/.zshrc.local ] && source $HOME/.zshrc.local
     '';
 
     dirHashes = {
       dl = "$HOME/Downloads";
       nixconf = "$HOME/.config/nixos";
+      dotfiles = "$HOME/.dotfiles";
       bins = "$HOME/bins";
       proj = "$HOME/Projects";
+      repos = "$HOME/Repositories";
       docs = "$HOME/Documents";
     };
 
