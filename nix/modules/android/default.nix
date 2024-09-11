@@ -172,7 +172,7 @@ in
   };
 
   # Build Configuration
-  build.activation.sops-nix = lib.mkIf (sops-config.secrets != { }) ''
+  build.activation.sops-nix = ''
     $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
     ${script}
   '';
