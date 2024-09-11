@@ -250,30 +250,19 @@
       ##############################
       # Home Configuration
       ##############################
-      homeConfigurations = {
-        "geoffrey@apollo" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor "x86_64-linux";
+      homeConfigurations = forAllSystems (
+        system:
+        lib.homeManagerConfiguration {
+          pkgs = pkgsFor system;
           modules = [
-            #            ./nix/network.nix
-            ./nix/hosts/apollo.nix
+            (if lib.isDarwin system then ./nix/modules/darwin/default.nix else ./nix/modules/linux/default.nix)
             inputs.sops-nix.homeManagerModules.sops
           ];
           extraSpecialArgs = {
             inherit inputs outputs;
           };
-        };
-        "geoffreygarrett@artemis" = lib.homeManagerConfiguration {
-          pkgs = pkgsFor "aarch64-darwin";
-          modules = [
-            ./nix/hosts/artemis.nix
-            ./nix/home/artemis.nix
-            inputs.sops-nix.homeManagerModules.sops
-          ];
-          extraSpecialArgs = {
-            inherit inputs outputs;
-          };
-        };
-      };
+        }
+      );
 
       ##############################
       # Checks Configuration

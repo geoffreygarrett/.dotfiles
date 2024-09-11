@@ -1,0 +1,44 @@
+name: Deploy Nix-on-Droid Bootstrap
+
+on:
+  push:
+    branches:
+      - develop  # Trigger on pushes to the develop branch
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v22
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Build bootstrap zip
+        run: |
+          nix build .#bootstrapZip-aarch64 --impure
+          cp result/bootstrap.zip ./nix-on-droid-bootstrap.zip
+
+      - name: Create or update bootstrap branch
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout -b bootstrap || git checkout bootstrap
+          git rm -rf . || true
+          mv nix-on-droid-bootstrap.zip ./
+          git add nix-on-droid-bootstrap.zip
+          git commit -m "Update Nix-on-Droid bootstrap files"
+          git push -f origin bootstrap
+
+      - name: Upload bootstrap zip as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: nix-on-droid-bootstrap
+          path: nix-on-droid-bootstrap.zip
+
+
+

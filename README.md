@@ -61,6 +61,13 @@ Legend:
   all supported platforms.
 
 ## Installation
+path/to/bootstrap'
+$ nix run .#deploy -- 'github:geoffreygarrett/nix-on-droid/main' 'user@host:/path/to/bootstrap'
+
+```shell 
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+```
+
 
 (Add installation instructions for each supported platform, including standalone Home Manager use)
 

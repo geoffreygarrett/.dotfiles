@@ -3,7 +3,7 @@
 # Ubuntu vs NixOS Comparison
 
 | Task/Concept                      | Ubuntu                                                                                | NixOS (system-wide)                                                         | NixOS (user) / Nix in general                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+|-----------------------------------|---------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|------------------------------------------------------------------|
 | Package Manager                   | apt (running on top of dpkg)                                                          | nix (with nixos packages for system-wide operations)                        | nix                                                              |
 | Who can install packages          | Only root can install packages (system-wide)                                          | Root installs system-wide packages through /etc/nixos/configuration.nix     | Users can install their own packages and have their own profiles |
 | Package installation location     | Globally in /bin/, /usr/, etc.                                                        | System-wide: /run/current-system/sw/ and /nix/var/nix/profiles/default/bin/ | User packages: ~/.nix-profile/                                   |
