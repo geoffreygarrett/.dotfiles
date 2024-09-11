@@ -115,7 +115,7 @@
     useUserPackages = true;
     extraSpecialArgs = {
       inherit (config) services;
-      inherit self;
+      inherit self environment build;
     };
     config = import ./home-manager.nix;
   };
