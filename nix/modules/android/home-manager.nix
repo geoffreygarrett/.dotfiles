@@ -23,7 +23,6 @@
     ../shared/secrets.nix
     ./sops-nix.nix
   ];
-  services.sops-nix.enable = true;
   programs.bash = {
     enable = true;
     shellAliases =
