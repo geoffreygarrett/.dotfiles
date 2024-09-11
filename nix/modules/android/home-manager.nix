@@ -21,9 +21,8 @@
     ../shared/home-manager/programs/zellij.nix
     ../shared/home-manager/programs/zsh.nix
     ../shared/secrets.nix
+    ./sops-nix.nix
   ];
-  # Override the default secrets mount point for Nix-on-Droid
-  sops.defaultSecretsMountPoint = lib.mkForce "/data/data/com.termux.nix/files/home/.run/secrets";
   programs.bash = {
     enable = true;
     shellAliases =
@@ -38,8 +37,6 @@
       }
       // sshAliases;
   };
-  # Ensure the secrets directory exists
-  home.file.".run/secrets/.keep".text = "";
   home.packages = with pkgs; [
     fortune
     lolcat

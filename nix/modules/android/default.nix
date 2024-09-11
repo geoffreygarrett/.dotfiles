@@ -12,7 +12,7 @@
     # ./storage.nix
     # ./battery.nix
     # ./font.nix
-    ./sops-nix.nix
+    #    ./sops-nix.nix
   ];
 
   # System Configuration
