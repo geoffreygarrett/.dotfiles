@@ -77,7 +77,7 @@ in
       compinit
     '';
 
-    shellAliases = shellAliasesConfig.shellAliases.zsh;
+    #    shellAliases = shellAliasesConfig.shellAliases.zsh;
 
     sessionVariables = {
       FLAKE = "$HOME/.dotfiles";

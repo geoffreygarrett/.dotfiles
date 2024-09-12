@@ -7,7 +7,8 @@
 }:
 
 {
-  aliases = {
+  aliases.enable = true;
+  aliases.aliases = {
     # File and Directory Operations
     ls = {
       command = "${pkgs.eza}/bin/eza --icons --group-directories-first";
@@ -275,19 +276,20 @@
     };
 
     localip = {
-      command = ''
+      command = "${pkgs.writeShellScriptBin "localip-script" ''
+        #!/usr/bin/env bash
         if [[ "$(uname)" == "Darwin" ]]; then
             ifconfig | grep "inet " | grep -v 127.0.0.1 | cut -d\  -f2
         elif [[ -x "$(command -v hostname)" && "$(hostnamectl | grep "Operating System")" == *"Ubuntu"* ]]; then
-            hostname -i | awk "{print \$3}"
+            hostname -i | awk '{print $3}'
         elif [[ -x "$(command -v hostname)" && "$(hostnamectl | grep "Operating System")" == *"Debian"* ]]; then
             hostname -i
         elif [[ -x "/sbin/ifconfig" ]]; then
-            /sbin/ifconfig eth0 | grep "inet addr" | cut -d: -f2 | awk "{print \$1}"
+            /sbin/ifconfig eth0 | grep "inet addr" | cut -d: -f2 | awk '{print $1}'
         else
             echo "Unable to determine local IP"
         fi
-      '';
+      ''}/bin/localip-script";
       description = "Show local IP address";
       tags = [
         "network"
@@ -392,26 +394,31 @@
     };
 
     delete-images = {
-      command = ''
-        f() {
-          delete_image() {
-            if rm -i "$1"; then
-              echo "Deleted: $1"
-            else
-              echo "Deletion cancelled for: $1"
-            fi
-          }
-          export -f delete_image
-          fd --extension jpg --extension png --base-directory "$1" | \
-          fzf --preview "${pkgs.viu}/bin/viu --width 80 \"$1/{}\""  \
-              --preview-window=right:81:wrap \
-              --bind "enter:execute(delete_image \"$1/{}\")+reload(fd --extension jpg --extension png --base-directory \"{}\")"
-        }; f
-      '';
-      description = "Delete images interactively.";
+      command = "${pkgs.writeShellScriptBin "delete-images-script" ''
+        #!/usr/bin/env bash
+        delete_image() {
+          if rm -i "$1"; then
+            echo "Deleted: $1"
+          else
+            echo "Deletion cancelled for: $1"
+          fi
+        }
+        export -f delete_image
+
+        if [ $# -eq 0 ]; then
+          echo "Please provide a directory path as an argument."
+          exit 1
+        fi
+
+        ${pkgs.fd}/bin/fd --extension jpg --extension png --base-directory "$1" | \
+        ${pkgs.fzf}/bin/fzf --preview "${pkgs.viu}/bin/viu --width 80 \"$1/{}\""  \
+          --preview-window=right:81:wrap \
+          --bind "enter:execute(delete_image \"$1/{}\")+reload(${pkgs.fd}/bin/fd --extension jpg --extension png --base-directory \"$1\")"
+      ''}/bin/delete-images-script";
+      description = "Interactive image deletion using fzf and viu";
       tags = [
-        "image"
-        "delete"
+        "utilities"
+        "images"
         "zsh"
         "bash"
       ];

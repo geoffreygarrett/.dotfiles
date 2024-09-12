@@ -56,7 +56,12 @@ let
     })
     (mkAlias "ls" "eza" "--icons --group-directories-first"
       "List directory contents with icons and directories first."
-      shells
+      {
+        zsh = true;
+        nu = true;
+        bash = true;
+        fish = false;
+      }
     )
     (mkAlias "ll" "eza" "-alF --icons --group-directories-first" "List all files with detailed view."
       shells

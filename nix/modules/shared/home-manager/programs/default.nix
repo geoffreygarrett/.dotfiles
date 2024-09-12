@@ -6,7 +6,6 @@
   ...
 }:
 let
-  # Helper function to import modules with arguments
   importModule =
     file:
     import file {
@@ -19,17 +18,16 @@ let
     };
 in
 {
-  # Import modules that each manage their own program configurations
   imports = [
     (importModule ./alacritty.nix)
     (importModule ./zellij.nix)
     (importModule ./git.nix)
     (importModule ./gh.nix)
     (importModule ./zsh.nix)
+    (importModule ./bash.nix)
     (importModule ./nushell.nix)
     (importModule ./nvim.nix)
     (importModule ./starship.nix)
     (importModule ./htop.nix)
-    #    (importModule ./qemu.nix)
   ];
 }

@@ -15,12 +15,6 @@ in
              show_banner: false,
       };
     '';
-
-    #    configFile.source = ../../dotfiles/nushell/config.nu;
-    #    envFile.source = ../../dotfiles/nushell/env.nu;
   };
-  #  home.packages = with pkgs; [
-  #   cargo
-  #  ];
-  programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
+  #  programs.nushell.shellAliases = shellAliasesConfig.shellAliases.nu;
 }

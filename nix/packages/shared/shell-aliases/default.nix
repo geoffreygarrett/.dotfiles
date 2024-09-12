@@ -17,94 +17,92 @@ let
 
   mkCompletion =
     name: command: shell:
-    if shell == "zsh" then
-      ''
+    let
+      commonSedCommand = "sed 's/^  *\\([a-z0-9-]*\\).*/\\1/' | grep '^[a-z0-9-]'";
+      helpCommand = "${command} --help 2>&1 | ${commonSedCommand}";
+    in
+    {
+      zsh = ''
         compdef _${name} ${name}
         function _${name} {
-          _arguments "1: :($(${command} --help 2>&1 | sed 's/^  *\([a-z0-9-]*\).*/\1/' | grep '^[a-z0-9-]'))"
+          _arguments "1: :($(${helpCommand}))"
         }
-      ''
-    else if shell == "bash" then
-      ''
+      '';
+      bash = ''
         _${name}() {
-          COMPREPLY=($(compgen -W "$(${command} --help 2>&1 | sed 's/^  *\([a-z0-9-]*\).*/\1/' | grep '^[a-z0-9-]')" -- "''${COMP_WORDS[COMP_CWORD]}"))
+          COMPREPLY=($(compgen -W "$(${helpCommand})" -- "''${COMP_WORDS[COMP_CWORD]}"))
         }
         complete -F _${name} ${name}
-      ''
-    else if shell == "fish" then
-      ''
-        complete -c ${name} -a "(${command} --help 2>&1 | sed 's/^  *\([a-z0-9-]*\).*/\1/' | grep '^[a-z0-9-]')"
-      ''
-    else if shell == "nu" then
-      ''
+      '';
+      fish = "complete -c ${name} -a \"(${helpCommand})\"";
+      nu = ''
         def "${name}_completer" [] {
-          ${command} --help 2>&1 | lines | find '  -' | str replace '  -' '-' | str replace -r ' .*' \'\'
+          ${helpCommand} | str replace -r ' .*' ''\''
         }
         def ${name} [...args: string@${name}_completer] {
           ${command} $args
         }
-      ''
-    else
-      "";
+      '';
+    }
+    .${shell} or "";
 
-  mkAliasConfig =
+  processAlias =
     name: def: shell:
     let
-      relevantTags = filter (tag: !(elem tag shellTypes)) def.tags;
-      tagString = optionalString (relevantTags != [ ]) " # Tags: ${concatStringsSep ", " relevantTags}";
-      aliasCommand = "${def.command}${tagString}";
+      isApplicable = isString def || (def ? command && (elem shell def.tags || def.tags == [ ]));
+      command = if isString def then def else def.command;
+      relevantTags = filter (tag: !(elem tag shellTypes)) (if isString def then [ ] else def.tags);
+      tagString =
+        if shell == "zsh" then
+          ""
+        else
+          optionalString (relevantTags != [ ]) " # Tags: ${concatStringsSep ", " relevantTags}";
     in
-    if (elem shell def.tags || def.tags == [ ]) then
-      if shell == "nu" then
-        {
-          alias = "use ${name} = ${aliasCommand}";
-          completion = mkCompletion name def.command shell;
-        }
-      else
-        {
-          alias = "alias ${name}='${aliasCommand}'";
-          completion = mkCompletion name def.command shell;
-        }
+    if isApplicable then
+      {
+        alias = nameValuePair name "${command}${tagString}";
+        completion = mkCompletion name command shell;
+      }
     else
       null;
 
   generateShellConfig =
     shell:
     let
-      aliasConfigs = mapAttrsToList (name: def: mkAliasConfig name def shell) config.aliases.aliases;
-      filteredConfigs = filter (x: x != null) aliasConfigs;
+      processedAliases = mapAttrsToList (name: def: processAlias name def shell) config.aliases.aliases;
+      validAliases = filter (x: x != null) processedAliases;
     in
     {
-      aliases = concatMapStringsSep "\n" (config: config.alias) filteredConfigs;
-      completions = concatMapStringsSep "\n" (config: config.completion) filteredConfigs;
+      aliases = listToAttrs (map (x: x.alias) validAliases);
+      completions = concatMapStringsSep "\n" (x: x.completion) validAliases;
     };
 
+  aliasType = types.either types.str (
+    types.submodule {
+      options = {
+        command = mkOption {
+          type = types.str;
+          description = "The command to be aliased.";
+        };
+        description = mkOption {
+          type = types.nullOr types.str;
+          default = null;
+          description = "Optional description of the alias.";
+        };
+        tags = mkOption {
+          type = types.listOf types.str;
+          default = [ ];
+          description = "List of tags for organization and shell specification.";
+        };
+      };
+    }
+  );
 in
 {
   options.aliases = {
     enable = mkEnableOption "shell aliases";
-
     aliases = mkOption {
-      type = types.attrsOf (
-        types.submodule {
-          options = {
-            command = mkOption {
-              type = types.str;
-              description = "The command to be aliased.";
-            };
-            description = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-              description = "Optional description of the alias.";
-            };
-            tags = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              description = "List of tags for organization and shell specification.";
-            };
-          };
-        }
-      );
+      type = types.attrsOf aliasType;
       default = { };
       description = "Attribute set of shell aliases with commands, optional descriptions, and tags.";
     };
@@ -114,41 +112,23 @@ in
     let
       shellConfigs = genAttrs shellTypes generateShellConfig;
     in
-    mkMerge [
+    mkMerge ([
       (mkIf (config.programs.bash.enable or false) {
-        programs.bash.initExtra = mkDefault ''
-          # Aliases
-          ${shellConfigs.bash.aliases}
-
-          # Completions
-          ${shellConfigs.bash.completions}
-        '';
+        programs.bash.shellAliases = shellConfigs.bash.aliases;
       })
       (mkIf (config.programs.zsh.enable or false) {
-        programs.zsh.initExtra = mkDefault ''
-          # Aliases
-          ${shellConfigs.zsh.aliases}
-
-          # Completions
-          ${shellConfigs.zsh.completions}
-        '';
+        programs.zsh.shellAliases = shellConfigs.zsh.aliases;
       })
       (mkIf (config.programs.fish.enable or false) {
-        programs.fish.interactiveShellInit = mkDefault ''
-          # Aliases
-          ${shellConfigs.fish.aliases}
-
-          # Completions
-          ${shellConfigs.fish.completions}
-        '';
+        programs.fish.shellAliases = shellConfigs.fish.aliases;
       })
       (mkIf (config.programs.nushell.enable or false) {
-        programs.nushell.extraConfig = mkDefault ''
-          # Aliases and Completions
-          ${shellConfigs.nu.completions}
-          ${shellConfigs.nu.aliases}
-        '';
+        programs.nushell.shellAliases = shellConfigs.nu.aliases;
       })
     ]
+    #    ++optional config.aliases.enable {
+    ##      environment.interactiveShellInit = concatStringsSep "\n" (mapAttrsToList (shell: cfg: cfg.completions) shellConfigs);
+    ##    }
+    )
   );
 }

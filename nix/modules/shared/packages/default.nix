@@ -15,7 +15,6 @@ with pkgs;
   opensc
   pkg-config
   wireguard-tools
-  tailscale # (Reqires root, breaks NixOnDroid), no access to netif's.
   ripgrep # DEPENDANT: Telescope live_grep
 
   # DEVELOPMENT
