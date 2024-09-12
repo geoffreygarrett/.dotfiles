@@ -58,7 +58,10 @@ let
   );
 in
 {
-  imports = [ ./config/ssh.nix ];
+  imports = [
+    ./config/ssh.nix
+    ../shared/aliases.nix
+  ];
 
   # System Configuration
   system.stateVersion = "24.05";

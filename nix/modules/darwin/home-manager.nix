@@ -11,7 +11,10 @@
 {
   home-manager = {
     useGlobalPkgs = true;
-    sharedModules = [ inputs.sops-nix.homeManagerModules.sops ];
+    sharedModules = [
+      inputs.sops-nix.homeManagerModules.sops
+      ../../packages/shared/shell-aliases
+    ];
     users.${user} =
       {
         self,
@@ -22,6 +25,7 @@
       }:
       {
         imports = [
+          #          ../shared/aliases.nix
           ../shared/secrets.nix
           ../shared/home-manager/programs
         ];

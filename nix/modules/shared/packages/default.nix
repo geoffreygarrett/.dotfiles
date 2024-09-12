@@ -2,12 +2,9 @@
 with pkgs;
 [
   (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  sops
+
   fastfetch
   nixus
-
-  # SECRETS
-  age
 
   # RUST-SCRIPT
   #  libiconv
@@ -37,6 +34,7 @@ with pkgs;
   # Encryption and security tools
   #  _1password
   age
+  sops
   age-plugin-yubikey
   gnupg
   libfido2

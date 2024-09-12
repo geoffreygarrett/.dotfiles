@@ -14,12 +14,8 @@
 
 ## Introduction
 
-Nixus Device System is a cross-platform terminal setup project aimed at
-providing a consistent and powerful environment across various devices and
-operating systems. By leveraging Nix and related technologies, we offer
-system-level integration, secret management, VPN solutions, and more for a
-seamless experience across desktop and mobile platforms, as well as standalone
-Home Manager configurations.
+My personal setup for what I envisioned something "cross-platform and
+consistent" to be.
 
 ## Supported Platforms and Frameworks
 

@@ -5,8 +5,8 @@ let
 in
 shared-packages
 ++ [
-  fswatch
-  dockutil
+  #  fswatch
+  #  dockutil
   #  swift
   #  iconv
   #  libiconv
