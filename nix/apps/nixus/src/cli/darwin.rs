@@ -166,7 +166,8 @@ fn switch(
         error_output
     });
 
-    let status = child.wait()
+    let status = child
+        .wait()
         .map_err(|e| format!("Failed to wait for switch command: {}", e))?;
 
     stdout_thread.join().expect("Failed to join stdout thread");

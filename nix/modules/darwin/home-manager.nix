@@ -32,14 +32,14 @@
 
           # https://github.com/NixOS/nixpkgs/issues/206242
           # https://github.com/nix-community/home-manager/issues/3482
-          sessionVariables = {
-            LIBRARY_PATH =
-              lib.makeLibraryPath [
-                pkgs.libiconv
-                pkgs.iconv
-              ]
-              + ''${config.environment.sessionVariables.LIBRARY_PATH or ""}:$LIBRARY_PATH'';
-          };
+          #          sessionVariables = {
+          #            LIBRARY_PATH =
+          #              lib.makeLibraryPath [
+          #                pkgs.libiconv
+          #                pkgs.iconv
+          #              ]
+          #              + ''${config.environment.sessionVariables.LIBRARY_PATH or ""}:$LIBRARY_PATH'';
+          #          };
 
           #          sessionVariables = {
           #            EDITOR = "nvim";
@@ -56,10 +56,10 @@
           #            LESS_TERMCAP_ue = "\e[0m";
           #            LESS_TERMCAP_us = "\e[1;32m";
           #          };
-          #          sessionPath = [
-          #              "$HOME/.cargo/bin"
-          #                "$HOME/.local/bin"
-          #            ];
+          #                    sessionPath = [
+          #                        "$HOME/.cargo/bin"
+          #                          "$HOME/.local/bin"
+          #                      ];
         };
       };
     extraSpecialArgs = {

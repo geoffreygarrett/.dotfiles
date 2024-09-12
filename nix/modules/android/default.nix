@@ -58,13 +58,7 @@ let
   );
 in
 {
-  imports = [
-    ./ssh.nix
-    # ./storage.nix
-    # ./battery.nix
-    # ./font.nix
-    #    ./sops-nix.nix
-  ];
+  imports = [ ./config/ssh.nix ];
 
   # System Configuration
   system.stateVersion = "24.05";

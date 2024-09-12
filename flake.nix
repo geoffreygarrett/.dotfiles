@@ -126,21 +126,9 @@
           inherit system;
           overlays =
             [
-              (import rust-overlay)
               (final: prev: {
                 nix-on-droid = nix-on-droid.packages.${system};
                 nixus = self.packages.${system}.nixus;
-                gptcommit = final.callPackage ./nix/packages/gptcommit.nix {
-                  inherit (final)
-                    lib
-                    rustPlatform
-                    fetchFromGitHub
-                    openssl
-                    pkg-config
-                    stdenv
-                    ;
-                  inherit (final.darwin) apple_sdk;
-                };
               })
             ]
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
@@ -272,14 +260,6 @@
           modules =
             [
               inputs.sops-nix.homeManagerModules.sops
-              {
-                nixpkgs.config.allowUnfreePredicate =
-                  pkg:
-                  builtins.elem (lib.getName pkg) [
-                    "nvidia"
-                  ];
-              }
-
             ]
             ++ lib.filter (m: m != null) [
               (if lib.isDarwin system then ./nix/modules/darwin/default.nix else null)

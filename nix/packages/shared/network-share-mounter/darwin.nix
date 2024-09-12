@@ -48,11 +48,9 @@ let
         KeepAlive = false;
       };
     };
-
 in
 {
   imports = [ common ];
-
   config = mkIf cfg.enable {
     environment.systemPackages = [ pkgs.osxfuse ];
     launchd.user.agents = listToAttrs (map mkLaunchdAgent cfg.mounts);

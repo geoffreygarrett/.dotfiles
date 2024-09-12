@@ -10,6 +10,7 @@ with pkgs;
   age
 
   # RUST-SCRIPT
+  #  libiconv
   rustup
   rust-script
   pcsclite
@@ -24,8 +25,10 @@ with pkgs;
   lazygit
   micromamba
   zig # also needed for cc compiler for lazy in neovim
+  git
   difftastic
   jq
+  #  gptcommit
 
   # Security
   gnupg

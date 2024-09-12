@@ -6,11 +6,11 @@
   inputs,
   ...
 }:
-
 {
   imports = [
     ./home-manager.nix
-    #    ./dock
+    #    ./config/dock.nix
+    #    ./dock.nix
   ];
 
   # System-wide Darwin configuration.
@@ -18,6 +18,24 @@
     stateVersion = 4;
 
     defaults = {
+      CustomUserPreferences = {
+        "com.apple.symbolichotkeys" = {
+          AppleSymbolicHotKeys = {
+            "118" = {
+              enabled = true;
+              value = {
+                parameters = [
+                  65535
+                  18
+                  262144
+                ];
+                type = "standard";
+              };
+            };
+          };
+        };
+      };
+
       LaunchServices.LSQuarantine = false;
 
       NSGlobalDomain = {

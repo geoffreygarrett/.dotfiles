@@ -1,9 +1,10 @@
+use std::env;
 use std::ffi::OsStr;
 use std::io::{BufRead, Error, ErrorKind, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitStatus, Output, Stdio};
 
-use log::{debug, error, info, trace};
+use log::{debug, error, info, trace, warn};
 
 pub struct CheckedCommand {
     inner: Command,
@@ -375,3 +376,21 @@ pub fn get_sops_secret(file: &str, key_path: &str) -> Result<String, String> {
 //         Err(error)
 //     }
 // }
+
+pub fn get_username() -> String {
+    env::var("USER")
+        .or_else(|_| env::var("USERNAME"))
+        .unwrap_or_else(|_| {
+            warn!("Failed to get username from environment variables");
+            "unknown_user".to_string()
+        })
+}
+
+pub fn get_hostname() -> String {
+    hostname::get()
+        .map(|h| h.to_string_lossy().into_owned())
+        .unwrap_or_else(|e| {
+            warn!("Failed to get hostname: {}", e);
+            "unknown_host".to_string()
+        })
+}

@@ -37,8 +37,9 @@ pub enum SshKeysCommand {
 pub fn run_ssh_keys(args: SshKeysArgs) -> Result<(), String> {
     match args.command {
         SshKeysCommand::Sync { path } => {
-            let manager = SshKeyManager::new(path)?;
-            manager.sync()
+            // let manager = SshKeyManager::new(path)?;
+            // manager.sync()
+            Ok(())
         }
         SshKeysCommand::Generate { name, description } => {
             let manager = SshKeyManager::new(None)?;

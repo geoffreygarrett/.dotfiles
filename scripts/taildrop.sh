@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuration
-NEW_TAILDROP_PATH="/path/to/your/new/location"
+NEW_TAILDROP_PATH="~/Taildrop"
 BACKUP_SUFFIX=".bak-$(date +%Y%m%d%H%M%S)"
 
 # Detect OS and set default Taildrop path

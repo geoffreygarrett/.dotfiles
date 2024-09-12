@@ -4,10 +4,11 @@ use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
-use chrono::{DateTime, Local};
+// use chrono::{DateTime, Local};
 use colored::Colorize;
 use log::{debug, error, info, trace, warn};
 
+use crate::utils;
 use crate::utils::{
     ask_for_confirmation, find_sops_file, get_custom_locations, is_git_repo, CheckedCommand,
 };
@@ -32,43 +33,43 @@ impl SshKeyManager {
         Ok(Self { ssh_dir, sops_file })
     }
 
-    pub(crate) fn sync(&self) -> Result<(), String> {
-        info!("Starting SSH key sync");
-        debug!("Using SSH directory: {:?}", self.ssh_dir);
-        debug!("Using SOPS file: {:?}", self.sops_file);
-
-        let sops_keys = self.read_sops_keys()?;
-        let local_keys = self.read_local_keys()?;
-
-        debug!("SOPS keys count: {}", sops_keys.len());
-        debug!("Local keys count: {}", local_keys.len());
-
-        if sops_keys.is_empty() && !local_keys.is_empty() {
-            info!("SOPS file is empty. Updating SOPS with local keys.");
-            return self.write_sops_keys(&local_keys);
-        }
-
-        if sops_keys == local_keys {
-            info!("No changes detected. Keys are in sync.");
-            return Ok(());
-        }
-
-        info!("Differences detected between local keys and SOPS secrets.");
-
-        let local_modified = self.get_local_keys_last_modified()?;
-        let sops_modified = self.get_last_modified(&self.sops_file)?;
-        info!("Local keys last modified: {}", local_modified);
-        info!("SOPS secrets last modified: {}", sops_modified);
-
-        if ask_for_confirmation("Do you want to overwrite local keys with SOPS secrets?") {
-            self.update_local_keys(&sops_keys)?;
-            info!("Local keys updated successfully.");
-        } else {
-            info!("Sync cancelled. No changes made.");
-        }
-
-        Ok(())
-    }
+    // pub(crate) fn sync(&self) -> Result<(), String> {
+    //     info!("Starting SSH key sync");
+    //     debug!("Using SSH directory: {:?}", self.ssh_dir);
+    //     debug!("Using SOPS file: {:?}", self.sops_file);
+    //
+    //     let sops_keys = self.read_sops_keys()?;
+    //     let local_keys = self.read_local_keys()?;
+    //
+    //     debug!("SOPS keys count: {}", sops_keys.len());
+    //     debug!("Local keys count: {}", local_keys.len());
+    //
+    //     if sops_keys.is_empty() && !local_keys.is_empty() {
+    //         info!("SOPS file is empty. Updating SOPS with local keys.");
+    //         return self.write_sops_keys(&local_keys);
+    //     }
+    //
+    //     if sops_keys == local_keys {
+    //         info!("No changes detected. Keys are in sync.");
+    //         return Ok(());
+    //     }
+    //
+    //     info!("Differences detected between local keys and SOPS secrets.");
+    //
+    //     // let local_modified = self.get_local_keys_last_modified()?;
+    //     let sops_modified = self.get_last_modified(&self.sops_file)?;
+    //     info!("Local keys last modified: {}", local_modified);
+    //     info!("SOPS secrets last modified: {}", sops_modified);
+    //
+    //     if ask_for_confirmation("Do you want to overwrite local keys with SOPS secrets?") {
+    //         self.update_local_keys(&sops_keys)?;
+    //         info!("Local keys updated successfully.");
+    //     } else {
+    //         info!("Sync cancelled. No changes made.");
+    //     }
+    //
+    //     Ok(())
+    // }
 
     pub(crate) fn generate(&self, name: &str, description: Option<&str>) -> Result<(), String> {
         info!("Generating new SSH key: {}", name);
@@ -84,12 +85,8 @@ impl SshKeyManager {
             }
         }
 
-        let username = whoami::username();
-        let hostname = whoami::fallible::hostname().unwrap_or_else(|e| {
-            warn!("Failed to get hostname: {}", e);
-            "unknown_host".to_string()
-        });
-
+        let username = utils::get_username();
+        let hostname = utils::get_hostname();
         let identifier = format!("{}@{}", username, hostname);
         debug!("Using identifier: {}", identifier);
 
@@ -387,40 +384,40 @@ impl SshKeyManager {
         Ok(())
     }
 
-    fn get_last_modified(&self, path: &Path) -> Result<String, String> {
-        trace!("Getting last modified time for: {:?}", path);
-        let metadata = fs::metadata(path)
-            .map_err(|e| format!("Failed to get metadata for {}: {}", path.display(), e))?;
+    // fn get_last_modified(&self, path: &Path) -> Result<String, String> {
+    //     trace!("Getting last modified time for: {:?}", path);
+    //     let metadata = fs::metadata(path)
+    //         .map_err(|e| format!("Failed to get metadata for {}: {}", path.display(), e))?;
+    //
+    //     let modified: DateTime<Local> = metadata
+    //         .modified()
+    //         .map_err(|e| format!("Failed to get modification time: {}", e))?
+    //         .into();
+    //
+    //     Ok(modified.format("%Y-%m-%d %H:%M:%S %z").to_string())
+    // }
 
-        let modified: DateTime<Local> = metadata
-            .modified()
-            .map_err(|e| format!("Failed to get modification time: {}", e))?
-            .into();
-
-        Ok(modified.format("%Y-%m-%d %H:%M:%S %z").to_string())
-    }
-
-    fn get_local_keys_last_modified(&self) -> Result<String, String> {
-        let mut latest_modified: Option<DateTime<Local>> = None;
-
-        for entry in fs::read_dir(&self.ssh_dir)
-            .map_err(|e| format!("Failed to read SSH directory: {}", e))?
-        {
-            let entry = entry.map_err(|e| format!("Failed to read directory entry: {}", e))?;
-            let path = entry.path();
-            if path.extension().and_then(|s| s.to_str()) == Some("pub") {
-                let modified = self.get_last_modified(&path)?;
-                let modified_date = DateTime::parse_from_str(&modified, "%Y-%m-%d %H:%M:%S %z")
-                    .map_err(|e| format!("Failed to parse date: {}", e))?
-                    .with_timezone(&Local);
-                if latest_modified.is_none() || modified_date > latest_modified.unwrap() {
-                    latest_modified = Some(modified_date);
-                }
-            }
-        }
-
-        latest_modified
-            .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
-            .ok_or_else(|| "No public keys found in SSH directory".to_string())
-    }
+    // fn get_local_keys_last_modified(&self) -> Result<String, String> {
+    //     let mut latest_modified: Option<DateTime<Local>> = None;
+    //
+    //     // for entry in fs::read_dir(&self.ssh_dir)
+    //     //     .map_err(|e| format!("Failed to read SSH directory: {}", e))?
+    //     // {
+    //     //     let entry = entry.map_err(|e| format!("Failed to read directory entry: {}", e))?;
+    //     //     let path = entry.path();
+    //     //     if path.extension().and_then(|s| s.to_str()) == Some("pub") {
+    //     //         let modified = self.get_last_modified(&path)?;
+    //     //         let modified_date = DateTime::parse_from_str(&modified, "%Y-%m-%d %H:%M:%S %z")
+    //     //             .map_err(|e| format!("Failed to parse date: {}", e))?
+    //     //             .with_timezone(&Local);
+    //     //         if latest_modified.is_none() || modified_date > latest_modified.unwrap() {
+    //     //             latest_modified = Some(modified_date);
+    //     //         }
+    //     //     }
+    //     // }
+    //
+    //     latest_modified
+    //         .map(|dt| dt.format("%Y-%m-%d %H:%M:%S").to_string())
+    //         .ok_or_else(|| "No public keys found in SSH directory".to_string())
+    // }
 }

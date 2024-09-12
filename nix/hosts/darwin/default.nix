@@ -7,11 +7,11 @@
   user,
   ...
 }:
-
 {
   imports = [
     ../../modules/darwin/home-manager.nix
     ../../modules/shared/cachix
+    ../../modules/shared
     ../../modules/darwin
   ];
 
@@ -21,7 +21,8 @@
   environment.systemPackages =
     with pkgs;
     [
-      pkgs.nushell
+      #      darwin.apple_sdk.frameworks.SystemConfiguration
+      #      darwin.apple_sdk.frameworks.CoreFoundation
     ]
     ++ (import ../../modules/shared/packages { inherit pkgs; });
 
