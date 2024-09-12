@@ -2,20 +2,15 @@
 with pkgs;
 [
   (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
-  rust-analyzer
   sops
   fastfetch
   nixus
-
-  syncthing
 
   # SECRETS
   age
 
   # RUST-SCRIPT
-  cargo
-  rustc
-  libiconv
+  rustup
   rust-script
   pcsclite
   gengetopt

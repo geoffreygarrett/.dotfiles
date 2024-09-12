@@ -126,6 +126,7 @@
           inherit system;
           overlays =
             [
+              (import rust-overlay)
               (final: prev: {
                 nix-on-droid = nix-on-droid.packages.${system};
                 nixus = self.packages.${system}.nixus;

@@ -1,5 +1,7 @@
-use std::io::{self, Write};
+use std::io::{self, BufRead, BufReader, Write};
 use std::path::PathBuf;
+use std::process::{Command, Stdio};
+use std::thread;
 
 use clap::{Args, ValueEnum};
 use colored::*;
@@ -120,40 +122,71 @@ fn switch(
 ) -> Result<(), String> {
     println!("{}", "Switching to new configuration...".yellow());
 
-    let mut cmd = CheckedCommand::new("./result/sw/bin/darwin-rebuild")
-        .map_err(|e| format!("Failed to create darwin-rebuild command: {}", e))?
-        .arg("switch")
+    let mut cmd = Command::new("./result/sw/bin/darwin-rebuild");
+    cmd.arg("switch")
         .arg("--flake")
         .arg(format!(".#{}", system_type))
         .args(extra_args)
-        .current_dir(flake_dir);
+        .current_dir(flake_dir)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     if !cache {
-        cmd = cmd.arg("--no-build-nix");
+        cmd.arg("--no-build-nix");
     }
 
-    let output = cmd
-        .output()
+    let mut child = cmd
+        .spawn()
         .map_err(|e| format!("Failed to execute switch command: {}", e))?;
 
-    if !output.status.success() {
-        let stdout = String::from_utf8_lossy(&output.stdout);
-        let stderr = String::from_utf8_lossy(&output.stderr);
+    let stdout = child.stdout.take().expect("Failed to capture stdout");
+    let stderr = child.stderr.take().expect("Failed to capture stderr");
 
-        return Err(stderr.into());
+    let stdout_thread = thread::spawn(move || {
+        let mut reader = BufReader::new(stdout);
+        let mut line = String::new();
+        while reader.read_line(&mut line).unwrap() > 0 {
+            print!("\r{}", " ".repeat(79)); // Clear the line
+            print!("\r{}", line.trim());
+            std::io::stdout().flush().unwrap();
+            line.clear();
+        }
+    });
+
+    let mut error_output = String::new();
+    let stderr_thread = thread::spawn(move || {
+        let reader = BufReader::new(stderr);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                error_output.push_str(&line);
+                error_output.push('\n');
+                eprintln!("{}", line.red());
+            }
+        }
+        error_output
+    });
+
+    let status = child.wait()
+        .map_err(|e| format!("Failed to wait for switch command: {}", e))?;
+
+    stdout_thread.join().expect("Failed to join stdout thread");
+    let error_output = stderr_thread.join().expect("Failed to join stderr thread");
+
+    println!(); // Move to the next line after carriage return outputs
+
+    if !status.success() {
+        return Err(format!("Switch failed. Error trace:\n{}", error_output));
     }
 
     println!("{}", "Switch to new configuration complete!".green());
 
     if !cachix_cache.is_empty() {
-        // Get all the paths that were switched
         let store_paths = get_build_paths()?;
-        push_to_cachix(&cachix_cache, store_paths)?;
+        push_to_cachix(cachix_cache, store_paths)?;
     }
 
     // Cleanup
-    let _ = CheckedCommand::new("unlink")
-        .map_err(|e| format!("Failed to create unlink command: {}", e))?
+    let _ = Command::new("unlink")
         .arg("./result")
         .current_dir(flake_dir)
         .status();
