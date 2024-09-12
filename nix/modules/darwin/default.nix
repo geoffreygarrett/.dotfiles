@@ -9,8 +9,8 @@
 {
   imports = [
     ./home-manager.nix
-    #    ./config/dock.nix
-    #    ./dock.nix
+    ./config/dock.nix
+    ./dock.nix
   ];
 
   # System-wide Darwin configuration.

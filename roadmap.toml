@@ -1,0 +1,27 @@
+
+
+
+
+gh api --method POST -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/geoffreygarrett/celestial-blueprint/issues -f "title=Found a bug" -f "body=Test API." -f "labels[]=bug"
+| Feature                                                           | Home | NixOS | macOS (nix-darwin) | Android (Nix-on-Droid) | Mobile NixOS |
+| ----------------------------------------------------------------- | :--: | :---: | :----------------: | :--------------------: | :----------: |
+| System-level integration                                          | N/A  |  ⚫   |         🟢         |           🟢           |      ⚫      |
+| Secret management ([sops-nix](https://github.com/Mic92/sops-nix)) |  🟢  |  ⚫   |         🟢         |           🟢           |      ⚫      |
+| VPN - [Tailscale](https://tailscale.com/)                         |  🟢  |  ⚫   |         🟢         |           🟠           |      ⚫      |
+| VPN - [WireGuard](https://www.wireguard.com/)                     |  ⚫  |  ⚫   |         ⚫         |           ⚫           |      ⚫      |
+| Distributed clipboard registry                                    |  🟡  |  ⚫   |         🟡         |           🟡           |      ⚫      |
+| GPG/YubiKey support                                               |  ⚫  |  ⚫   |         ⚫         |           ⚫           |      ⚫      |
+
+
+
+
+
+[[features]]
+name = "VPN: WireGuard"
+
+[[features]]
+name = "VPN: Tailscale"
+
+[[features]]
+name = "Secret Management: `sops-nix`"
+

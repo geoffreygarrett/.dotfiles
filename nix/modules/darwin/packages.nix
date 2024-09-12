@@ -6,7 +6,7 @@ in
 shared-packages
 ++ [
   fswatch
-  #  dockutil
+  dockutil
   #  swift
   #  iconv
   #  libiconv

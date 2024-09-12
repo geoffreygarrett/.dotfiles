@@ -95,13 +95,13 @@ including Home Manager)
 1. **System Integration**
 
    - NixOS: Native support
-   - macOS: via nix-darwin
-   - Android: via Nix-on-Droid (aarch64-linux only)
+   - macOS: via [`nix-darwin`](https://github.com/LnL7/nix-darwin)
+   - Android: via Nix-on-Droid (`aarch64-linux` only)
    - Mobile devices: Experimental support via Mobile NixOS
 
 1. **Secret Management**
 
-   - Powered by sops-nix
+   - Powered by [`sops-nix`](https://github.com/Mic92/sops-nix)
    - Supported across all platforms, including standalone Home Manager use
    - Custom workaround implemented for Nix-on-Droid
 
