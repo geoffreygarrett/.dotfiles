@@ -7,6 +7,8 @@ with pkgs;
   fastfetch
   nixus
 
+  syncthing
+
   # SECRETS
   age
 
@@ -42,7 +44,7 @@ with pkgs;
   libfido2
 
   # Nix
-  home-manager
+  #home-manager
 
   # CC essential
   #      cc-essential = mkPackageSet [

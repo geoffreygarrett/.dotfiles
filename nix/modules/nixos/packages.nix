@@ -7,4 +7,13 @@ shared-packages
 ++ [
   pinentry-curses
   pcscd
+  font-manager
+  simplescreenrecorder
+  # procps
+  # killall
+  # diffutils
+  # findutils
+  # utillinux
+  # tzdata
+  # hostname
 ]

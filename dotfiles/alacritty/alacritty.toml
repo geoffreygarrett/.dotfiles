@@ -15,7 +15,7 @@ opacity = 0.99
 startup_mode = "Windowed"
 title = "Alacritty"
 dynamic_title = true
-option_as_alt = "Both"  # NOTE: Needed for macOS
+option_as_alt = "Both"                    # NOTE: Needed for macOS
 
 # Window class (Linux/BSD only):
 # class = { instance = "Alacritty", general = "Alacritty" }

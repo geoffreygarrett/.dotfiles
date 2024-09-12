@@ -5,4 +5,4 @@
 
 ## NixOS
 
-- https://xeiaso.net/blog/paranoid-nixos-2021-07-18/
+- https://xeiaso.net/blog/paranoid-nixos-2021-07-18/q
