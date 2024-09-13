@@ -423,5 +423,136 @@
         "bash"
       ];
     };
+
+    # New enhanced CLI tool aliases
+    fzf = {
+      command = "${pkgs.fzf}/bin/fzf";
+      description = "Fuzzy finder for command-line";
+      tags = [
+        "search"
+        "productivity"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    jq = {
+      command = "${pkgs.jq}/bin/jq";
+      description = "Command-line JSON processor";
+      tags = [
+        "json"
+        "data"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    tldr = {
+      command = "${pkgs.tldr}/bin/tldr";
+      description = "Simplified and community-driven man pages";
+      tags = [
+        "documentation"
+        "help"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    bench = {
+      command = "${pkgs.hyperfine}/bin/hyperfine";
+      description = "Command-line benchmarking tool";
+      tags = [
+        "performance"
+        "benchmark"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    git-diff = {
+      command = "${pkgs.delta}/bin/delta";
+      description = "Syntax-highlighting pager for git, diff, and grep output";
+      tags = [
+        "git"
+        "diff"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    fpp = {
+      command = "${pkgs.fpp}/bin/fpp";
+      description = "CLI tool that lets you select files from command output";
+      tags = [
+        "file"
+        "productivity"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    z = {
+      command = "${pkgs.zoxide}/bin/zoxide";
+      description = "A smarter cd command with interactive selection";
+      tags = [
+        "navigation"
+        "productivity"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    csv = {
+      command = "${pkgs.xsv}/bin/xsv";
+      description = "A fast CSV command-line toolkit";
+      tags = [
+        "csv"
+        "data"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    fm = {
+      command = "${pkgs.nnn}/bin/nnn -e";
+      description = "Full-featured terminal file manager";
+      tags = [
+        "file"
+        "manager"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
+    tldrs = {
+      command = "${pkgs.tealdeer}/bin/tldr";
+      description = "Fast tldr client written in Rust";
+      tags = [
+        "documentation"
+        "help"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
   };
 }

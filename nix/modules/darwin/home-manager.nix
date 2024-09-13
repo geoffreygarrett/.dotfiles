@@ -52,7 +52,7 @@
 
         home = {
           enableNixpkgsReleaseCheck = false;
-          packages = pkgs.callPackage ./packages.nix { };
+          packages = pkgs.callPackage ./packages/user.nix { };
           stateVersion = "23.11";
 
           # https://github.com/NixOS/nixpkgs/issues/206242
@@ -107,6 +107,7 @@
     brews = [
       "nushell"
       "pinentry-mac"
+      "qemu"
     ];
     masApps = {
       "tailscale" = 1475387142;

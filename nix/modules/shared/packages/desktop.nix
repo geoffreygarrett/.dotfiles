@@ -5,6 +5,6 @@ let
 in
 shared-packages
 ++ [
-  qemu
+  qemu_full
   tailscale # (Reqires root, breaks NixOnDroid), no access to netif's.
 ]
