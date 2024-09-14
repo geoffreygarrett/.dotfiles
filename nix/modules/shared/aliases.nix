@@ -324,6 +324,18 @@
       ];
     };
 
+    gitstatusall = {
+      command = "\\find . -name .git -type d -execdir git status \\;";
+      description = "Show the status of all files in the repository.";
+      tags = [
+        "git"
+        "zsh"
+        "bash"
+        "fish"
+        "nu"
+      ];
+    };
+
     # Container and Orchestration
     k = {
       command = "${pkgs.kubectl}/bin/kubectl";
