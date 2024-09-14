@@ -114,6 +114,7 @@
       allowed-unfree-packages = [
         "lmstudio"
         "nvidia"
+        "mendeley"
       ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
       lib =
@@ -298,6 +299,7 @@
           modules =
             [
               inputs.sops-nix.homeManagerModules.sops
+              ./nix/packages/shared/shell-aliases
             ]
             ++ lib.filter (m: m != null) [
               (if lib.isDarwin system then ./nix/modules/darwin/default.nix else null)

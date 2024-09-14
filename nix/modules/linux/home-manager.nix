@@ -22,6 +22,7 @@
     ../shared/home-manager/programs/zellij.nix
     ../shared/home-manager/programs/zsh.nix
     ../shared/secrets.nix
+    ../shared/aliases.nix
   ];
   programs.bash = {
     enable = true;
