@@ -1,0 +1,535 @@
+/nix/store/0xcphynas8pri92b6shczg2qhp51b3v9-qemu-9.1.0
+├── bin
+│  ├── elf2dmp
+│  ├── qemu-edid
+│  ├── qemu-img
+│  ├── qemu-io
+│  ├── qemu-kvm -> qemu-system-aarch64
+│  ├── qemu-nbd
+│  ├── qemu-storage-daemon
+│  ├── qemu-system-aarch64
+│  ├── qemu-system-alpha
+│  ├── qemu-system-arm
+│  ├── qemu-system-avr
+│  ├── qemu-system-cris
+│  ├── qemu-system-hppa
+│  ├── qemu-system-i386
+│  ├── qemu-system-loongarch64
+│  ├── qemu-system-m68k
+│  ├── qemu-system-microblaze
+│  ├── qemu-system-microblazeel
+│  ├── qemu-system-mips
+│  ├── qemu-system-mips64
+│  ├── qemu-system-mips64el
+│  ├── qemu-system-mipsel
+│  ├── qemu-system-or1k
+│  ├── qemu-system-ppc
+│  ├── qemu-system-ppc64
+│  ├── qemu-system-riscv32
+│  ├── qemu-system-riscv64
+│  ├── qemu-system-rx
+│  ├── qemu-system-s390x
+│  ├── qemu-system-sh4
+│  ├── qemu-system-sh4eb
+│  ├── qemu-system-sparc
+│  ├── qemu-system-sparc64
+│  ├── qemu-system-tricore
+│  ├── qemu-system-x86_64
+│  ├── qemu-system-xtensa
+│  └── qemu-system-xtensaeb
+├── include
+│  └── qemu-plugin.h
+└── share
+   ├── applications
+   ├── doc
+   │  └── qemu
+   │     ├── _static
+   │     │  ├── _sphinx_javascript_frameworks_compat.js
+   │     │  ├── basic.css
+   │     │  ├── css
+   │     │  │  ├── badge_only.css
+   │     │  │  ├── fonts
+   │     │  │  │  ├── fontawesome-webfont.eot
+   │     │  │  │  ├── fontawesome-webfont.svg
+   │     │  │  │  ├── fontawesome-webfont.ttf
+   │     │  │  │  ├── fontawesome-webfont.woff
+   │     │  │  │  ├── fontawesome-webfont.woff2
+   │     │  │  │  ├── lato-bold-italic.woff
+   │     │  │  │  ├── lato-bold-italic.woff2
+   │     │  │  │  ├── lato-bold.woff
+   │     │  │  │  ├── lato-bold.woff2
+   │     │  │  │  ├── lato-normal-italic.woff
+   │     │  │  │  ├── lato-normal-italic.woff2
+   │     │  │  │  ├── lato-normal.woff
+   │     │  │  │  ├── lato-normal.woff2
+   │     │  │  │  ├── Roboto-Slab-Bold.woff
+   │     │  │  │  ├── Roboto-Slab-Bold.woff2
+   │     │  │  │  ├── Roboto-Slab-Regular.woff
+   │     │  │  │  └── Roboto-Slab-Regular.woff2
+   │     │  │  └── theme.css
+   │     │  ├── custom.js
+   │     │  ├── doctools.js
+   │     │  ├── documentation_options.js
+   │     │  ├── file.png
+   │     │  ├── jquery.js
+   │     │  ├── js
+   │     │  │  ├── badge_only.js
+   │     │  │  ├── html5shiv-printshiv.min.js
+   │     │  │  ├── html5shiv.min.js
+   │     │  │  └── theme.js
+   │     │  ├── language_data.js
+   │     │  ├── minus.png
+   │     │  ├── plus.png
+   │     │  ├── pygments.css
+   │     │  ├── qemu_32x32.png
+   │     │  ├── qemu_128x128.png
+   │     │  ├── searchtools.js
+   │     │  ├── sphinx_highlight.js
+   │     │  └── theme_overrides.css
+   │     ├── about
+   │     │  ├── build-platforms.html
+   │     │  ├── deprecated.html
+   │     │  ├── emulation.html
+   │     │  ├── index.html
+   │     │  ├── license.html
+   │     │  └── removed-features.html
+   │     ├── dbus-dbusindex.html
+   │     ├── devel
+   │     │  ├── acpi-bits.html
+   │     │  ├── atomics.html
+   │     │  ├── bitops.html
+   │     │  ├── block-coroutine-wrapper.html
+   │     │  ├── build-system.html
+   │     │  ├── ci.html
+   │     │  ├── clocks.html
+   │     │  ├── code-of-conduct.html
+   │     │  ├── conflict-resolution.html
+   │     │  ├── control-flow-integrity.html
+   │     │  ├── crypto.html
+   │     │  ├── decodetree.html
+   │     │  ├── docs.html
+   │     │  ├── ebpf_rss.html
+   │     │  ├── fuzzing.html
+   │     │  ├── index-api.html
+   │     │  ├── index-build.html
+   │     │  ├── index-internals.html
+   │     │  ├── index-process.html
+   │     │  ├── index-tcg.html
+   │     │  ├── index.html
+   │     │  ├── kconfig.html
+   │     │  ├── loads-stores.html
+   │     │  ├── luks-detached-header.html
+   │     │  ├── maintainers.html
+   │     │  ├── memory.html
+   │     │  ├── migration
+   │     │  │  ├── best-practices.html
+   │     │  │  ├── compatibility.html
+   │     │  │  ├── CPR.html
+   │     │  │  ├── dirty-limit.html
+   │     │  │  ├── features.html
+   │     │  │  ├── index.html
+   │     │  │  ├── main.html
+   │     │  │  ├── mapped-ram.html
+   │     │  │  ├── postcopy.html
+   │     │  │  ├── qpl-compression.html
+   │     │  │  ├── uadk-compression.html
+   │     │  │  ├── vfio.html
+   │     │  │  └── virtio.html
+   │     │  ├── modules.html
+   │     │  ├── multi-process.html
+   │     │  ├── multi-thread-tcg.html
+   │     │  ├── pci.html
+   │     │  ├── qapi-code-gen.html
+   │     │  ├── qdev-api.html
+   │     │  ├── qgraph.html
+   │     │  ├── qom-api.html
+   │     │  ├── qom.html
+   │     │  ├── qtest.html
+   │     │  ├── replay.html
+   │     │  ├── reset.html
+   │     │  ├── s390-cpu-topology.html
+   │     │  ├── s390-dasd-ipl.html
+   │     │  ├── secure-coding-practices.html
+   │     │  ├── stable-process.html
+   │     │  ├── style.html
+   │     │  ├── submitting-a-patch.html
+   │     │  ├── submitting-a-pull-request.html
+   │     │  ├── tcg-icount.html
+   │     │  ├── tcg-ops.html
+   │     │  ├── tcg-plugins.html
+   │     │  ├── tcg.html
+   │     │  ├── testing.html
+   │     │  ├── tracing.html
+   │     │  ├── trivial-patches.html
+   │     │  ├── ui.html
+   │     │  ├── vfio-iommufd.html
+   │     │  ├── virtio-backends.html
+   │     │  ├── writing-monitor-commands.html
+   │     │  └── zoned-storage.html
+   │     ├── genindex.html
+   │     ├── index.html
+   │     ├── interop
+   │     │  ├── barrier.html
+   │     │  ├── bitmaps.html
+   │     │  ├── dbus-display.html
+   │     │  ├── dbus-vmstate.html
+   │     │  ├── dbus.html
+   │     │  ├── index.html
+   │     │  ├── live-block-operations.html
+   │     │  ├── nbd.html
+   │     │  ├── parallels.html
+   │     │  ├── pr-helper.html
+   │     │  ├── prl-xml.html
+   │     │  ├── qemu-ga-ref.html
+   │     │  ├── qemu-ga.html
+   │     │  ├── qemu-qmp-ref.html
+   │     │  ├── qemu-storage-daemon-qmp-ref.html
+   │     │  ├── qmp-spec.html
+   │     │  ├── vhost-user-gpu.html
+   │     │  ├── vhost-user.html
+   │     │  ├── vhost-vdpa.html
+   │     │  ├── virtio-balloon-stats.html
+   │     │  └── vnc-ledstate-pseudo-encoding.html
+   │     ├── objects.inv
+   │     ├── search.html
+   │     ├── searchindex.js
+   │     ├── specs
+   │     │  ├── acpi_cpu_hotplug.html
+   │     │  ├── acpi_erst.html
+   │     │  ├── acpi_hest_ghes.html
+   │     │  ├── acpi_hw_reduced_hotplug.html
+   │     │  ├── acpi_mem_hotplug.html
+   │     │  ├── acpi_nvdimm.html
+   │     │  ├── acpi_pci_hotplug.html
+   │     │  ├── edu.html
+   │     │  ├── fsi.html
+   │     │  ├── fw_cfg.html
+   │     │  ├── index.html
+   │     │  ├── ivshmem-spec.html
+   │     │  ├── pci-ids.html
+   │     │  ├── pci-serial.html
+   │     │  ├── pci-testdev.html
+   │     │  ├── ppc-spapr-hcalls.html
+   │     │  ├── ppc-spapr-hotplug.html
+   │     │  ├── ppc-spapr-numa.html
+   │     │  ├── ppc-spapr-uv-hcalls.html
+   │     │  ├── ppc-spapr-xive.html
+   │     │  ├── ppc-xive.html
+   │     │  ├── pvpanic.html
+   │     │  ├── rapl-msr.html
+   │     │  ├── rocker.html
+   │     │  ├── sev-guest-firmware.html
+   │     │  ├── spdm.html
+   │     │  ├── standard-vga.html
+   │     │  ├── tpm.html
+   │     │  ├── virt-ctlr.html
+   │     │  ├── vmcoreinfo.html
+   │     │  ├── vmgenid.html
+   │     │  └── vmw_pvscsi-spec.html
+   │     ├── system
+   │     │  ├── arm
+   │     │  │  ├── aspeed.html
+   │     │  │  ├── b-l475e-iot01a.html
+   │     │  │  ├── bananapi_m2u.html
+   │     │  │  ├── collie.html
+   │     │  │  ├── cpu-features.html
+   │     │  │  ├── cubieboard.html
+   │     │  │  ├── digic.html
+   │     │  │  ├── emcraft-sf2.html
+   │     │  │  ├── emulation.html
+   │     │  │  ├── gumstix.html
+   │     │  │  ├── highbank.html
+   │     │  │  ├── imx25-pdk.html
+   │     │  │  ├── integratorcp.html
+   │     │  │  ├── kzm.html
+   │     │  │  ├── mainstone.html
+   │     │  │  ├── mps2.html
+   │     │  │  ├── musca.html
+   │     │  │  ├── musicpal.html
+   │     │  │  ├── nrf.html
+   │     │  │  ├── nseries.html
+   │     │  │  ├── nuvoton.html
+   │     │  │  ├── orangepi.html
+   │     │  │  ├── palm.html
+   │     │  │  ├── raspi.html
+   │     │  │  ├── realview.html
+   │     │  │  ├── sabrelite.html
+   │     │  │  ├── sbsa.html
+   │     │  │  ├── stellaris.html
+   │     │  │  ├── stm32.html
+   │     │  │  ├── sx1.html
+   │     │  │  ├── versatile.html
+   │     │  │  ├── vexpress.html
+   │     │  │  ├── virt.html
+   │     │  │  ├── xenpvh.html
+   │     │  │  ├── xlnx-versal-virt.html
+   │     │  │  ├── xlnx-zynq.html
+   │     │  │  └── xscale.html
+   │     │  ├── authz.html
+   │     │  ├── barrier.html
+   │     │  ├── bootindex.html
+   │     │  ├── confidential-guest-support.html
+   │     │  ├── cpu-hotplug.html
+   │     │  ├── device-emulation.html
+   │     │  ├── devices
+   │     │  │  ├── can.html
+   │     │  │  ├── canokey.html
+   │     │  │  ├── ccid.html
+   │     │  │  ├── cxl.html
+   │     │  │  ├── igb.html
+   │     │  │  ├── ivshmem.html
+   │     │  │  ├── keyboard.html
+   │     │  │  ├── net.html
+   │     │  │  ├── nvme.html
+   │     │  │  ├── usb-u2f.html
+   │     │  │  ├── usb.html
+   │     │  │  ├── vhost-user-input.html
+   │     │  │  ├── vhost-user-rng.html
+   │     │  │  ├── vhost-user.html
+   │     │  │  ├── virtio-gpu.html
+   │     │  │  ├── virtio-pmem.html
+   │     │  │  └── virtio-snd.html
+   │     │  ├── gdb.html
+   │     │  ├── generic-loader.html
+   │     │  ├── guest-loader.html
+   │     │  ├── i386
+   │     │  │  ├── amd-memory-encryption.html
+   │     │  │  ├── cpu.html
+   │     │  │  ├── hyperv.html
+   │     │  │  ├── kvm-pv.html
+   │     │  │  ├── microvm.html
+   │     │  │  ├── pc.html
+   │     │  │  ├── sgx.html
+   │     │  │  └── xen.html
+   │     │  ├── images.html
+   │     │  ├── index.html
+   │     │  ├── introduction.html
+   │     │  ├── invocation.html
+   │     │  ├── keys.html
+   │     │  ├── linuxboot.html
+   │     │  ├── loongarch
+   │     │  │  └── virt.html
+   │     │  ├── managed-startup.html
+   │     │  ├── monitor.html
+   │     │  ├── multi-process.html
+   │     │  ├── mux-chardev.html
+   │     │  ├── openrisc
+   │     │  │  ├── cpu-features.html
+   │     │  │  ├── emulation.html
+   │     │  │  ├── or1k-sim.html
+   │     │  │  └── virt.html
+   │     │  ├── ppc
+   │     │  │  ├── amigang.html
+   │     │  │  ├── embedded.html
+   │     │  │  ├── powermac.html
+   │     │  │  ├── powernv.html
+   │     │  │  ├── ppce500.html
+   │     │  │  ├── prep.html
+   │     │  │  └── pseries.html
+   │     │  ├── pr-manager.html
+   │     │  ├── qemu-block-drivers.html
+   │     │  ├── qemu-cpu-models.html
+   │     │  ├── qemu-manpage.html
+   │     │  ├── replay.html
+   │     │  ├── riscv
+   │     │  │  ├── microchip-icicle-kit.html
+   │     │  │  ├── shakti-c.html
+   │     │  │  ├── sifive_u.html
+   │     │  │  └── virt.html
+   │     │  ├── s390x
+   │     │  │  ├── 3270.html
+   │     │  │  ├── bootdevices.html
+   │     │  │  ├── cpu-topology.html
+   │     │  │  ├── css.html
+   │     │  │  ├── pcidevices.html
+   │     │  │  ├── protvirt.html
+   │     │  │  ├── vfio-ap.html
+   │     │  │  └── vfio-ccw.html
+   │     │  ├── secrets.html
+   │     │  ├── security.html
+   │     │  ├── target-arm.html
+   │     │  ├── target-avr.html
+   │     │  ├── target-i386.html
+   │     │  ├── target-m68k.html
+   │     │  ├── target-mips.html
+   │     │  ├── target-openrisc.html
+   │     │  ├── target-ppc.html
+   │     │  ├── target-riscv.html
+   │     │  ├── target-rx.html
+   │     │  ├── target-s390x.html
+   │     │  ├── target-sparc.html
+   │     │  ├── target-sparc64.html
+   │     │  ├── target-xtensa.html
+   │     │  ├── targets.html
+   │     │  ├── tls.html
+   │     │  ├── virtio-net-failover.html
+   │     │  ├── vm-templating.html
+   │     │  └── vnc-security.html
+   │     ├── tools
+   │     │  ├── index.html
+   │     │  ├── qemu-img.html
+   │     │  ├── qemu-nbd.html
+   │     │  ├── qemu-pr-helper.html
+   │     │  ├── qemu-storage-daemon.html
+   │     │  ├── qemu-trace-stap.html
+   │     │  ├── qemu-vmsr-helper.html
+   │     │  └── virtfs-proxy-helper.html
+   │     └── user
+   │        ├── index.html
+   │        └── main.html
+   ├── icons
+   │  └── hicolor
+   │     ├── 16x16
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     ├── 24x24
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     ├── 32x32
+   │     │  └── apps
+   │     │     ├── qemu.bmp
+   │     │     └── qemu.png
+   │     ├── 48x48
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     ├── 64x64
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     ├── 128x128
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     ├── 256x256
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     ├── 512x512
+   │     │  └── apps
+   │     │     └── qemu.png
+   │     └── scalable
+   │        └── apps
+   │           └── qemu.svg
+   ├── man
+   │  ├── man1
+   │  │  ├── qemu-img.1.gz
+   │  │  ├── qemu-storage-daemon.1.gz
+   │  │  └── qemu.1.gz
+   │  ├── man7
+   │  │  ├── qemu-block-drivers.7.gz
+   │  │  ├── qemu-cpu-models.7.gz
+   │  │  ├── qemu-qmp-ref.7.gz
+   │  │  └── qemu-storage-daemon-qmp-ref.7.gz
+   │  └── man8
+   │     ├── qemu-nbd.8.gz
+   │     └── qemu-pr-helper.8.gz
+   └── qemu
+      ├── bamboo.dtb
+      ├── bios-256k.bin
+      ├── bios-microvm.bin
+      ├── bios.bin
+      ├── canyonlands.dtb
+      ├── edk2-aarch64-code.fd
+      ├── edk2-arm-code.fd
+      ├── edk2-arm-vars.fd
+      ├── edk2-i386-code.fd
+      ├── edk2-i386-secure-code.fd
+      ├── edk2-i386-vars.fd
+      ├── edk2-licenses.txt
+      ├── edk2-riscv-code.fd
+      ├── edk2-riscv-vars.fd
+      ├── edk2-x86_64-code.fd
+      ├── edk2-x86_64-secure-code.fd
+      ├── efi-e1000.rom
+      ├── efi-e1000e.rom
+      ├── efi-eepro100.rom
+      ├── efi-ne2k_pci.rom
+      ├── efi-pcnet.rom
+      ├── efi-rtl8139.rom
+      ├── efi-virtio.rom
+      ├── efi-vmxnet3.rom
+      ├── firmware
+      │  ├── 50-edk2-i386-secure.json
+      │  ├── 50-edk2-x86_64-secure.json
+      │  ├── 60-edk2-aarch64.json
+      │  ├── 60-edk2-arm.json
+      │  ├── 60-edk2-i386.json
+      │  └── 60-edk2-x86_64.json
+      ├── hppa-firmware.img
+      ├── hppa-firmware64.img
+      ├── keymaps
+      │  ├── ar
+      │  ├── bepo
+      │  ├── cz
+      │  ├── da
+      │  ├── de
+      │  ├── de-ch
+      │  ├── en-gb
+      │  ├── en-us
+      │  ├── es
+      │  ├── et
+      │  ├── fi
+      │  ├── fo
+      │  ├── fr
+      │  ├── fr-be
+      │  ├── fr-ca
+      │  ├── fr-ch
+      │  ├── hr
+      │  ├── hu
+      │  ├── is
+      │  ├── it
+      │  ├── ja
+      │  ├── lt
+      │  ├── lv
+      │  ├── mk
+      │  ├── nl
+      │  ├── no
+      │  ├── pl
+      │  ├── pt
+      │  ├── pt-br
+      │  ├── ru
+      │  ├── sl
+      │  ├── sv
+      │  ├── th
+      │  └── tr
+      ├── kvmvapic.bin
+      ├── linuxboot.bin
+      ├── linuxboot_dma.bin
+      ├── multiboot.bin
+      ├── multiboot_dma.bin
+      ├── npcm7xx_bootrom.bin
+      ├── openbios-ppc
+      ├── openbios-sparc32
+      ├── openbios-sparc64
+      ├── opensbi-riscv32-generic-fw_dynamic.bin
+      ├── opensbi-riscv64-generic-fw_dynamic.bin
+      ├── palcode-clipper
+      ├── petalogix-ml605.dtb
+      ├── petalogix-s3adsp1800.dtb
+      ├── pvh.bin
+      ├── pxe-e1000.rom
+      ├── pxe-eepro100.rom
+      ├── pxe-ne2k_pci.rom
+      ├── pxe-pcnet.rom
+      ├── pxe-rtl8139.rom
+      ├── pxe-virtio.rom
+      ├── qboot.rom
+      ├── QEMU,cgthree.bin
+      ├── QEMU,tcx.bin
+      ├── qemu-nsis.bmp
+      ├── qemu_vga.ndrv
+      ├── s390-ccw.img
+      ├── s390-netboot.img
+      ├── skiboot.lid
+      ├── slof.bin
+      ├── trace-events-all
+      ├── u-boot-sam460-20100605.bin
+      ├── u-boot.e500
+      ├── vgabios-ati.bin
+      ├── vgabios-bochs-display.bin
+      ├── vgabios-cirrus.bin
+      ├── vgabios-qxl.bin
+      ├── vgabios-ramfb.bin
+      ├── vgabios-stdvga.bin
+      ├── vgabios-virtio.bin
+      ├── vgabios-vmware.bin
+      ├── vgabios.bin
+      ├── vof-nvram.bin
+      └── vof.bin

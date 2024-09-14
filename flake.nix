@@ -24,6 +24,10 @@
       url = "github:numtide/system-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # Security
     sops-nix = {
@@ -79,6 +83,7 @@
       sops-nix,
       treefmt-nix,
       nixgl,
+      disko,
       darwin,
       nix-homebrew,
       nix-on-droid,
@@ -90,11 +95,7 @@
     }@inputs:
     let
       inherit (self) outputs;
-      user =
-        let
-          envUser = builtins.getEnv "USER";
-        in
-        if envUser != "" then envUser else "geoffrey";
+      user = "geoffrey";
       systems.linux = [
         "aarch64-linux"
         "x86_64-linux"
@@ -110,6 +111,10 @@
         # "armv8-linux"
         # "x86_64-linux"
       ];
+      allowed-unfree-packages = [
+        "lmstudio"
+        "nvidia"
+      ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
       lib =
         nixpkgs.lib
@@ -120,17 +125,24 @@
           isAndroid = system: builtins.elem system systems.android;
         };
       forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
+
       pkgsFor =
         system:
         import nixpkgs {
           inherit system;
+          # config.allowUnfree = true;
+          config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
           overlays =
             [
               (final: prev: {
-                nix-on-droid = nix-on-droid.packages.${system};
                 nixus = self.packages.${system}.nixus;
               })
             ]
+            ++ lib.optional (lib.isAndroid system) (
+              final: prev: {
+                nix-on-droid = nix-on-droid.packages.${system};
+              }
+            )
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
             ++ lib.optional (lib.isAndroid system) sops-nix.overlays.default
             ++ lib.optional (lib.isLinux system) nixgl.overlay;
@@ -140,6 +152,7 @@
       );
     in
     {
+
       ##############################
       # Packages Configuration
       ##############################
@@ -215,10 +228,34 @@
               };
             }
             ./nix/hosts/darwin
+
           ];
           specialArgs = {
             inherit inputs self user;
           };
+        }
+      );
+
+      ##############################
+      # NixOS Configuration
+      ##############################
+      nixosConfigurations = nixpkgs.lib.genAttrs systems.linux (
+        system:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = inputs;
+          modules = [
+            disko.nixosModules.disko
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.${user} = import ./modules/nixos/home-manager.nix;
+              };
+            }
+            ./hosts/nixos
+          ];
         }
       );
 
@@ -241,6 +278,7 @@
               "100.112.193.127" = [ "voyager.tail" ];
             };
           }
+
           {
             home-manager.extraSpecialArgs = {
               inherit self inputs user;
@@ -270,7 +308,6 @@
               self
               inputs
               user
-              outputs
               ;
           };
         }
@@ -301,7 +338,7 @@
       # Dev Shell Configuration
       ##############################
       devShells = forAllSystems (system: {
-        default = nixpkgs.legacyPackages.${system}.mkShell {
+        default = (pkgsFor system).mkShell {
           buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           shellHook = self.checks.${system}.pre-commit-check.shellHook;
         };

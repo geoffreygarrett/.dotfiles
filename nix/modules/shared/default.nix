@@ -9,6 +9,7 @@
       allowBroken = true;
       allowInsecure = false;
       allowUnsupportedSystem = true;
+      allowUnfreePredicate = pkg: true;
     };
 
     overlays =

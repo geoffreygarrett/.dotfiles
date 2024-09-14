@@ -9,6 +9,7 @@ shared-packages
   pcscd
   font-manager
   simplescreenrecorder
+  mendeley
   # procps
   # killall
   # diffutils

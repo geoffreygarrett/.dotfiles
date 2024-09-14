@@ -38,4 +38,9 @@ _: [
 
   # Security
   "yubico-yubikey-manager"
+
+  # Research
+  "mendeley"
+
+  # Drive management
 ]

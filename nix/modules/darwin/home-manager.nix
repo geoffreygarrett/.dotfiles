@@ -29,26 +29,6 @@
           ../shared/secrets.nix
           ../shared/home-manager/programs
         ];
-        # Enable the aliases module
-        aliases = {
-          enable = true;
-          aliases = {
-            # You can add your aliases here, or import them from another file
-            hw = {
-              command = "echo 'Hello, World!'";
-              description = "Print 'Hello, World!'";
-              tags = [
-                "file"
-                "list"
-                "zsh"
-                "bash"
-                "fish"
-                "nu"
-              ];
-            };
-            # Add more aliases as needed
-          };
-        };
 
         home = {
           enableNixpkgsReleaseCheck = false;
@@ -108,6 +88,7 @@
       "nushell"
       "pinentry-mac"
       "qemu"
+      "gsmartcontrol"
     ];
     masApps = {
       "tailscale" = 1475387142;

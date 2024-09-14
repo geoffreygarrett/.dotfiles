@@ -20,11 +20,7 @@
   # Environment packages
   environment.systemPackages =
     with pkgs;
-    [
-      #      darwin.apple_sdk.frameworks.SystemConfiguration
-      #      darwin.apple_sdk.frameworks.CoreFoundation
-    ]
-    ++ (import ../../modules/shared/packages { inherit pkgs; });
+    [ ] ++ (import ../../modules/shared/packages { inherit pkgs; });
 
   #  environment.sessionVariables = {
   #    EDITOR = "nvim";
