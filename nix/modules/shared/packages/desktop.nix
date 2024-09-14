@@ -7,5 +7,11 @@ shared-packages
 ++ [
   qemu_full
   tailscale # (Reqires root, breaks NixOnDroid), no access to netif's.
-  #  lmstudio
+  lmstudio
+
+  # Disk testing
+  testdisk
+  ddrescue
+  ddrescueview
+  fio
 ]

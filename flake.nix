@@ -252,10 +252,10 @@
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                users.${user} = import ./modules/nixos/home-manager.nix;
+                users.${user} = import ./nix/modules/nixos/home-manager.nix;
               };
             }
-            ./hosts/nixos
+            ./nix/hosts/nixos
           ];
         }
       );

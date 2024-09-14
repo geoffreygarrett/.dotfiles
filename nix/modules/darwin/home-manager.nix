@@ -7,7 +7,6 @@
   inputs,
   ...
 }:
-
 {
   home-manager = {
     useGlobalPkgs = true;
