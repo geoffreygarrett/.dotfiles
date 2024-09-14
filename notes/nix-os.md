@@ -49,3 +49,12 @@ official documentation of Ubuntu and NixOS.
 # Any Linux
 
 - https://github.com/numtide/system-manager
+
+# Tails
+
+- https://tails.net/install/linux/index.en.html
+
+# nixos-generators - one config, multiple formats
+- https://nixos.org/manual/nixos/stable/index.html#sec-building-image
+The nixos-generators project allows to take the same NixOS configuration, and generate outputs for different target formats.
+- https://github.com/nix-community/nixos-generators/tree/master
