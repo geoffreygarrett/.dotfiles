@@ -6,7 +6,6 @@ in
 shared-packages
 ++ [
   pinentry-curses
-  pcscd
   font-manager
   simplescreenrecorder
   mendeley

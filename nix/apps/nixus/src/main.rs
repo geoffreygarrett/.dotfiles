@@ -79,7 +79,7 @@ enum Commands {
     #[command(name = "nixos")]
     NixOS(cli::nixos::NixOSArgs),
     Home(cli::home::HomeArgs),
-    // SshKeys(cli::ssh_keys::SshKeysArgs),
+ //   SshKeys(cli::ssh_keys::SshKeysArgs),
     Cachix(cli::cachix::CachixArgs),
 
     Secrets(cli::secrets::SecretsArgs),
