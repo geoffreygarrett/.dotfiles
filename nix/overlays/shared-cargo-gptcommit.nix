@@ -1,6 +1,6 @@
 final: prev: {
   gptcommit = final.callPackage ./nix/packages/gptcommit.nix {
-    inherit darwin;
+    #    inherit darwin;
     inherit (final)
       lib
       rustPlatform
@@ -9,6 +9,6 @@ final: prev: {
       pkg-config
       stdenv
       ;
-    inherit (final.darwin) apple_sdk;
+    #    inherit (final.darwin) apple_sdk;
   };
 }

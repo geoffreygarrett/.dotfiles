@@ -11,7 +11,7 @@
   imports = [
     #    ../../modules/nixos
     #    ../../modules/nixos/home-manager.nix
-       ../../modules/shared
+    ../../modules/shared
     #    ../../modules/shared/cachix
     #./configuration.nix
   ];

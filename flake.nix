@@ -117,7 +117,7 @@
         "mendeley"
       ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
-      
+
       forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
       lib =
         nixpkgs.lib
@@ -126,19 +126,33 @@
           isLinux = system: builtins.elem system systems.linux;
           isDarwin = system: builtins.elem system systems.darwin;
           isAndroid = system: builtins.elem system systems.android;
-	  forAllSystems = forAllSystems;
+          forAllSystems = forAllSystems;
         };
       sharedConfig = import ./nix/modules/shared/default.nix;
       pkgsFor =
         system:
         import nixpkgs {
           inherit system;
-	  config = {
-	    allowUnfree = true;
-	    allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
-	  };
-          overlays = #sharedConfig.nixpkgs.overlays ++
-            [
+          config = {
+            allowUnfree = true;
+            allowBroken = true;
+            allowInsecure = false;
+            allowUnsupportedSystem = true;
+            allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
+          };
+          overlays =
+            let
+              path = ./nix/overlays;
+              overlayFiles =
+                with builtins;
+                filter (n: match ".*\\.nix" n != null || pathExists (path + ("/" + n + "/default.nix"))) (
+                  attrNames (readDir path)
+                );
+            in
+            builtins.trace "Loading overlays: ${builtins.toString overlayFiles}" (
+              map (n: import (path + ("/" + n))) overlayFiles
+            )
+            ++ [
               (final: prev: {
                 nixus = self.packages.${system}.nixus;
               })
@@ -248,6 +262,7 @@
         system:
         nixpkgs.lib.nixosSystem {
           inherit system;
+          pkgs = pkgsFor system;
           specialArgs = {
             inherit inputs self user;
           };
@@ -255,17 +270,14 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-	    ./nix/hosts/nixos/configuration.nix
+            ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
-
                 sharedModules = [
                   inputs.sops-nix.homeManagerModules.sops
                   ./nix/packages/shared/shell-aliases
-
                 ];
                 useGlobalPkgs = true;
-
                 extraSpecialArgs = {
                   inherit inputs self user;
                 };
