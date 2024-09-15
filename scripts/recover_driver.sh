@@ -4,14 +4,14 @@
 
 # Step 1: Create a disk image using ddrescue
 create_disk_image() {
-    echo "Creating disk image..."
-    sudo env "PATH=$PATH" ddrescue -d -r3 /dev/sdb ./disk.img ./rescue.log
+  echo "Creating disk image..."
+  sudo env "PATH=$PATH" ddrescue -d -r3 /dev/sdb ./disk.img ./rescue.log
 }
 
 # Step 2: Analyze and recover partitions using TestDisk
 recover_partitions() {
-    echo "Analyzing and recovering partitions..."
-    sudo env "PATH=$PATH" testdisk ./disk.img << EOF
+  echo "Analyzing and recovering partitions..."
+  sudo env "PATH=$PATH" testdisk ./disk.img << EOF
 Proceed
 Intel
 Analyze
@@ -23,8 +23,8 @@ EOF
 
 # Step 3: Recover files using PhotoRec
 recover_files() {
-    echo "Recovering files..."
-    sudo env "PATH=$PATH" photorec ./disk.img
+  echo "Recovering files..."
+  sudo env "PATH=$PATH" photorec ./disk.img
 }
 
 # Main execution

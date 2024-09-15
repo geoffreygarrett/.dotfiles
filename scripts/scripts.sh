@@ -14,16 +14,16 @@ echo "{" > "$TEMP_FILE"
 
 # Process each line of the Tailscale status
 while IFS= read -r line; do
-    # Extract IP, hostname, and user from each line
-    IP=$(echo "$line" | awk '{print $1}')
-    HOSTNAME=$(echo "$line" | awk '{print $2}')
-    USER=$(echo "$line" | awk '{print $3}' | cut -d@ -f1)
+  # Extract IP, hostname, and user from each line
+  IP=$(echo "$line" | awk '{print $1}')
+  HOSTNAME=$(echo "$line" | awk '{print $2}')
+  USER=$(echo "$line" | awk '{print $3}' | cut -d@ -f1)
 
-    # Add the entry to the JSON file
-    echo "  \"$IP\": {" >> "$TEMP_FILE"
-    echo "    \"hostname\": \"$HOSTNAME\"," >> "$TEMP_FILE"
-    echo "    \"user\": \"$USER\"" >> "$TEMP_FILE"
-    echo "  }," >> "$TEMP_FILE"
+  # Add the entry to the JSON file
+  echo "  \"$IP\": {" >> "$TEMP_FILE"
+  echo "    \"hostname\": \"$HOSTNAME\"," >> "$TEMP_FILE"
+  echo "    \"user\": \"$USER\"" >> "$TEMP_FILE"
+  echo "  }," >> "$TEMP_FILE"
 done <<< "$TAILSCALE_STATUS"
 
 # Remove the trailing comma from the last entry

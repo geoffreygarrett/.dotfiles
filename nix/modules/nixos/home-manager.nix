@@ -1,5 +1,6 @@
 {
   config,
+  self,
   pkgs,
   lib,
   home-manager,
@@ -9,16 +10,25 @@
 }:
 let
 
-  shared-programs = import ../shared/home-manager.nix {
+  shared-programs = import ../shared/home-manager/programs {
     inherit
       config
       pkgs
       lib
       home-manager
       inputs
+      user
+      self
       ;
   };
-  secrets = import ./secrets.nix { inherit config pkgs user; };
+  secrets = import ../shared/secrets.nix {
+    inherit
+      self
+      config
+      pkgs
+      user
+      ;
+  };
 in
 {
   imports = [

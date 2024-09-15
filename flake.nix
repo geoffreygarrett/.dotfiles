@@ -117,6 +117,8 @@
         "mendeley"
       ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
+      
+      forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
       lib =
         nixpkgs.lib
         // home-manager.lib
@@ -124,16 +126,18 @@
           isLinux = system: builtins.elem system systems.linux;
           isDarwin = system: builtins.elem system systems.darwin;
           isAndroid = system: builtins.elem system systems.android;
+	  forAllSystems = forAllSystems;
         };
-      forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
-
+      sharedConfig = import ./nix/modules/shared/default.nix;
       pkgsFor =
         system:
         import nixpkgs {
           inherit system;
-          # config.allowUnfree = true;
-          config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
-          overlays =
+	  config = {
+	    allowUnfree = true;
+	    allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
+	  };
+          overlays = #sharedConfig.nixpkgs.overlays ++
             [
               (final: prev: {
                 nixus = self.packages.${system}.nixus;
@@ -244,16 +248,40 @@
         system:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = inputs;
+          specialArgs = {
+            inherit inputs self user;
+          };
           modules = [
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
+	    ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
+
+                sharedModules = [
+                  inputs.sops-nix.homeManagerModules.sops
+                  ./nix/packages/shared/shell-aliases
+
+                ];
                 useGlobalPkgs = true;
+
+                extraSpecialArgs = {
+                  inherit inputs self user;
+                };
                 useUserPackages = true;
-                users.${user} = import ./modules/nixos/home-manager.nix;
+                users.${user} =
+                  {
+                    self,
+                    config,
+                    pkgs,
+                    inputs,
+                    user,
+                    ...
+                  }:
+                  {
+                    imports = [ ./nix/modules/nixos/home-manager.nix ];
+                  };
               };
             }
             ./nix/hosts/nixos

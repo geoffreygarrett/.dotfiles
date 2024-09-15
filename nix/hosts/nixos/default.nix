@@ -11,12 +11,12 @@
   imports = [
     #    ../../modules/nixos
     #    ../../modules/nixos/home-manager.nix
-    #    ../../modules/shared
+       ../../modules/shared
     #    ../../modules/shared/cachix
-    ./configuration.nix
+    #./configuration.nix
   ];
 
-  services.nix-daemon.enable = true;
+  #  services.nix-daemon.enable = true;
 
   # Environment packages
   environment.systemPackages =
