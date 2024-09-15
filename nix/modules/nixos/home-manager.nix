@@ -21,11 +21,16 @@ let
   secrets = import ./secrets.nix { inherit config pkgs user; };
 in
 {
-  home.username = "${user}";
-  home.homeDirectory = "/home/${user}";
   imports = [
     shared-programs
     secrets
-  ]; # programs = shared-programs // { gpg.enable = true; };
-  home.packages = pkgs.callPackage ./packages.nix { inherit pkgs; };
+  ];
+  home = {
+    enableNixpkgsReleaseCheck = false;
+    username = "${user}";
+    homeDirectory = "/home/${user}";
+    packages = pkgs.callPackage ./packages.nix { };
+    #      file = shared-files // import ./files.nix { inherit user pkgs; };
+    stateVersion = "21.05";
+  };
 }

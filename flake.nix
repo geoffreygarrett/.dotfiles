@@ -248,11 +248,12 @@
           modules = [
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
+            sops-nix.nixosModules.sops
             {
               home-manager = {
                 useGlobalPkgs = true;
                 useUserPackages = true;
-                users.${user} = import ./nix/modules/nixos/home-manager.nix;
+                users.${user} = import ./modules/nixos/home-manager.nix;
               };
             }
             ./nix/hosts/nixos
