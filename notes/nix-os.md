@@ -55,8 +55,10 @@ official documentation of Ubuntu and NixOS.
 - https://tails.net/install/linux/index.en.html
 
 # nixos-generators - one config, multiple formats
-- https://nixos.org/manual/nixos/stable/index.html#sec-building-image
-The nixos-generators project allows to take the same NixOS configuration, and generate outputs for different target formats.
+
+- https://nixos.org/manual/nixos/stable/index.html#sec-building-image The
+  nixos-generators project allows to take the same NixOS configuration, and
+  generate outputs for different target formats.
 - https://github.com/nix-community/nixos-generators/tree/master
 
 # Learning Nix

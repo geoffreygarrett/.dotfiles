@@ -12,6 +12,5 @@ shared-packages
   # Disk testing
   testdisk
   ddrescue
-  ddrescueview
   fio
 ]

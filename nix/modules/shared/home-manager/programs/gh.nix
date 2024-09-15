@@ -6,11 +6,22 @@
   ...
 }:
 let
-  gh-wrapped = pkgs.writeShellScriptBin "gh" ''
-    GITHUB_TOKEN=$(cat ${config.sops.secrets.github-token.path})
-    export GITHUB_TOKEN
-    ${pkgs.gh}/bin/gh "$@"
-  '';
+  gh-wrapped =
+    if
+      pkgs.lib.hasAttrByPath [
+        "sops"
+        "secrets"
+        "github-token"
+        "path"
+      ] config
+    then
+      pkgs.writeShellScriptBin "gh" ''
+        GITHUB_TOKEN=$(cat ${config.sops.secrets.github-token.path})
+        export GITHUB_TOKEN
+        ${pkgs.gh}/bin/gh "$@"
+      ''
+    else
+      pkgs.gh;
 in
 {
   programs.gh = {
@@ -45,18 +56,18 @@ in
       };
     };
   };
-  # Service to login once sops-nix is ready.
-  systemd.user.services.gh-auth = {
-    Unit = {
-      Description = "Authenticate GitHub CLI with token";
-      After = [ "sops-nix.service" ];
-    };
-    Service = {
-      Type = "oneshot";
-      ExecStart = "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github-token.path}";
-    };
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
-  };
+  #  # Service to login once sops-nix is ready.
+  #  systemd.user.services.gh-auth = {
+  #    Unit = {
+  #      Description = "Authenticate GitHub CLI with token";
+  #      After = [ "sops-nix.service" ];
+  #    };
+  #    Service = {
+  #      Type = "oneshot";
+  #      ExecStart = "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github-token.path}";
+  #    };
+  #    Install = {
+  #      WantedBy = [ "default.target" ];
+  #    };
+  #  };
 }

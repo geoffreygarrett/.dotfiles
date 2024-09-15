@@ -8,39 +8,71 @@
 let
   # Define a script that returns either the GitHub token or OpenAI API key
   #language=sh
-  key-fetcher = pkgs.writeShellScriptBin "key-fetcher" ''
-    #!/bin/sh
-
-    # Function to return the key based on the file path
-    fetch_key() {
-      if [ -f "$1" ]; then
-        cat "$1"
-      else
-        echo "Error: $2 not found."
+  key-fetcher =
+    if
+      pkgs.lib.hasAttrByPath [
+        "sops"
+        "secrets"
+      ] config
+    then
+      pkgs.writeShellScriptBin "key-fetcher" ''
+        #!/bin/sh
+        fetch_key() {
+          if [ -z "$1" ]; then
+            echo "Error: Secret path for $2 is not defined."
+            exit 1
+          elif [ -f "$1" ]; then
+            cat "$1"
+          else
+            echo "Error: $2 not found at $1."
+            exit 1
+          fi
+        }
+        case "$1" in
+          "github-token")
+            fetch_key "${
+              if
+                pkgs.lib.hasAttrByPath [
+                  "sops"
+                  "secrets"
+                  "github-token"
+                  "path"
+                ] config
+              then
+                config.sops.secrets.github-token.path
+              else
+                ""
+            }" "GitHub token"
+            ;;
+          "openai-api-key")
+            fetch_key "${
+              if
+                pkgs.lib.hasAttrByPath [
+                  "sops"
+                  "secrets"
+                  "openai-api-key"
+                  "path"
+                ] config
+              then
+                config.sops.secrets.openai-api-key.path
+              else
+                ""
+            }" "OpenAI API key"
+            ;;
+          *)
+            echo "Usage: $0 {github-token|openai-api-key}"
+            exit 1
+            ;;
+        esac
+      ''
+    else
+      pkgs.writeShellScriptBin "key-fetcher" ''
+        #!/bin/sh
+        echo "Error: sops secrets are not configured."
         exit 1
-      fi
-    }
-
-    # Determine which key to return based on the argument
-    case "$1" in
-      "github-token")
-        fetch_key "${config.sops.secrets.github-token.path}" "GitHub token"
-        ;;
-      "openai-api-key")
-        fetch_key "${config.sops.secrets.openai-api-key.path}" "OpenAI API key"
-        ;;
-      *)
-        echo "Usage: $0 {github-token|openai-api-key}"
-        exit 1
-        ;;
-    esac
-  '';
+      '';
 in
 {
-  sops.secrets.openai-api-key = {
-    sopsFile = config.sops.defaultSopsFile;
-  };
-
   programs.neovim = {
     enable = true;
     viAlias = true;
