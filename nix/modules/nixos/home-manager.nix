@@ -8,6 +8,7 @@
   ...
 }:
 let
+
   shared-programs = import ../shared/home-manager.nix {
     inherit
       config

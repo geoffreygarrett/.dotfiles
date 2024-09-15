@@ -58,3 +58,12 @@ official documentation of Ubuntu and NixOS.
 - https://nixos.org/manual/nixos/stable/index.html#sec-building-image
 The nixos-generators project allows to take the same NixOS configuration, and generate outputs for different target formats.
 - https://github.com/nix-community/nixos-generators/tree/master
+
+# Learning Nix
+
+- https://www.youtube.com/watch?v=a67Sv4Mbxmc&list=PLko9chwSoP-15ZtZxu64k_CuTzXrFpxPE&ab_channel=Vimjoyer
+
+# Key Remapping
+
+- https://github.com/xremap/xremap
+- https://www.youtube.com/watch?v=UPWkQ3LUDOU&list=PLko9chwSoP-15ZtZxu64k_CuTzXrFpxPE&index=9&ab_channel=Vimjoyer

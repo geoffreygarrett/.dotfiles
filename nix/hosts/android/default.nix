@@ -18,6 +18,8 @@ in
   # User Configuration
   user.shell = "${pkgs.zsh}/bin/zsh";
 
+  # TODO: XREMAP!
+
   # Nix Configuration
   nix = {
     extraOptions = ''

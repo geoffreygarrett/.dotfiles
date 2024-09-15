@@ -5,12 +5,14 @@
   https://github.com/dustinlyons/nixos-config/tree/main
 
 - \[3\] Uses WSL:
+
   - https://codeberg.org/Gipphe/dotfiles/src/branch/main/home/modules/system/wsl
   - https://github.com/davidtwco/veritas
 
 - \[4\] Uses nix-on-droid:
   https://github.com/t184256/nix-configs/blob/main/user/gpg.nix
-- 
+
+-
 
 # Flakes
 
