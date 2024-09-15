@@ -3,6 +3,21 @@ final: prev: {
     {
       config ? final.config,
     }:
+    let
+      secretNames = final.lib.attrNames (config.sops.secrets or { });
+      secretCases = final.lib.concatMapStrings (name: ''
+        "${name}")
+          fetch_key "${
+            final.lib.getAttrFromPath [
+              "sops"
+              "secrets"
+              name
+              "path"
+            ] config
+          }" "${name}"
+          ;;
+      '') secretNames;
+    in
     if
       final.lib.hasAttrByPath [
         "sops"
@@ -12,22 +27,20 @@ final: prev: {
       final.writeShellScriptBin "key-fetcher" ''
         #!/bin/sh
         fetch_key() {
-          if [ -f "$1" ]; then
+          if [ -z "$1" ]; then
+            echo "Error: Secret path for $2 is not defined." >&2
+            exit 1
+          elif [ -f "$1" ]; then
             cat "$1"
           else
-            echo "Error: $2 not found."
+            echo "Error: $2 not found at $1." >&2
             exit 1
           fi
         }
         case "$1" in
-          "github-token")
-            fetch_key "${config.sops.secrets.github-token.path}" "GitHub token"
-            ;;
-          "openai-api-key")
-            fetch_key "${config.sops.secrets.openai-api-key.path}" "OpenAI API key"
-            ;;
+          ${secretCases}
           *)
-            echo "Usage: $0 {github-token|openai-api-key}"
+            echo "Usage: $0 {${final.lib.concatStringsSep "|" secretNames}}" >&2
             exit 1
             ;;
         esac
@@ -35,7 +48,7 @@ final: prev: {
     else
       final.writeShellScriptBin "key-fetcher" ''
         #!/bin/sh
-        echo "Error: sops secrets are not configured."
+        echo "Error: sops secrets are not configured." >&2
         exit 1
       ''
   ) { };
