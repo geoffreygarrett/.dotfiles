@@ -9,31 +9,12 @@
   ...
 }:
 let
-
-  shared-programs = import ../shared/home-manager/programs {
-    inherit
-      config
-      pkgs
-      lib
-      home-manager
-      inputs
-      user
-      self
-      ;
-  };
-  secrets = import ../shared/secrets.nix {
-    inherit
-      self
-      config
-      pkgs
-      user
-      ;
-  };
 in
 {
   imports = [
-    shared-programs
-    secrets
+    ../shared/aliases.nix
+    ../shared/secrets.nix
+    ../shared/home-manager/programs
   ];
 
   dconf.settings = {
@@ -45,10 +26,10 @@ in
       ];
     };
     "org/gnome/desktop/interface" = {
-      font-name = "Roboto 12"; # Interface font
-      document-font-name = "Roboto 12"; # Document font
-      monospace-font-name = "JetBrains Mono 10"; # Monospace font
-      cursor-blink = false; # Disable cursor blink
+      font-name = "Roboto 12";
+      document-font-name = "Roboto 12";
+      monospace-font-name = "JetBrains Mono 10";
+      cursor-blink = false;
     };
   };
   home = {

@@ -16,6 +16,7 @@ in
     roboto # This is equivalent to pkgs.roboto
     #jetbrains-mono   # This is equivalent to pkgs.jetbrains-mono
     dejavu_fonts
+    #    feather-font # from overlay
     jetbrains-mono
     font-awesome
     noto-fonts
@@ -23,30 +24,67 @@ in
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # RGB
-  services.hardware.openrgb.enable = true;
-
   # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "nodev";
-  boot.loader.grub.useOSProber = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.gfxmodeEfi = "2560x1440";
-  # boot.loader.grub.theme = pkgs.nixos-grub2-theme;
-  boot.loader.grub.theme =
-    let
-      hyperfluent-theme = pkgs.fetchFromGitHub {
-        owner = "Coopydood";
-        repo = "HyperFluent-GRUB-Theme";
-        rev = "v1.0.1"; # Use the latest release tag or a specific commit hash
-        sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f"; # Replace with the correct hash
-      };
-    in
-    "${hyperfluent-theme}/nixos";
-  boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.efi.canTouchEfiVariables = false;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+  #  boot.loader.grub.enable = true;
+  #  boot.loader.grub.device = "nodev";
+  #  boot.loader.grub.useOSProber = true;
+  #  boot.loader.grub.efiSupport = true;
+  #  boot.loader.grub.gfxmodeEfi = "2560x1440";
+  #  # boot.loader.grub.theme = pkgs.nixos-grub2-theme;
+  #  boot.loader.grub.theme =
+  #    let
+  #      hyperfluent-theme = pkgs.fetchFromGitHub {
+  #        owner = "Coopydood";
+  #        repo = "HyperFluent-GRUB-Theme";
+  #        rev = "v1.0.1"; # Use the latest release tag or a specific commit hash
+  #        sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f"; # Replace with the correct hash
+  #      };
+  #    in
+  #    "${hyperfluent-theme}/nixos";
+  #  boot.loader.grub.efiInstallAsRemovable = true;
+  #  boot.loader.efi.canTouchEfiVariables = false;
+  #  boot.loader.efi.efiSysMountPoint = "/boot/efi";
 
+  # Use the systemd-boot EFI boot loader.
+  #  boot = {
+  #    loader = {
+  #      systemd-boot = {
+  #        enable = true;
+  #        configurationLimit = 42;
+  #      };
+  #      #Sboot.loader.grub.efiInstallAsRemovable = true;
+  #      efi.canTouchEfiVariables = false;
+  #      efi.efiSysMountPoint = "/boot/efi";
+  #    };
+  #    initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usbhid" "usb_storage" "sd_mod" "v4l2loopback" ];
+  #    kernelModules = [ "uinput" "v4l2loopback" ];
+  #    extraModulePackages = [ pkgs.linuxPackages.v4l2loopback ];
+  #  };
+  # Bootloader Configuration
+boot.loader.systemd-boot.enable = true;
+boot.loader.systemd-boot.configurationLimit = 5;
+boot.loader.efi.canTouchEfiVariables = true;
+#boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
+fileSystems."/boot/efi" = {
+  device = "/dev/disk/by-uuid/887C-24DF";
+  fsType = "vfat";
+};
+
+  # Kernel modules
+  boot.initrd.availableKernelModules = [
+    "nvme"
+    "xhci_pci"
+    "ahci"
+    "usbhid"
+    "usb_storage"
+    "sd_mod"
+  ];
+  boot.initrd.kernelModules = [ ];
+  boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModulePackages = [ ];
+
+  programs.zsh.enable = true;
   networking.hostName = "apollo"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -120,7 +158,6 @@ in
 
   # Install firefox.
   programs.firefox.enable = true;
-  programs.zsh.enable = true;
 
   # Allow unfree packages
   # nixpkgs.config.allowUnfree = true;
@@ -128,7 +165,6 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    openrgb-with-all-plugins # RGB
     gitAndTools.gitFull
     linuxPackages.v4l2loopback
     v4l-utils
