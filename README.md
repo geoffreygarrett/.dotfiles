@@ -1,159 +1,56 @@
-# `nixus-core`
+# Nerd Fonts
 
-## Table of Contents
+This is an archived font from the Nerd Fonts release v3.2.1.
 
-- [Introduction](#introduction)
-- [Supported Platforms and Frameworks](#supported-platforms-and-frameworks)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Key Components](#key-components)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
+For more information see:
 
-## Introduction
+- https://github.com/ryanoasis/nerd-fonts/
+- https://github.com/ryanoasis/nerd-fonts/releases/latest/
 
-My personal setup for what I envisioned something "cross-platform and
-consistent" to be.
+# JetBrains Mono
 
-## Supported Platforms and Frameworks
+JetBrains Mono: a typeface made for developers
 
-- [Home Manager](https://github.com/nix-community/home-manager): Standalone user
-  environment management
-- [NixOS](https://nixos.org/): Full system-level integration
-- [nix-darwin](https://github.com/LnL7/nix-darwin): macOS system-level
-  integration
-- [Nix-on-Droid](https://github.com/nix-community/nix-on-droid): Android
-  integration (aarch64-linux only)
-- [Mobile NixOS](https://github.com/mobile-nixos/mobile-nixos): Experimental
-  mobile device support
+For more information have a look at the upstream website:
+https://github.com/JetBrains/JetBrainsMono
 
-## Features
+Version: 2.304
 
-| Feature                                                           | Home | NixOS | macOS (nix-darwin) | Android (Nix-on-Droid) | Mobile NixOS |
-| ----------------------------------------------------------------- | :--: | :---: | :----------------: | :--------------------: | :----------: |
-| System-level integration                                          | N/A  |  ⚫   |         🟢         |           🟢           |      ⚫      |
-| Secret management ([sops-nix](https://github.com/Mic92/sops-nix)) |  🟢  |  ⚫   |         🟢         |           🟢           |      ⚫      |
-| VPN - [Tailscale](https://tailscale.com/)                         |  🟢  |  ⚫   |         🟢         |           🟠           |      ⚫      |
-| VPN - [WireGuard](https://www.wireguard.com/)                     |  ⚫  |  ⚫   |         ⚫         |           ⚫           |      ⚫      |
-| Distributed clipboard registry                                    |  🟡  |  ⚫   |         🟡         |           🟡           |      ⚫      |
-| GPG/YubiKey support                                               |  ⚫  |  ⚫   |         ⚫         |           ⚫           |      ⚫      |
+## Which font?
 
-Legend:
+### TL;DR
 
-- 🟢 Completed
-- 🟠 Partial Support
-- 🟡 In Progress
-- ⚫ Planned
-- ⛔ Not Possible/Applicable
-- N/A Not Applicable
+- Pick your font family:
+  - If you are limited to monospaced fonts (because of your terminal, etc) then
+    pick a font with `Nerd Font Mono` (or `NFM`).
+  - If you want to have bigger icons (usually around 1.5 normal letters wide)
+    pick a font without `Mono` i.e. `Nerd Font` (or `NF`). Most terminals
+    support this, but ymmv.
+  - If you work in a proportional context (GUI elements or edit a presentation
+    etc) pick a font with `Nerd Font Propo` (or `NFP`).
 
-### Feature Descriptions
+### Ligatures
 
-- **System-level integration**: Ensures deep integration with the host operating
-  system for optimal performance and functionality. Not applicable for
-  standalone Home Manager use.
-- **Secret management**: Utilizes sops-nix for secure handling of sensitive
-  information across platforms, including standalone Home Manager
-  configurations.
-- **VPN solutions**: Implements Tailscale for secure networking, with WireGuard
-  support planned for the future. Available in Home Manager configurations.
-- **Distributed clipboard registry**: A work-in-progress feature for seamless
-  clipboard sharing between devices, including Home Manager setups.
-- **GPG/YubiKey support**: Planned security enhancements for robust
-  authentication and encryption capabilities across all supported platforms.
+Ligatures are generally preserved in the patched fonts. Nerd Fonts `v2.0.0` had
+no ligatures in the `Nerd Font Mono` fonts, this has been dropped with `v2.1.0`.
+If you have a ligature-aware terminal and don't want ligatures you can (usually)
+disable them in the terminal settings.
 
-## Installation
+### Explanation
 
-path/to/bootstrap' $ nix run .#deploy --
-'github:geoffreygarrett/nix-on-droid/main' 'user@host:/path/to/bootstrap'
+Once you narrow down your font choice of family (`Droid Sans`, `Inconsolata`,
+etc) and style (`bold`, `italic`, etc) you have 2 main choices:
 
-```shell
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-```
+#### `Option 1: Download already patched font`
 
-(Add installation instructions for each supported platform, including standalone
-Home Manager use)
+- For a stable version download a font package from the
+  [release page](https://github.com/ryanoasis/nerd-fonts/releases)
+- Or download the development version from the folders here
 
-## Usage
+#### `Option 2: Patch your own font`
 
-(Provide usage examples and common commands for each deployment scenario,
-including Home Manager)
+- Patch your own variations with the various options provided by the font
+  patcher (i.e. not include all symbols for smaller font size)
 
-## Key Components
-
-1. **Home Manager Integration**
-
-   - Standalone user environment management
-   - Compatible with various Linux distributions and macOS
-
-1. **System Integration**
-
-   - NixOS: Native support
-   - macOS: via [`nix-darwin`](https://github.com/LnL7/nix-darwin)
-   - Android: via Nix-on-Droid (`aarch64-linux` only)
-   - Mobile devices: Experimental support via Mobile NixOS
-
-1. **Secret Management**
-
-   - Powered by [`sops-nix`](https://github.com/Mic92/sops-nix)
-   - Supported across all platforms, including standalone Home Manager use
-   - Custom workaround implemented for Nix-on-Droid
-
-1. **VPN Solutions**
-
-   - Tailscale: Fully implemented on Home Manager and macOS, partial support on
-     Nix-on-Droid
-   - WireGuard: Planned for future implementation across all platforms
-
-1. **Clipboard Management**
-
-   - Distributed clipboard registry system (in progress)
-   - Inspired by Neovim's registry clipboard system
-   - Planned for all supported platforms, including Home Manager
-
-1. **Security Enhancements**
-
-   - GPG integration planned for all platforms
-   - YubiKey support in roadmap for enhanced security across deployments
-
-## Roadmap
-
-### Short-term Goals
-
-- Merge Nix-on-Droid sops-nix workaround upstream
-- Complete distributed clipboard registry system
-- Improve Tailscale support for Nix-on-Droid
-- Implement WireGuard support
-
-### Medium-term Goals
-
-- Develop sops-nix.lib.darwinModules for improved macOS support
-- Expand GPG functionality with YubiKey integration
-- Enhance cross-platform compatibility for clipboard registry
-
-### Long-term Goals
-
-- Further integrate and stabilize Mobile NixOS support
-- Explore iOS integration possibilities
-- Continuous improvement of system-level integration across platforms
-- Investigate support for additional Android architectures in Nix-on-Droid
-
-## Contributing
-
-We welcome contributions to the Nixus Device System project! If you're
-interested in helping, please:
-
-1. Fork the repository
-1. Create a new branch for your feature or bug fix
-1. Make your changes and commit them with clear, descriptive messages
-1. Push your changes to your fork
-1. Create a pull request with a detailed description of your changes
-
-For more detailed contributing guidelines, please see our CONTRIBUTING.md file
-(link to file).
-
-## License
-
-(Add your project's license information here)
+For more information see:
+[The FAQ](https://github.com/ryanoasis/nerd-fonts/wiki/FAQ-and-Troubleshooting#which-font)

@@ -72,6 +72,20 @@
       url = "github:oxalica/rust-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Browser
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Add the apple-fonts input
+    apple-fonts = {
+      url = "git+https://codeberg.org/adamcstephens/apple-fonts.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      # Optionally, specify the branch if it's not the default
+      # url = "git+https://codeberg.org/adamcstephens/apple-fonts.nix?ref=main";
+    };
   };
 
   outputs =
@@ -273,6 +287,7 @@
             ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
+                backupFileExtension = "nixus.bak";
                 sharedModules = [
                   inputs.sops-nix.homeManagerModules.sops
                   ./nix/packages/shared/shell-aliases
@@ -281,7 +296,7 @@
                 extraSpecialArgs = {
                   inherit inputs self user;
                 };
-                useUserPackages = true;
+                # useUserPackages = true;
                 users.${user} =
                   {
                     self,

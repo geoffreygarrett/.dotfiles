@@ -23,11 +23,14 @@ in
     (importModule ./zellij.nix)
     (importModule ./git.nix)
     (importModule ./gh.nix)
+    (importModule ./tmux.nix)
     (importModule ./zsh.nix)
     (importModule ./bash.nix)
     (importModule ./nushell.nix)
     (importModule ./nvim.nix)
     (importModule ./starship.nix)
+    (importModule ./firefox.nix)
     (importModule ./htop.nix)
+    (importModule ./vscode.nix)
   ];
 }

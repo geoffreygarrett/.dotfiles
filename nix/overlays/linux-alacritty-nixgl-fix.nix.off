@@ -4,7 +4,7 @@ final: prev: {
       alacritty ? prev.alacritty,
       nixgl ? final.nixgl.auto.nixGLDefault,
     }:
-    if final.stdenv.isLinux then
+    if final.stdenv.isLinux && !(builtins.pathExists "/etc/NIXOS") then
       final.writeShellScriptBin "alacritty" ''
         #!/bin/sh
         ${nixgl}/bin/nixGL ${alacritty}/bin/alacritty "$@"

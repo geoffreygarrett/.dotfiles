@@ -9,6 +9,11 @@
     # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
+  fonts.packages = with pkgs; [
+    roboto # This is equivalent to pkgs.roboto
+    #jetbrains-mono   # This is equivalent to pkgs.jetbrains-mono
+    (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
+  ];
 
   # Bootloader.
   boot.loader.grub.enable = true;
@@ -16,7 +21,15 @@
   boot.loader.grub.useOSProber = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.gfxmodeEfi = "2560x1440";
-  boot.loader.grub.theme = pkgs.nixos-grub2-theme;
+  # boot.loader.grub.theme = pkgs.nixos-grub2-theme;
+  boot.loader.grub.theme = let
+      hyperfluent-theme = pkgs.fetchFromGitHub {
+        owner = "Coopydood";
+        repo = "HyperFluent-GRUB-Theme";
+        rev = "v1.0.1"; # Use the latest release tag or a specific commit hash
+        sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f"; # Replace with the correct hash
+      };
+    in "${hyperfluent-theme}/nixos";
   boot.loader.grub.efiInstallAsRemovable = true;
   boot.loader.efi.canTouchEfiVariables = false;
   boot.loader.efi.efiSysMountPoint = "/boot/efi";

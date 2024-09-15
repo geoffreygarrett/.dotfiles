@@ -63,8 +63,8 @@ list_usb_devices_linux() {
   echo "Debug: Running lsblk command..."
   lsblk -d -o NAME,SIZE,MODEL,TRAN,TYPE,RM,MOUNTPOINT
 
-  # Use `lsblk` to list only removable block devices
-  local devices=($(lsblk -dnro NAME,SIZE,MODEL,TRAN,TYPE,RM | awk '$6 == 1 && $5 == "disk" && $4 == "usb" {print $1","$2","$3}'))
+  # Use `lsblk` to list block devices with the 'usb' transport type
+  local devices=($(lsblk -dnro NAME,SIZE,MODEL,TRAN,TYPE | awk '$4 == "usb" && $5 == "disk" {print $1","$2","$3}'))
 
   local count=1
   for device_info in "${devices[@]}"; do
@@ -75,10 +75,11 @@ list_usb_devices_linux() {
   done
 
   if [ ${#usb_devices[@]} -eq 0 ]; then
-    echo "Debug: No removable USB devices found. Here's the output of 'lsblk -d':"
+    echo "Debug: No USB devices found. Here's the output of 'lsblk -d':"
     lsblk -d
   fi
 }
+
 
 list_usb_devices_macos() {
   print_step "Scanning for available USB devices on macOS"

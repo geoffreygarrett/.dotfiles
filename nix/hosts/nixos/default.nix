@@ -12,8 +12,8 @@
     #    ../../modules/nixos
     #    ../../modules/nixos/home-manager.nix
     ../../modules/shared
-    #    ../../modules/shared/cachix
-    #./configuration.nix
+    ../../modules/shared/cachix
+    ./configuration.nix
   ];
 
   #  services.nix-daemon.enable = true;
@@ -21,7 +21,10 @@
   # Environment packages
   environment.systemPackages =
     with pkgs;
-    [ ] ++ (import ../../modules/shared/packages { inherit pkgs; });
+    [
+      wl-clipboard
+    ]
+    ++ (import ../../modules/shared/packages/desktop.nix { inherit pkgs; });
 
   #  environment.sessionVariables = {
   #    EDITOR = "nvim";
