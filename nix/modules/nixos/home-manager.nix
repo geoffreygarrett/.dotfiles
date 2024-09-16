@@ -22,6 +22,7 @@ in
         "firefox.desktop"
         "Alacritty.desktop"
         "mendeley-reference-manager.desktop"
+        "obsidian.desktop"
       ];
     };
     "org/gnome/desktop/interface" = {
