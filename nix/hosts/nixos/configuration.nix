@@ -134,8 +134,16 @@ in
     description = "Automatic connection to Tailscale";
 
     # make sure tailscale is running before trying to connect to tailscale
-    after = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
-    wants = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
+    after = [
+      "network-pre.target"
+      "tailscale.service"
+      "sops-nix.service"
+    ];
+    wants = [
+      "network-pre.target"
+      "tailscale.service"
+      "sops-nix.service"
+    ];
     wantedBy = [ "multi-user.target" ];
 
     # set this service as a oneshot job

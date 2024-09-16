@@ -1,11 +1,12 @@
-{ config
-, self
-, pkgs
-, lib
-, home-manager
-, inputs
-, user
-, ...
+{
+  config,
+  self,
+  pkgs,
+  lib,
+  home-manager,
+  inputs,
+  user,
+  ...
 }:
 let
 in
@@ -33,7 +34,7 @@ in
     };
     "org/gnome/desktop/peripherals/keyboard" = {
       repeat-interval = 30;
-      delay = 250;
+      delay = 225;
     };
     "org/gnome/desktop/search-providers" = {
       disabled = [

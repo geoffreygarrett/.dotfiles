@@ -222,6 +222,10 @@
             type = "app";
             program = "${nixusApp}/bin/nixus";
           };
+          switch = {
+            type = "app";
+            program = "${pkgs.writeScriptBin "switch" (builtins.readFile ./nix/apps/switch.sh)}/bin/switch";
+          };
           nixus = {
             type = "app";
             program = "${nixusApp}/bin/nixus";

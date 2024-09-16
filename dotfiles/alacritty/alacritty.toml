@@ -96,10 +96,10 @@ save_to_clipboard = false
 # semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
 
 [cursor]
-style = { shape = "Block", blinking = "Off" }
+#style = { shape = "Block", blinking = "Off" }
 vi_mode_style = "None"
-blink_interval = 750
-unfocused_hollow = true
+#blink_interval = 750
+#unfocused_hollow = true
 thickness = 0.15
 
 # Cursor style

@@ -13,4 +13,5 @@
 
 - \[ \] Key-repeat for ubuntu/linux & NixOS
 
-- [ ] CI intgeration for screenshotting configs for seeing it's evolution over time.
+- \[ \] CI intgeration for screenshotting configs for seeing it's evolution over
+  time.

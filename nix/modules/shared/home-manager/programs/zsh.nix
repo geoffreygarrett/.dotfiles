@@ -95,63 +95,72 @@ in
     };
 
     initExtra = ''
-      # Zsh options
-      setopt extendedglob nomatch
-      setopt EXTENDED_HISTORY INC_APPEND_HISTORY HIST_FIND_NO_DUPS HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS
-      setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
-      unsetopt beep
-      setopt PROMPT_SUBST
+       # Zsh options
+       setopt extendedglob nomatch
+       setopt EXTENDED_HISTORY INC_APPEND_HISTORY HIST_FIND_NO_DUPS HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS
+       setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT
+       unsetopt beep
+       setopt PROMPT_SUBST
 
-      # Key bindings
-      bindkey -v
-      bindkey '^R' history-incremental-search-backward
-      export KEYTIMEOUT=1
+       # Key bindings
+       bindkey -v
+       bindkey '^R' history-incremental-search-backward
+       export KEYTIMEOUT=1
 
-      # Vi mode indicator
-      vim_ins_mode="%{$fg[green]%}|%{$reset_color%}"
-      vim_cmd_mode="%{$fg[red]%}|%{$reset_color%}"
-      vim_mode=$vim_ins_mode
+       # Autosuggestion key bindings
+       bindkey '^Y' autosuggest-accept
+      # bindkey '^X^M' autosuggest-execute
+      # bindkey '^X^L' autosuggest-clear
+      # bindkey '^X^F' autosuggest-fetch
+      # bindkey '^X^D' autosuggest-disable
+      # bindkey '^X^E' autosuggest-enable
+      # bindkey '^X^T' autosuggest-toggle
 
-      function zle-keymap-select {
-        vim_mode="''${''${KEYMAP/vicmd/$vim_cmd_mode}/(main|viins)/$vim_ins_mode}"
-        zle reset-prompt
-      }
+       # Vi mode indicator
+       vim_ins_mode="%{$fg[green]%}|%{$reset_color%}"
+       vim_cmd_mode="%{$fg[red]%}|%{$reset_color%}"
+       vim_mode=$vim_ins_mode
 
-      function zle-line-finish {
-        vim_mode=$vim_ins_mode
-      }
+       function zle-keymap-select {
+         vim_mode="''${''${KEYMAP/vicmd/$vim_cmd_mode}/(main|viins)/$vim_ins_mode}"
+         zle reset-prompt
+       }
 
-      zle -N zle-line-finish
-      zle -N zle-keymap-select
+       function zle-line-finish {
+         vim_mode=$vim_ins_mode
+       }
 
-      # Direnv hook
-      eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
+       zle -N zle-line-finish
+       zle -N zle-keymap-select
 
-      # Utility functions
-      function hashish() {
-        local length=$1
-        ${pkgs.openssl}/bin/openssl rand -base64 $(( length * 3 / 4 + 1 )) | tr -dc 'a-zA-Z0-9' | head -c $length
-        echo
-      }
+       # Direnv hook
+       eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
 
-      # FZF key bindings and completion
-      if [ -n "''${commands[fzf-share]}" ]; then
-        source "$(fzf-share)/key-bindings.zsh"
-        source "$(fzf-share)/completion.zsh"
-      fi
+       # Utility functions
+       function hashish() {
+         local length=$1
+         ${pkgs.openssl}/bin/openssl rand -base64 $(( length * 3 / 4 + 1 )) | tr -dc 'a-zA-Z0-9' | head -c $length
+         echo
+       }
 
-      # Load NVM if installed
-      export NVM_DIR="$HOME/.nvm"
-      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+       # FZF key bindings and completion
+       if [ -n "''${commands[fzf-share]}" ]; then
+         source "$(fzf-share)/key-bindings.zsh"
+         source "$(fzf-share)/completion.zsh"
+       fi
 
-      # Pyenv initialization
-      if command -v pyenv 1>/dev/null 2>&1; then
-        eval "$(pyenv init -)"
-      fi
+       # Load NVM if installed
+       export NVM_DIR="$HOME/.nvm"
+       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-      # Source additional custom configurations
-      [ -f $HOME/.zshrc.local ] && source $HOME/.zshrc.local
+       # Pyenv initialization
+       if command -v pyenv 1>/dev/null 2>&1; then
+         eval "$(pyenv init -)"
+       fi
+
+       # Source additional custom configurations
+       [ -f $HOME/.zshrc.local ] && source $HOME/.zshrc.local
     '';
 
     dirHashes = {
