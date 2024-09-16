@@ -89,6 +89,12 @@
       "qemu"
       "gsmartcontrol"
     ];
+    #    taps = [
+    #      "nikitabobko/tap"
+    #    ];
+    #    casks = [
+    #      "nikitabobko/tap/aerospace"
+    #    ];
     masApps = {
       "tailscale" = 1475387142;
     };
