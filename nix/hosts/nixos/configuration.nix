@@ -286,6 +286,68 @@ in
     #   nvidiaSettings = true;
     #   package = config.boot.kernelPackages.nvidiaPackages.stable;
     # };
+  services.xserver = {
+    enable = true;
+    displayManager.sessionCommands = ''
+      # Equivalent to KeyRepeat = 2 and InitialKeyRepeat = 15
+      ${pkgs.xorg.xset}/bin/xset r rate 225 30
+
+      # Equivalent to ApplePressAndHoldEnabled = false
+      ${pkgs.xorg.setxkbmap}/bin/setxkbmap -layout us -option ctrl:nocaps
+
+      # Additional settings to match macOS configuration
+      ${pkgs.xorg.xset}/bin/xset b off  # Disable terminal bell (equivalent to setting beep volume to 0)
+    '';
+  };
+
+  # Bootloader.
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "nodev";
+  boot.loader.grub.useOSProber = true;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.grub.gfxmodeEfi = "2560x1440";
+  # boot.loader.grub.theme = pkgs.nixos-grub2-theme;
+  boot.loader.grub.theme =
+    let
+      hyperfluent-theme = pkgs.fetchFromGitHub {
+        owner = "Coopydood";
+        repo = "HyperFluent-GRUB-Theme";
+        rev = "v1.0.1"; # Use the latest release tag or a specific commit hash
+        sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f"; # Replace with the correct hash
+      };
+    in
+    "${hyperfluent-theme}/nixos";
+  boot.loader.grub.efiInstallAsRemovable = true;
+  boot.loader.efi.canTouchEfiVariables = false;
+  boot.loader.efi.efiSysMountPoint = "/boot/efi";
+
+  networking.hostName = "apollo"; # Define your hostname.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+
+  # Enable networking
+  networking.networkmanager.enable = true;
+
+  # Set your time zone.
+  time.timeZone = "Africa/Johannesburg";
+
+  # Select internationalisation properties.
+  i18n.defaultLocale = "en_GB.UTF-8";
+
+  # Enable the X11 windowing system.
+  services.xserver.enable = true;
+
+  # Enable the GNOME Desktop Environment.
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
+
+  # Configure keymap in X11
+  services.xserver.xkb = {
+    layout = "us";
+    variant = "";
   };
 
   # Virtualization

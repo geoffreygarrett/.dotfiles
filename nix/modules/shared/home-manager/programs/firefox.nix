@@ -80,6 +80,14 @@
         tridactyl
         youtube-shorts-block
       ];
+      #  extensions = with inputs.firefox-addons.packages.${system}; [
+      #    bitwarden
+      #    ublock-origin
+      #    sponsorblock
+      #    darkreader
+      #    tridactyl
+      #    youtube-shorts-block
+      #  ];
     };
   };
 }
