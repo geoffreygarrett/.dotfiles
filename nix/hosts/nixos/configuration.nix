@@ -54,6 +54,9 @@ in
   networking = {
     hostName = "apollo";
     networkmanager.enable = true;
+    interfaces.enp3s0.wakeOnLan.enable = true;
+    interfaces.tailscale0.wakeOnLan.enable = true;
+
     # wireless.enable = true;  # Uncomment to enable wireless support via wpa_supplicant
     # proxy = {
     #   default = "http://user:password@proxy:port/";
@@ -71,7 +74,10 @@ in
         41641 # Tailscale
       ];
       # Tailscale-specific firewall rules
-      trustedInterfaces = [ "tailscale0" ];
+      trustedInterfaces = [
+        "tailscale0"
+        "enp3s0"
+      ];
       allowedUDPPortRanges = [
         {
           from = 41641;

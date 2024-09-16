@@ -7,7 +7,7 @@ NC='\033[0m'
 
 OS_TYPE=$(uname -s)
 SYSTEM=$(uname -m)
-
+e
 if [ "$OS_TYPE" = "Linux" ]; then
     case "$SYSTEM" in
         x86_64)
