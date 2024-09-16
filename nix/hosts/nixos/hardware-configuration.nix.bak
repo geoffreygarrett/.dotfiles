@@ -31,7 +31,24 @@
     fsType = "ext4";
   };
 
-  swapDevices = [ ];
+  # File system configuration for /boot/efi
+  fileSystems."/boot/efi" = {
+    device = "/dev/disk/by-uuid/887C-24DF";
+    fsType = "vfat";
+  };
+
+  # Ensure /boot is also mounted
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/887C-24DF";
+    fsType = "vfat";
+  };
+  #
+  #  swapDevices = [ ];
+
+  # Swap configuration
+  swapDevices = [
+    { device = "/dev/disk/by-uuid/9dc1d93d-d337-4f61-8644-441feb7fd44c"; }
+  ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
@@ -42,4 +59,22 @@
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
+
+  # Enable sound
+  #  sound.enable = true;
+  #  hardware = {
+  ##    pulseaudio.enable = true;
+  #
+  #    # Video support
+  #    opengl = {
+  #      enable = true;
+  #      driSupport32Bit = true;
+  #      driSupport = true;
+  #    };
+  #
+  #    nvidia.modesetting.enable = true;
+  #
+  #    # Crypto wallet support
+  #    ledger.enable = true;
+  #  };
 }

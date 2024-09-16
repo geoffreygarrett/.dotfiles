@@ -1,20 +1,260 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 let
   keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITvBraRmM6IvQFt8VUHRx9hZ5DZVkPX3ORlfVqGa05z" ];
+  hyperfluent-theme = pkgs.fetchFromGitHub {
+    owner = "Coopydood";
+    repo = "HyperFluent-GRUB-Theme";
+    rev = "v1.0.1";
+    sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f";
+  };
 in
 {
-  imports = [
-    # Include the results of the hardware scan.
-    ./hardware-configuration.nix
+  imports = [ ./hardware-configuration.nix ];
+
+  # System-wide configurations
+  system.stateVersion = "24.05";
+  time.timeZone = "Africa/Johannesburg";
+  i18n.defaultLocale = "en_GB.UTF-8";
+
+  # Bootloader configuration
+  boot.loader = {
+    systemd-boot.enable = false; # Disable systemd-boot
+    efi = {
+      canTouchEfiVariables = false;
+      efiSysMountPoint = "/boot/efi";
+    };
+    grub = {
+      enable = true;
+      efiSupport = true;
+      efiInstallAsRemovable = true;
+      device = "nodev";
+      #useOSProber = true;
+      gfxmodeEfi = "2560x1440";
+      theme = "${hyperfluent-theme}/nixos";
+      extraConfig = ''
+        GRUB_DEFAULT=saved
+        GRUB_SAVEDEFAULT=true
+      '';
+    };
+  };
+
+  # File systems configuration
+  fileSystems."/boot/efi" = {
+    device = "/dev/nvme0n1p1";
+    fsType = "vfat";
+    options = [
+      "defaults"
+      "noatime"
+      "nofail"
+    ];
+  };
+
+  # Networking
+  networking = {
+    hostName = "apollo";
+    networkmanager.enable = true;
+    # wireless.enable = true;  # Uncomment to enable wireless support via wpa_supplicant
+    # proxy = {
+    #   default = "http://user:password@proxy:port/";
+    #   noProxy = "127.0.0.1,localhost,internal.domain";
+    # };
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [
+        22 # SSH
+        80 # HTTP
+        443 # HTTPS
+      ];
+      allowedUDPPorts = [
+        53 # DNS
+        41641 # Tailscale
+      ];
+      # Tailscale-specific firewall rules
+      trustedInterfaces = [ "tailscale0" ];
+      allowedUDPPortRanges = [
+        {
+          from = 41641;
+          to = 41641;
+        }
+      ];
+      # extraCommands = ''
+      #   iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --set
+      #   iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 -j DROP
+      # '';  # Example: rate limiting for SSH connections
+    };
+    # Tailscale configuration
+    #    tailscale.enable = true;
+  };
+
+  # Services
+  services = {
+    tailscale = {
+      enable = true;
+      openFirewall = true; # This replaces the manual firewall configuration
+      useRoutingFeatures = "both"; # Enable subnet routing and exit nodes
+    };
+
+    xserver = {
+      enable = true;
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
+      xkb = {
+        layout = "us";
+        variant = "";
+      };
+      # libinput.enable = true;  # Uncomment to enable touchpad support
+      # videoDrivers = [ "nvidia" ];  # Uncomment for NVIDIA support
+    };
+    printing.enable = true;
+    pipewire = {
+      enable = true;
+      alsa = {
+        enable = true;
+        support32Bit = true;
+      };
+      pulse.enable = true;
+      # jack.enable = true;  # Uncomment to enable JACK support
+    };
+    hardware.openrgb.enable = true;
+    # openssh.enable = true;  # Uncomment to enable OpenSSH server
+  };
+
+  # Enable OpenSSH server
+  services.openssh = {
+    enable = true;
+    settings = {
+      PermitRootLogin = "no";
+      PasswordAuthentication = false;
+    };
+  };
+
+  # create aoneshot job to authenticate to Tailscale
+  systemd.services.tailscale-autoconnect = {
+    description = "Automatic connection to Tailscale";
+
+    # make sure tailscale is running before trying to connect to tailscale
+    after = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
+    wants = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
+    wantedBy = [ "multi-user.target" ];
+
+    # set this service as a oneshot job
+    serviceConfig.Type = "oneshot";
+
+    # have the job run this shell script
+    script = with pkgs; ''
+      set -euo pipefail
+      echo "Starting Tailscale autoconnect service"
+      # wait for tailscaled to settle
+      sleep 2
+      echo "Checking Tailscale status"
+      # check if we are already authenticated to tailscale
+      status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
+      if [ "$status" = "Running" ]; then
+        echo "Tailscale is already running"
+        exit 0
+      fi
+      echo "Authenticating to Tailscale"
+      # otherwise authenticate with tailscale
+      if [ ! -f "${config.sops.secrets.tailscale-auth-key.path}" ]; then
+        echo "Error: Tailscale auth key file not found"
+        exit 1
+      fi
+      ${tailscale}/bin/tailscale up -authkey "$(cat ${config.sops.secrets.tailscale-auth-key.path})"
+      echo "Tailscale authentication completed"
+    '';
+  };
+  # Security
+  security = {
+    rtkit.enable = true;
+    sudo = {
+      enable = true;
+      extraRules = [
+        {
+          commands = [
+            {
+              command = "${pkgs.systemd}/bin/reboot";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+          groups = [ "wheel" ];
+        }
+      ];
+    };
+  };
+
+  # User configuration
+  users.users = {
+    geoffrey = {
+      isNormalUser = true;
+      description = "Geoffrey Garrett";
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "docker"
+        "tailscale" # Add the tailscale group
+      ];
+      shell = pkgs.zsh;
+      openssh.authorizedKeys.keys = keys;
+      packages = with pkgs; [
+        # thunderbird
+      ];
+    };
+    root.openssh.authorizedKeys.keys = keys;
+  };
+
+  # System packages and programs
+  environment.systemPackages = with pkgs; [
+    tailscale
+    openrgb-with-all-plugins
+    gitAndTools.gitFull
+    linuxPackages.v4l2loopback
+    v4l-utils
+    inetutils
+    (writeScriptBin "reboot-to-windows" ''
+      #!${pkgs.stdenv.shell}
+      windows_menu_entry=$(grep menuentry /boot/grub/grub.cfg | grep -i windows | cut -d "'" -f2)
+      sudo grub-reboot "$windows_menu_entry" && sudo reboot
+    '')
+    # vim
+    # wget
   ];
+
+  # # Systemd configuration for Tailscale
+  # systemd.services.tailscaled = {
+  #   wantedBy = [ "multi-user.target" ];
+  #   after = [
+  #     "network-pre.target"
+  #     "NetworkManager.service"
+  #     "systemd-resolved.service"
+  #   ];
+  #   wants = [
+  #     "network-pre.target"
+  #     "NetworkManager.service"
+  #     "systemd-resolved.service"
+  #   ];
+  #   serviceConfig = {
+  #     Restart = "on-failure";
+  #     RestartSec = 5;
+  #   };
+  # };
+
+  # Uncomment to allow unfree packages
+  # nixpkgs.config.allowUnfree = true;
+
+  programs = {
+    firefox.enable = true;
+    zsh.enable = true;
+    # gnupg.agent = {
+    #   enable = true;
+    #   enableSSHSupport = true;
+    # };
+    # mtr.enable = true;
+  };
+
+  # Font configuration
   fonts.packages = with pkgs; [
-    roboto # This is equivalent to pkgs.roboto
-    #jetbrains-mono   # This is equivalent to pkgs.jetbrains-mono
+    roboto
     dejavu_fonts
     jetbrains-mono
     font-awesome
@@ -23,161 +263,42 @@ in
     (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
   ];
 
-  # RGB
-  services.hardware.openrgb.enable = true;
-
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "nodev";
-  boot.loader.grub.useOSProber = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.gfxmodeEfi = "2560x1440";
-  # boot.loader.grub.theme = pkgs.nixos-grub2-theme;
-  boot.loader.grub.theme =
-    let
-      hyperfluent-theme = pkgs.fetchFromGitHub {
-        owner = "Coopydood";
-        repo = "HyperFluent-GRUB-Theme";
-        rev = "v1.0.1"; # Use the latest release tag or a specific commit hash
-        sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f"; # Replace with the correct hash
-      };
-    in
-    "${hyperfluent-theme}/nixos";
-  boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.efi.canTouchEfiVariables = false;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-
-  networking.hostName = "apollo"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Africa/Johannesburg";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_GB.UTF-8";
-
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
+  # Hardware configuration
+  hardware = {
+    pulseaudio.enable = false;
+    # opengl = {
+    #   enable = true;
+    #   driSupport = true;
+    #   driSupport32Bit = true;
+    # };
+    # nvidia = {
+    #   modesetting.enable = true;
+    #   powerManagement.enable = true;
+    #   open = false;
+    #   nvidiaSettings = true;
+    #   package = config.boot.kernelPackages.nvidiaPackages.stable;
+    # };
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
-  };
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.geoffrey = {
-    isNormalUser = true;
-    description = "Geoffrey Garrett";
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "docker"
-    ];
-    shell = pkgs.zsh;
-    openssh.authorizedKeys.keys = keys;
-    packages = with pkgs; [
-      #  thunderbird
-    ];
-  };
-
-  users.users.root = {
-    openssh.authorizedKeys.keys = keys;
-  };
-
-  # Install firefox.
-  programs.firefox.enable = true;
-  programs.zsh.enable = true;
-
-  # Allow unfree packages
-  # nixpkgs.config.allowUnfree = true;
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    openrgb-with-all-plugins # RGB
-    gitAndTools.gitFull
-    linuxPackages.v4l2loopback
-    v4l-utils
-    inetutils
-    #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-    #  wget
-  ];
-
-  # Don't require password for users in `wheel` group for these commands
-  security.sudo = {
-    enable = true;
-    extraRules = [
-      {
-        commands = [
-          {
-            command = "${pkgs.systemd}/bin/reboot";
-            options = [ "NOPASSWD" ];
-          }
-        ];
-        groups = [ "wheel" ];
-      }
-    ];
-  };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
+  # Virtualization
+  # virtualisation = {
+  #   docker.enable = true;
+  #   libvirtd.enable = true;
   # };
 
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.05"; # Did you read the comment?
-
+  # Nix settings
+  nix = {
+    settings = {
+      auto-optimise-store = true;
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
+  };
 }

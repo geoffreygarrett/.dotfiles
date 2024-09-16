@@ -12,6 +12,7 @@
     #    ../../modules/nixos
     #    ../../modules/nixos/home-manager.nix
     ../../modules/shared
+    ../../modules/shared/secrets.nix
     ../../modules/shared/cachix
     ./configuration.nix
   ];

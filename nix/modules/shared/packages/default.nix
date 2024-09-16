@@ -37,7 +37,7 @@ with pkgs;
   age-plugin-yubikey
   gnupg
   libfido2
-
+  ssh-to-age
   # Nix
   #home-manager
 
