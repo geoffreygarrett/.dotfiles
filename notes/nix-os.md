@@ -69,3 +69,16 @@ official documentation of Ubuntu and NixOS.
 
 - https://github.com/xremap/xremap
 - https://www.youtube.com/watch?v=UPWkQ3LUDOU&list=PLko9chwSoP-15ZtZxu64k_CuTzXrFpxPE&index=9&ab_channel=Vimjoyer
+
+
+# Raspberry Pi
+
+- [Installing NixOS on Raspberry Pi 4](https://mtlynch.io/nixos-pi4/)
+- [NixOS on ARM/Raspberry Pi Official](https://nixos.wiki/wiki/NixOS_on_ARM/Raspberry_Pi)
+- [myme's post with mention of deploy-rs](https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html)
+- [Pablo's custom image](https://pablo.tools/blog/computers/nixos-generate-raspberry-images/)
+- [Random cross compile](https://discourse.nixos.org/t/flake-to-create-a-simple-sd-image-for-rpi4-cross/35185)
+# Dual Booting
+
+- [Official](https://nixos.wiki/wiki/Dual_Booting_NixOS_and_Windows)
+

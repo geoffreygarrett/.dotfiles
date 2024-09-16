@@ -16,7 +16,7 @@ in
   system.stateVersion = "24.05";
   time.timeZone = "Africa/Johannesburg";
   i18n.defaultLocale = "en_GB.UTF-8";
-
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   # Bootloader configuration
   boot.loader = {
     systemd-boot.enable = false; # Disable systemd-boot

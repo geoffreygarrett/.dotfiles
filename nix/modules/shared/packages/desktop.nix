@@ -9,6 +9,8 @@ shared-packages
   tailscale # (Reqires root, breaks NixOnDroid), no access to netif's.
   lmstudio
   jetbrains.rust-rover
+  jetbrains.clion
+  jetbrains.pycharm-professional
   # Disk testing
   testdisk
   ddrescue

@@ -31,6 +31,10 @@ in
       monospace-font-name = "JetBrains Mono 10";
       cursor-blink = false;
     };
+    "org/gnome/desktop/peripherals/keyboard" = {
+      repeat-interval = 30;
+      delay = 250;
+    };
     "org/gnome/desktop/search-providers" = {
       disabled = [
         "org.gnome.Contacts.desktop"
