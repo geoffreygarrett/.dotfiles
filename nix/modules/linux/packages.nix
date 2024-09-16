@@ -15,6 +15,9 @@ shared-packages
   # Data recovery
   ddrescueview
 
+  jetbrains.rust-rover
+  jetbrains.clion
+  jetbrains.pycharm-professional
   # Communication
   simplescreenrecorder
   mendeley

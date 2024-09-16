@@ -30,7 +30,7 @@ in
     (importModule ./nvim.nix)
     (importModule ./starship.nix)
     #    (importModule ./firefox.nix)
-    (importModule ./htop.nix)
+    #    (importModule ./htop.nix)
     (importModule ./vscode.nix)
   ];
 }

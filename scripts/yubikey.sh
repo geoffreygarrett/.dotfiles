@@ -7,16 +7,16 @@ echo
 
 # Function to check if a command exists
 command_exists() {
-  command -v "$1" >/dev/null 2>&1
+    command -v "$1" >/dev/null 2>&1
 }
 
 # Check for required software
 echo "Checking for required software..."
 for cmd in gpg gpg-agent ssh-agent scdaemon; do
-  if ! command_exists $cmd; then
-    echo "Error: $cmd is not installed. Please install it and run this script again."
-    exit 1
-  fi
+    if ! command_exists $cmd; then
+        echo "Error: $cmd is not installed. Please install it and run this script again."
+        exit 1
+    fi
 done
 echo "All required software is installed."
 echo

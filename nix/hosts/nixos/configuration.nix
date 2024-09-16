@@ -286,6 +286,7 @@ in
     #   nvidiaSettings = true;
     #   package = config.boot.kernelPackages.nvidiaPackages.stable;
     # };
+  };
   services.xserver = {
     enable = true;
     displayManager.sessionCommands = ''

@@ -10,47 +10,47 @@
   aliases.enable = true;
   aliases.aliases = {
 
-    # New RGB control aliases
-    rgb-off = {
-      command = "${pkgs.writeShellScriptBin "rgb-off-script" ''
-        #!/bin/sh
-        NUM_DEVICES=$(${pkgs.openrgb}/bin/openrgb --noautoconnect --list-devices | grep -E '^[0-9]+: ' | wc -l)
-
-        for i in $(seq 0 $(($NUM_DEVICES - 1))); do
-          ${pkgs.openrgb}/bin/openrgb --noautoconnect --device $i --mode static --color 000000
-        done
-      ''}/bin/rgb-off-script";
-      description = "Turn off all RGB lighting";
-      tags = [
-        "system"
-        "rgb"
-        "zsh"
-        "bash"
-        "fish"
-        "nu"
-      ];
-    };
-
-    rgb-on = {
-      command = "${pkgs.writeShellScriptBin "rgb-on-script" ''
-        #!/bin/sh
-        NUM_DEVICES=$(${pkgs.openrgb}/bin/openrgb --noautoconnect --list-devices | grep -E '^[0-9]+: ' | wc -l)
-
-        for i in $(seq 0 $(($NUM_DEVICES - 1))); do
-          ${pkgs.openrgb}/bin/openrgb --noautoconnect --device $i --mode static --color FFFFFF
-        done
-      ''}/bin/rgb-on-script";
-      description = "Turn on all RGB lighting (white color)";
-      tags = [
-        "system"
-        "rgb"
-        "zsh"
-        "bash"
-        "fish"
-        "nu"
-      ];
-    };
-
+    #    # New RGB control aliases
+    #    rgb-off = {
+    #      command = "${pkgs.writeShellScriptBin "rgb-off-script" ''
+    #        #!/bin/sh
+    #        NUM_DEVICES=$(${pkgs.openrgb}/bin/openrgb --noautoconnect --list-devices | grep -E '^[0-9]+: ' | wc -l)
+    #
+    #        for i in $(seq 0 $(($NUM_DEVICES - 1))); do
+    #          ${pkgs.openrgb}/bin/openrgb --noautoconnect --device $i --mode static --color 000000
+    #        done
+    #      ''}/bin/rgb-off-script";
+    #      description = "Turn off all RGB lighting";
+    #      tags = [
+    #        "system"
+    #        "rgb"
+    #        "zsh"
+    #        "bash"
+    #        "fish"
+    #        "nu"
+    #      ];
+    #    };
+    #
+    #    rgb-on = {
+    #      command = "${pkgs.writeShellScriptBin "rgb-on-script" ''
+    #        #!/bin/sh
+    #        NUM_DEVICES=$(${pkgs.openrgb}/bin/openrgb --noautoconnect --list-devices | grep -E '^[0-9]+: ' | wc -l)
+    #
+    #        for i in $(seq 0 $(($NUM_DEVICES - 1))); do
+    #          ${pkgs.openrgb}/bin/openrgb --noautoconnect --device $i --mode static --color FFFFFF
+    #        done
+    #      ''}/bin/rgb-on-script";
+    #      description = "Turn on all RGB lighting (white color)";
+    #      tags = [
+    #        "system"
+    #        "rgb"
+    #        "zsh"
+    #        "bash"
+    #        "fish"
+    #        "nu"
+    #      ];
+    #    };
+    #
     # File and Directory Operations
     ls = {
       command = "${pkgs.eza}/bin/eza --icons --group-directories-first";

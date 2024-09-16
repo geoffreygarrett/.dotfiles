@@ -8,13 +8,13 @@ KEY_SIZE=3072   # RSA key size
 
 # Function to check if a command exists
 command_exists() {
-  command -v "$1" >/dev/null 2>&1
+    command -v "$1" >/dev/null 2>&1
 }
 
 # Check if OpenSSL is installed
 if ! command_exists openssl; then
-  echo "Error: OpenSSL is not installed. Please install OpenSSL and try again."
-  exit 1
+    echo "Error: OpenSSL is not installed. Please install OpenSSL and try again."
+    exit 1
 fi
 
 # Generate private key

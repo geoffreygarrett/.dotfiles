@@ -79,6 +79,8 @@ in
     vimAlias = true;
     extraPackages = with pkgs; [
       ripgrep # Requirement for telescope
+      lua-language-server
+      nil
     ];
   };
   #  home.packages = [ pkgs.lazygit ];
