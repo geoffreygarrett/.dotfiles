@@ -18,6 +18,7 @@ in
   time.timeZone = "Africa/Johannesburg";
   i18n.defaultLocale = "en_GB.UTF-8";
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   # Bootloader configuration
   boot.loader = {
     systemd-boot.enable = false; # Disable systemd-boot
@@ -27,10 +28,10 @@ in
     };
     grub = {
       enable = true;
+      device = "nodev";
       efiSupport = true;
       efiInstallAsRemovable = true;
-      device = "nodev";
-      #useOSProber = true;
+      useOSProber = true;
       gfxmodeEfi = "2560x1440";
       theme = "${hyperfluent-theme}/nixos";
       extraConfig = ''
@@ -44,20 +45,17 @@ in
   fileSystems."/boot/efi" = {
     device = "/dev/nvme0n1p1";
     fsType = "vfat";
-    options = [
-      "defaults"
-      "noatime"
-      "nofail"
-    ];
+    options = [ "defaults" "noatime" "nofail" ];
   };
 
   # Networking
   networking = {
     hostName = "apollo";
     networkmanager.enable = true;
-    interfaces.enp3s0.wakeOnLan.enable = true;
-    interfaces.tailscale0.wakeOnLan.enable = true;
-
+    interfaces = {
+      enp3s0.wakeOnLan.enable = true;
+      tailscale0.wakeOnLan.enable = true;
+    };
     # wireless.enable = true;  # Uncomment to enable wireless support via wpa_supplicant
     # proxy = {
     #   default = "http://user:password@proxy:port/";
@@ -74,37 +72,32 @@ in
         53 # DNS
         41641 # Tailscale
       ];
-      # Tailscale-specific firewall rules
-      trustedInterfaces = [
-        "tailscale0"
-        "enp3s0"
-      ];
-      allowedUDPPortRanges = [
-        {
-          from = 41641;
-          to = 41641;
-        }
-      ];
+      trustedInterfaces = [ "tailscale0" "enp3s0" ];
+      allowedUDPPortRanges = [{ from = 41641; to = 41641; }];
       # extraCommands = ''
       #   iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --set
       #   iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 -j DROP
       # '';  # Example: rate limiting for SSH connections
     };
-    # Tailscale configuration
-    #    tailscale.enable = true;
   };
 
   # Services
   services = {
     tailscale = {
       enable = true;
-      openFirewall = true; # This replaces the manual firewall configuration
+      openFirewall = true;
       useRoutingFeatures = "both"; # Enable subnet routing and exit nodes
     };
-
     xserver = {
       enable = true;
-      displayManager.gdm.enable = true;
+      displayManager = {
+        gdm.enable = true;
+        sessionCommands = ''
+          ${pkgs.xorg.xset}/bin/xset r rate 225 30
+          ${pkgs.xorg.setxkbmap}/bin/setxkbmap -layout us -option ctrl:nocaps
+          ${pkgs.xorg.xset}/bin/xset b off  # Disable terminal bell
+        '';
+      };
       desktopManager.gnome.enable = true;
       xkb = {
         layout = "us";
@@ -124,53 +117,33 @@ in
       # jack.enable = true;  # Uncomment to enable JACK support
     };
     hardware.openrgb.enable = true;
-    # openssh.enable = true;  # Uncomment to enable OpenSSH server
-  };
-
-  # Enable OpenSSH server
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "no";
-      PasswordAuthentication = false;
+    openssh = {
+      enable = true;
+      settings = {
+        PermitRootLogin = "no";
+        PasswordAuthentication = false;
+      };
     };
   };
 
-  # create aoneshot job to authenticate to Tailscale
+  # Tailscale autoconnect service
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
-
-    # make sure tailscale is running before trying to connect to tailscale
-    after = [
-      "network-pre.target"
-      "tailscale.service"
-      "sops-nix.service"
-    ];
-    wants = [
-      "network-pre.target"
-      "tailscale.service"
-      "sops-nix.service"
-    ];
+    after = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
+    wants = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
     wantedBy = [ "multi-user.target" ];
-
-    # set this service as a oneshot job
     serviceConfig.Type = "oneshot";
-
-    # have the job run this shell script
     script = with pkgs; ''
       set -euo pipefail
       echo "Starting Tailscale autoconnect service"
-      # wait for tailscaled to settle
       sleep 2
       echo "Checking Tailscale status"
-      # check if we are already authenticated to tailscale
       status="$(${tailscale}/bin/tailscale status -json | ${jq}/bin/jq -r .BackendState)"
       if [ "$status" = "Running" ]; then
         echo "Tailscale is already running"
         exit 0
       fi
       echo "Authenticating to Tailscale"
-      # otherwise authenticate with tailscale
       if [ ! -f "${config.sops.secrets.tailscale-auth-key.path}" ]; then
         echo "Error: Tailscale auth key file not found"
         exit 1
@@ -179,22 +152,19 @@ in
       echo "Tailscale authentication completed"
     '';
   };
+
   # Security
   security = {
     rtkit.enable = true;
     sudo = {
       enable = true;
-      extraRules = [
-        {
-          commands = [
-            {
-              command = "${pkgs.systemd}/bin/reboot";
-              options = [ "NOPASSWD" ];
-            }
-          ];
-          groups = [ "wheel" ];
-        }
-      ];
+      extraRules = [{
+        commands = [{
+          command = "${pkgs.systemd}/bin/reboot";
+          options = [ "NOPASSWD" ];
+        }];
+        groups = [ "wheel" ];
+      }];
     };
   };
 
@@ -203,12 +173,7 @@ in
     geoffrey = {
       isNormalUser = true;
       description = "Geoffrey Garrett";
-      extraGroups = [
-        "networkmanager"
-        "wheel"
-        "docker"
-        "tailscale" # Add the tailscale group
-      ];
+      extraGroups = [ "networkmanager" "wheel" "docker" "tailscale" ];
       shell = pkgs.zsh;
       openssh.authorizedKeys.keys = keys;
       packages = with pkgs; [
@@ -235,28 +200,7 @@ in
     # wget
   ];
 
-  # # Systemd configuration for Tailscale
-  # systemd.services.tailscaled = {
-  #   wantedBy = [ "multi-user.target" ];
-  #   after = [
-  #     "network-pre.target"
-  #     "NetworkManager.service"
-  #     "systemd-resolved.service"
-  #   ];
-  #   wants = [
-  #     "network-pre.target"
-  #     "NetworkManager.service"
-  #     "systemd-resolved.service"
-  #   ];
-  #   serviceConfig = {
-  #     Restart = "on-failure";
-  #     RestartSec = 5;
-  #   };
-  # };
-
-  # Uncomment to allow unfree packages
-  # nixpkgs.config.allowUnfree = true;
-
+  # Programs
   programs = {
     firefox.enable = true;
     zsh.enable = true;
@@ -294,69 +238,6 @@ in
     #   package = config.boot.kernelPackages.nvidiaPackages.stable;
     # };
   };
-  services.xserver = {
-    enable = true;
-    displayManager.sessionCommands = ''
-      # Equivalent to KeyRepeat = 2 and InitialKeyRepeat = 15
-      ${pkgs.xorg.xset}/bin/xset r rate 225 30
-
-      # Equivalent to ApplePressAndHoldEnabled = false
-      ${pkgs.xorg.setxkbmap}/bin/setxkbmap -layout us -option ctrl:nocaps
-
-      # Additional settings to match macOS configuration
-      ${pkgs.xorg.xset}/bin/xset b off  # Disable terminal bell (equivalent to setting beep volume to 0)
-    '';
-  };
-
-  # Bootloader.
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "nodev";
-  boot.loader.grub.useOSProber = true;
-  boot.loader.grub.efiSupport = true;
-  boot.loader.grub.gfxmodeEfi = "2560x1440";
-  # boot.loader.grub.theme = pkgs.nixos-grub2-theme;
-  boot.loader.grub.theme =
-    let
-      hyperfluent-theme = pkgs.fetchFromGitHub {
-        owner = "Coopydood";
-        repo = "HyperFluent-GRUB-Theme";
-        rev = "v1.0.1"; # Use the latest release tag or a specific commit hash
-        sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f"; # Replace with the correct hash
-      };
-    in
-    "${hyperfluent-theme}/nixos";
-  boot.loader.grub.efiInstallAsRemovable = true;
-  boot.loader.efi.canTouchEfiVariables = false;
-  boot.loader.efi.efiSysMountPoint = "/boot/efi";
-
-  networking.hostName = "apollo"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Enable networking
-  networking.networkmanager.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "Africa/Johannesburg";
-
-  # Select internationalisation properties.
-  i18n.defaultLocale = "en_GB.UTF-8";
-
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
-
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
 
   # Virtualization
   # virtualisation = {
@@ -368,10 +249,7 @@ in
   nix = {
     settings = {
       auto-optimise-store = true;
-      experimental-features = [
-        "nix-command"
-        "flakes"
-      ];
+      experimental-features = [ "nix-command" "flakes" ];
     };
     gc = {
       automatic = true;
@@ -379,4 +257,27 @@ in
       options = "--delete-older-than 30d";
     };
   };
+
+  # Uncomment to allow unfree packages
+  # nixpkgs.config.allowUnfree = true;
+
+  # Additional Tailscale configuration (commented out)
+  # systemd.services.tailscaled = {
+  #   wantedBy = [ "multi-user.target" ];
+  #   after = [
+  #     "network-pre.target"
+  #     "NetworkManager.service"
+  #     "systemd-resolved.service"
+  #   ];
+  #   wants = [
+  #     "network-pre.target"
+  #     "NetworkManager.service"
+  #     "systemd-resolved.service"
+  #   ];
+  #   serviceConfig = {
+  #     Restart = "on-failure";
+  #     RestartSec = 5;
+  #   };
+  # };
 }
+
