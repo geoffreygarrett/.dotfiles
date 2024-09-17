@@ -61,6 +61,10 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    nikitabobko-aerospace = {
+      url = "github:nikitabobko/homebrew-tap";
+      flake = false;
+    };
 
     # Linux-specific
     nixgl = {
@@ -105,6 +109,7 @@
       homebrew-core,
       homebrew-cask,
       homebrew-bundle,
+      nikitabobko-aerospace,
       ...
     }@inputs:
     let
@@ -257,6 +262,7 @@
                 enable = true;
                 taps = {
                   "homebrew/homebrew-core" = homebrew-core;
+                  "nikitabobko/homebrew-tap" = nikitabobko-aerospace;
                   "homebrew/homebrew-cask" = homebrew-cask;
                   "homebrew/homebrew-bundle" = homebrew-bundle;
                 };

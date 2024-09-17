@@ -80,23 +80,21 @@
   };
 
   # Homebrew configuration
+  # Homebrew configuration
   homebrew = {
     enable = true;
-    casks = pkgs.callPackage ./casks.nix { };
+    casks = pkgs.callPackage ./casks.nix { } ++ [
+      "nikitabobko/tap/aerospace"
+    ];
     brews = [
       "nushell"
       "pinentry-mac"
       "qemu"
       "gsmartcontrol"
     ];
-    #    taps = [
-    #      "nikitabobko/tap"
-    #    ];
-    #    casks = [
-    #      "nikitabobko/tap/aerospace"
-    #    ];
     masApps = {
       "tailscale" = 1475387142;
     };
   };
+
 }
