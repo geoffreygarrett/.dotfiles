@@ -81,3 +81,7 @@ official documentation of Ubuntu and NixOS.
 # Dual Booting
 
 - [Official](https://nixos.wiki/wiki/Dual_Booting_NixOS_and_Windows)
+
+## Gnome
+
+- [Official](https://wiki.nixos.org/wiki/GNOME)

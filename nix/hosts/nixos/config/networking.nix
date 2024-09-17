@@ -1,9 +1,9 @@
 { config, pkgs, ... }:
 
 let
-  mainInterface = "eno2";  # Main network interface name
-  tailscalePort = 41641;   # Tailscale port
-  hostName = "apollo";     # Machine hostname
+  mainInterface = "eno2"; # Main network interface name
+  tailscalePort = 41641; # Tailscale port
+  hostName = "apollo"; # Machine hostname
 in
 {
   networking = {
@@ -23,8 +23,16 @@ in
         53 # DNS
         tailscalePort
       ];
-      trustedInterfaces = [ "tailscale0" mainInterface ];
-      allowedUDPPortRanges = [{ from = tailscalePort; to = tailscalePort; }];
+      trustedInterfaces = [
+        "tailscale0"
+        mainInterface
+      ];
+      allowedUDPPortRanges = [
+        {
+          from = tailscalePort;
+          to = tailscalePort;
+        }
+      ];
     };
   };
 
@@ -33,7 +41,6 @@ in
     openFirewall = true;
     useRoutingFeatures = "both";
   };
-
 
   /*
     Network Configuration:

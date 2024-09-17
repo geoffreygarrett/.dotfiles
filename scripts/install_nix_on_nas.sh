@@ -11,51 +11,51 @@ NC='\033[0m' # No Color
 
 # Function to print colored output
 print_color() {
-    local color=$1
-    local message=$2
-    echo -e "${color}${message}${NC}"
+  local color=$1
+  local message=$2
+  echo -e "${color}${message}${NC}"
 }
 
 # Function to prompt for SSH credentials
 prompt_credentials() {
-    print_color "$BLUE" "Please enter your NAS connection details:"
-    read -p "Enter NAS username: " NAS_USER
-    read -p "Enter NAS hostname or IP address: " NAS_HOST
-    read -p "Enter NAS SSH port (default 22): " NAS_PORT
-    NAS_PORT=${NAS_PORT:-22}
+  print_color "$BLUE" "Please enter your NAS connection details:"
+  read -p "Enter NAS username: " NAS_USER
+  read -p "Enter NAS hostname or IP address: " NAS_HOST
+  read -p "Enter NAS SSH port (default 22): " NAS_PORT
+  NAS_PORT=${NAS_PORT:-22}
 
-    print_color "$YELLOW" "Debug: Connection details entered:"
-    print_color "$YELLOW" "Username: $NAS_USER"
-    print_color "$YELLOW" "Hostname: $NAS_HOST"
-    print_color "$YELLOW" "Port: $NAS_PORT"
+  print_color "$YELLOW" "Debug: Connection details entered:"
+  print_color "$YELLOW" "Username: $NAS_USER"
+  print_color "$YELLOW" "Hostname: $NAS_HOST"
+  print_color "$YELLOW" "Port: $NAS_PORT"
 }
 
 # Function to check SSH connection
 check_ssh_connection() {
-    print_color "$YELLOW" "Checking SSH connection..."
-    if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -p "$NAS_PORT" "$NAS_USER@$NAS_HOST" 'echo "SSH connection successful"'; then
-        print_color "$RED" "Error: Unable to connect to NAS. Please check your credentials and try again."
-        exit 1
-    fi
+  print_color "$YELLOW" "Checking SSH connection..."
+  if ! ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -p "$NAS_PORT" "$NAS_USER@$NAS_HOST" 'echo "SSH connection successful"'; then
+    print_color "$RED" "Error: Unable to connect to NAS. Please check your credentials and try again."
+    exit 1
+  fi
 }
 
 # Function to execute remote command with error handling
 execute_remote_command() {
-    local command="$1"
-    local error_message="$2"
-    if ! ssh -p "$NAS_PORT" "$NAS_USER@$NAS_HOST" "$command"; then
-        print_color "$RED" "Error: $error_message"
-        exit 1
-    fi
+  local command="$1"
+  local error_message="$2"
+  if ! ssh -p "$NAS_PORT" "$NAS_USER@$NAS_HOST" "$command"; then
+    print_color "$RED" "Error: $error_message"
+    exit 1
+  fi
 }
 
 # Upload and execute the remote script on the NAS
 run_remote_script() {
-    print_color "$YELLOW" "Creating temporary directory on the NAS..."
-    execute_remote_command "mkdir -p /tmp/nix_install" "Failed to create temporary directory on NAS."
+  print_color "$YELLOW" "Creating temporary directory on the NAS..."
+  execute_remote_command "mkdir -p /tmp/nix_install" "Failed to create temporary directory on NAS."
 
-    print_color "$YELLOW" "Uploading the installation script to the NAS..."
-    cat <<'EOF' >/tmp/install_nix_remote.sh
+  print_color "$YELLOW" "Uploading the installation script to the NAS..."
+  cat <<'EOF' >/tmp/install_nix_remote.sh
 #!/bin/sh
 set -e
 
@@ -106,16 +106,16 @@ print_color "$GREEN" "Nix installed and verified successfully"
 rm -rf $CERT_DIR
 EOF
 
-    if ! scp -P "$NAS_PORT" /tmp/install_nix_remote.sh "$NAS_USER@$NAS_HOST:/tmp/nix_install/install_nix_remote.sh"; then
-        print_color "$RED" "Error: Failed to upload installation script to NAS."
-        exit 1
-    fi
+  if ! scp -P "$NAS_PORT" /tmp/install_nix_remote.sh "$NAS_USER@$NAS_HOST:/tmp/nix_install/install_nix_remote.sh"; then
+    print_color "$RED" "Error: Failed to upload installation script to NAS."
+    exit 1
+  fi
 
-    print_color "$YELLOW" "Running the installation script on the NAS..."
-    execute_remote_command "sh /tmp/nix_install/install_nix_remote.sh" "Failed to execute Nix installation script on NAS."
+  print_color "$YELLOW" "Running the installation script on the NAS..."
+  execute_remote_command "sh /tmp/nix_install/install_nix_remote.sh" "Failed to execute Nix installation script on NAS."
 
-    # Clean up
-    rm /tmp/install_nix_remote.sh
+  # Clean up
+  rm /tmp/install_nix_remote.sh
 }
 
 # Main flow

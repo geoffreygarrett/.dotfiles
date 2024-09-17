@@ -44,7 +44,11 @@ in
   fileSystems."/boot/efi" = {
     device = "/dev/nvme0n1p1";
     fsType = "vfat";
-    options = [ "defaults" "noatime" "nofail" ];
+    options = [
+      "defaults"
+      "noatime"
+      "nofail"
+    ];
   };
 
   # Networking
@@ -71,8 +75,16 @@ in
         53 # DNS
         41641 # Tailscale
       ];
-      trustedInterfaces = [ "tailscale0" "enp3s0" ];
-      allowedUDPPortRanges = [{ from = 41641; to = 41641; }];
+      trustedInterfaces = [
+        "tailscale0"
+        "enp3s0"
+      ];
+      allowedUDPPortRanges = [
+        {
+          from = 41641;
+          to = 41641;
+        }
+      ];
       # extraCommands = ''
       #   iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --set
       #   iptables -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 -j DROP
@@ -130,8 +142,16 @@ in
   # Tailscale autoconnect service
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
-    after = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
-    wants = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
+    after = [
+      "network-pre.target"
+      "tailscale.service"
+      "sops-nix.service"
+    ];
+    wants = [
+      "network-pre.target"
+      "tailscale.service"
+      "sops-nix.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig.Type = "oneshot";
     script = with pkgs; ''
@@ -159,13 +179,17 @@ in
     rtkit.enable = true;
     sudo = {
       enable = true;
-      extraRules = [{
-        commands = [{
-          command = "${pkgs.systemd}/bin/reboot";
-          options = [ "NOPASSWD" ];
-        }];
-        groups = [ "wheel" ];
-      }];
+      extraRules = [
+        {
+          commands = [
+            {
+              command = "${pkgs.systemd}/bin/reboot";
+              options = [ "NOPASSWD" ];
+            }
+          ];
+          groups = [ "wheel" ];
+        }
+      ];
     };
   };
 
@@ -174,7 +198,12 @@ in
     geoffrey = {
       isNormalUser = true;
       description = "Geoffrey Garrett";
-      extraGroups = [ "networkmanager" "wheel" "docker" "tailscale" ];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "docker"
+        "tailscale"
+      ];
       shell = pkgs.zsh;
       openssh.authorizedKeys.keys = keys;
       packages = with pkgs; [
@@ -250,7 +279,10 @@ in
   nix = {
     settings = {
       auto-optimise-store = true;
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
     gc = {
       automatic = true;
@@ -281,4 +313,3 @@ in
   #   };
   # };
 }
-

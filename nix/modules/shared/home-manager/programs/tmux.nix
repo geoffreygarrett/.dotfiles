@@ -50,7 +50,7 @@ in
       # Left status
       set -g status-left "#[fg=#0F111A bg=#82aaff bold] #S #[fg=#82aaff bg=#0F111A]"
       set -ag status-left "#{?client_prefix,#[fg=#0F111A bg=#c792ea] PREFIX #[fg=#c792ea bg=#0F111A],#[fg=#0F111A bg=#0F111A]}"
-     
+
       # Window status
       set-window-option -g window-status-format " #I #W "
       set-window-option -g window-status-current-format "#[fg=#f78c6c,bg=#1A1C25,bold] #I #W "
@@ -114,4 +114,3 @@ in
     tmux
   ];
 }
-

@@ -3,94 +3,94 @@
 /* General UI */
 :root {
   --lwt-accent-color: #84ffff;
-  --lwt-text-color: #8F93A2;
-  --lwt-toolbar-field-focus-color: #FFFFFF;
-  --lwt-toolbar-field-color: #4B526D;
-  --lwt-toolbar-field-background-color: #181A1F;
-  --lwt-toolbar-field-border-color: #0F111A;
-  --lwt-toolbarbutton-hover-background: #1A1C25;
-  --lwt-toolbarbutton-active-background: #1F2233;
-  --lwt-selected-tab-background-color: #191A21;
-  --toolbar-bgcolor: #0F111A;
+  --lwt-text-color: #8f93a2;
+  --lwt-toolbar-field-focus-color: #ffffff;
+  --lwt-toolbar-field-color: #4b526d;
+  --lwt-toolbar-field-background-color: #181a1f;
+  --lwt-toolbar-field-border-color: #0f111a;
+  --lwt-toolbarbutton-hover-background: #1a1c25;
+  --lwt-toolbarbutton-active-background: #1f2233;
+  --lwt-selected-tab-background-color: #191a21;
+  --toolbar-bgcolor: #0f111a;
   --tab-line-color: #84ffff;
-  --tabs-border-color: #0F111A;
+  --tabs-border-color: #0f111a;
 }
 
 /* Main browser window */
 #main-window {
-  background-color: #0F111A !important;
-  color: #8F93A2 !important;
+  background-color: #0f111a !important;
+  color: #8f93a2 !important;
 }
 
 /* Tabs */
 .tabbrowser-tab {
-  background-color: #181A1F !important;
-  color: #8F93A2 !important;
+  background-color: #181a1f !important;
+  color: #8f93a2 !important;
 }
 
 .tabbrowser-tab[selected="true"] {
-  background-color: #191A21 !important;
-  color: #FFFFFF !important;
+  background-color: #191a21 !important;
+  color: #ffffff !important;
 }
 
 /* URL bar */
 #urlbar-input-container {
-  background-color: #181A1F !important;
-  color: #8F93A2 !important;
+  background-color: #181a1f !important;
+  color: #8f93a2 !important;
 }
 
 #urlbar-input:focus {
-  color: #FFFFFF !important;
+  color: #ffffff !important;
 }
 
 /* Buttons */
 .toolbarbutton-1 {
-  color: #8F93A2 !important;
+  color: #8f93a2 !important;
 }
 
 .toolbarbutton-1:hover {
-  background-color: #1A1C25 !important;
+  background-color: #1a1c25 !important;
 }
 
 .toolbarbutton-1[open="true"] {
-  background-color: #1F2233 !important;
+  background-color: #1f2233 !important;
 }
 
 /* Bookmarks */
 #PlacesToolbarItems > .bookmark-item {
-  color: #8F93A2 !important;
+  color: #8f93a2 !important;
 }
 
 /* Sidebar */
 #sidebar-box {
-  background-color: #181A1F !important;
-  color: #8F93A2 !important;
+  background-color: #181a1f !important;
+  color: #8f93a2 !important;
 }
 
 /* Scrollbars */
 scrollbar {
-  background-color: #0F111A !important;
+  background-color: #0f111a !important;
 }
 
 scrollbar thumb {
-  background-color: #464B5D !important;
+  background-color: #464b5d !important;
 }
 
 /* Menus */
 menupopup {
-  background-color: #181A1F !important;
-  color: #8F93A2 !important;
-  border-color: #0F111A !important;
+  background-color: #181a1f !important;
+  color: #8f93a2 !important;
+  border-color: #0f111a !important;
 }
 
 menuitem:hover {
-  background-color: #1A1C25 !important;
+  background-color: #1a1c25 !important;
 }
 
 /* Notifications */
 .notification-message {
-  background-color: #090B10 !important;
-  color: #8F93A2 !important;
+  background-color: #090b10 !important;
+  color: #8f93a2 !important;
 }
 
 /* Links */
@@ -100,11 +100,11 @@ menuitem:hover {
 
 /* Error pages */
 .certerror-body {
-  background-color: #0F111A !important;
-  color: #8F93A2 !important;
+  background-color: #0f111a !important;
+  color: #8f93a2 !important;
 }
 
 .certerror-body button {
-  background-color: #191A21 !important;
-  color: #8F93A2 !important;
+  background-color: #191a21 !important;
+  color: #8f93a2 !important;
 }

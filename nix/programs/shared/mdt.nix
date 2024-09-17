@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 with lib;
 
@@ -36,13 +41,19 @@ in
     home.sessionVariables = cfg.settings;
 
     programs.bash.shellAliases = mkIf config.programs.bash.enable {
-      mdt = "mdt ${concatStringsSep " " (mapAttrsToList (name: value: 
-        "--${toLower (removePrefix "MDT_" name)} '${value}'") cfg.settings)}";
+      mdt = "mdt ${
+        concatStringsSep " " (
+          mapAttrsToList (name: value: "--${toLower (removePrefix "MDT_" name)} '${value}'") cfg.settings
+        )
+      }";
     };
 
     programs.zsh.shellAliases = mkIf config.programs.zsh.enable {
-      mdt = "mdt ${concatStringsSep " " (mapAttrsToList (name: value: 
-        "--${toLower (removePrefix "MDT_" name)} '${value}'") cfg.settings)}";
+      mdt = "mdt ${
+        concatStringsSep " " (
+          mapAttrsToList (name: value: "--${toLower (removePrefix "MDT_" name)} '${value}'") cfg.settings
+        )
+      }";
     };
   };
 }

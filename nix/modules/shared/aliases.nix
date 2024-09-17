@@ -1,8 +1,9 @@
-{ self
-, config
-, pkgs
-, user
-, ...
+{
+  self,
+  config,
+  pkgs,
+  user,
+  ...
 }:
 
 {
@@ -54,7 +55,12 @@
     cdf = {
       command = "cd ~/.dotfiles";
       description = "Enter directory with dotfiles flake";
-      tags = [ "zsh" "nu" "bash" "navigation" ];
+      tags = [
+        "zsh"
+        "nu"
+        "bash"
+        "navigation"
+      ];
     };
 
     # File and Directory Operations

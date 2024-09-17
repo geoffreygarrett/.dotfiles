@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 let
-  useGnome = true;  # Set to false to use BSPWM
+  useGnome = true; # Set to false to use BSPWM
   screens = [
     {
       output = "DP-1";
@@ -17,7 +17,7 @@ let
     }
   ];
   primaryScreen = builtins.head (builtins.filter (s: s.primary) screens);
-  loginWallpaperPath = ../../../modules/nixos/login-wallpaper.png;
+  loginWallpaperPath = ../../../modules/shared/assets/wallpaper/login-wallpaper.png;
 in
 {
   services.xserver = {
@@ -25,38 +25,56 @@ in
     videoDrivers = [ "nvidia" ];
 
     displayManager =
-      if useGnome then {
+      if useGnome then
+        {
+          sessionCommands = ''
+            ${builtins.concatStringsSep "\n" (
+              builtins.map (
+                s:
+                "${pkgs.xorg.xrandr}/bin/xrandr --output ${s.output} --mode ${s.mode} --rate ${s.rate} ${
+                  if s.primary then "--primary" else ""
+                }"
+              ) screens
+            )}
+            ${pkgs.feh}/bin/feh --bg-scale ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
+          '';
 
-        gdm = {
-          enable = true;
-          wayland = true;
-          settings = {
-            "org/gnome/desktop/background" = {
-              picture-uri = "file:///etc/login-wallpaper.png";
-              picture-uri-dark = "file:///etc/login-wallpaper.png";
-              picture-options = "spanned";
-              primary-color = "#000000";
+          gdm = {
+            enable = true;
+            wayland = true;
+            settings = {
+              "org/gnome/desktop/background" = {
+                picture-uri = "file:///etc/login-wallpaper.png";
+                picture-uri-dark = "file:///etc/login-wallpaper.png";
+                picture-options = "spanned";
+                primary-color = "#000000";
+              };
+              # Add any other GDM settings here
             };
-            # Add any other GDM settings here
           };
+        }
+      else
+        {
+          lightdm = {
+            enable = true;
+            greeters.slick.enable = true;
+            background = loginWallpaperPath;
+          };
+          defaultSession = "none+bspwm";
+          sessionCommands = ''
+            ${builtins.concatStringsSep "\n" (
+              builtins.map (
+                s:
+                "${pkgs.xorg.xrandr}/bin/xrandr --output ${s.output} --mode ${s.mode} --rate ${s.rate} ${
+                  if s.primary then "--primary" else ""
+                }"
+              ) screens
+            )}
+            ${pkgs.feh}/bin/feh --bg-scale ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
+          '';
         };
-      } else {
-        lightdm = {
-          enable = true;
-          greeters.slick.enable = true;
-          background = loginWallpaperPath;
-        };
-        defaultSession = "none+bspwm";
-        sessionCommands = ''
-          ${builtins.concatStringsSep "\n" (builtins.map (s: 
-            "${pkgs.xorg.xrandr}/bin/xrandr --output ${s.output} --mode ${s.mode} --rate ${s.rate} ${if s.primary then "--primary" else ""}"
-          ) screens)}
-          ${pkgs.feh}/bin/feh --bg-scale ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
-        '';
-      };
 
     desktopManager.gnome.enable = useGnome;
-
 
     windowManager.bspwm = {
       enable = !useGnome;
@@ -75,21 +93,28 @@ in
   # Copy the login wallpaper to the Nix store
   environment.etc."login-wallpaper.png".source = loginWallpaperPath;
 
-
   services.picom.enable = !useGnome;
 
-  environment.systemPackages = with pkgs; [
-    firefox
-  ] ++ (if !useGnome then [
-    bspwm
-    sxhkd
-    dmenu
-    rofi
-    alacritty
-    feh
-    polybar
-    dunst
-  ] else [ ]);
+  environment.systemPackages =
+    with pkgs;
+    [
+      firefox
+    ]
+    ++ (
+      if !useGnome then
+        [
+          bspwm
+          sxhkd
+          dmenu
+          rofi
+          alacritty
+          feh
+          polybar
+          dunst
+        ]
+      else
+        [ ]
+    );
 
   hardware.nvidia = {
     modesetting.enable = true;
@@ -98,13 +123,12 @@ in
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
-  boot.kernelParams = builtins.concatMap
-    (s: [
+  boot.kernelParams =
+    builtins.concatMap (s: [
       "video=${s.output}:${s.mode}@${s.rate}"
-    ])
-    screens ++ [
-    "console=tty0"
-    "console=ttyS0,115200n8"
-  ];
+    ]) screens
+    ++ [
+      "console=tty0"
+      "console=ttyS0,115200n8"
+    ];
 }
-

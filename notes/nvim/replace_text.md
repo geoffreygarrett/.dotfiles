@@ -2,12 +2,12 @@
 
 y{motion}{motion}v{motion}p
 
-    y{motion} to yank the origin text.
+```
+y{motion} to yank the origin text.
 
-    {motion} to move the cursor to the target.
+{motion} to move the cursor to the target.
 
-    v{motion} to visually select the target text.
+v{motion} to visually select the target text.
 
-    p to put the origin text.
-
-
+p to put the origin text.
+```

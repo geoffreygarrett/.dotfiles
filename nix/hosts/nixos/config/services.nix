@@ -23,8 +23,16 @@
 
   systemd.services.tailscale-autoconnect = {
     description = "Automatic connection to Tailscale";
-    after = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
-    wants = [ "network-pre.target" "tailscale.service" "sops-nix.service" ];
+    after = [
+      "network-pre.target"
+      "tailscale.service"
+      "sops-nix.service"
+    ];
+    wants = [
+      "network-pre.target"
+      "tailscale.service"
+      "sops-nix.service"
+    ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig.Type = "oneshot";
     script = with pkgs; ''

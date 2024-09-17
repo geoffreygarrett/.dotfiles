@@ -34,13 +34,20 @@ in
   fileSystems."/boot/efi" = {
     device = "/dev/nvme0n1p1";
     fsType = "vfat";
-    options = [ "defaults" "noatime" "nofail" ];
+    options = [
+      "defaults"
+      "noatime"
+      "nofail"
+    ];
   };
 
   nix = {
     settings = {
       auto-optimise-store = true;
-      experimental-features = [ "nix-command" "flakes" ];
+      experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
     };
     gc = {
       automatic = true;
