@@ -24,6 +24,7 @@ with pkgs;
   git
   difftastic
   jq
+  mdt
   #  gptcommit
 
   # Security

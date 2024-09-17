@@ -1,0 +1,110 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+/* General UI */
+:root {
+  --lwt-accent-color: #84ffff;
+  --lwt-text-color: #8F93A2;
+  --lwt-toolbar-field-focus-color: #FFFFFF;
+  --lwt-toolbar-field-color: #4B526D;
+  --lwt-toolbar-field-background-color: #181A1F;
+  --lwt-toolbar-field-border-color: #0F111A;
+  --lwt-toolbarbutton-hover-background: #1A1C25;
+  --lwt-toolbarbutton-active-background: #1F2233;
+  --lwt-selected-tab-background-color: #191A21;
+  --toolbar-bgcolor: #0F111A;
+  --tab-line-color: #84ffff;
+  --tabs-border-color: #0F111A;
+}
+
+/* Main browser window */
+#main-window {
+  background-color: #0F111A !important;
+  color: #8F93A2 !important;
+}
+
+/* Tabs */
+.tabbrowser-tab {
+  background-color: #181A1F !important;
+  color: #8F93A2 !important;
+}
+
+.tabbrowser-tab[selected="true"] {
+  background-color: #191A21 !important;
+  color: #FFFFFF !important;
+}
+
+/* URL bar */
+#urlbar-input-container {
+  background-color: #181A1F !important;
+  color: #8F93A2 !important;
+}
+
+#urlbar-input:focus {
+  color: #FFFFFF !important;
+}
+
+/* Buttons */
+.toolbarbutton-1 {
+  color: #8F93A2 !important;
+}
+
+.toolbarbutton-1:hover {
+  background-color: #1A1C25 !important;
+}
+
+.toolbarbutton-1[open="true"] {
+  background-color: #1F2233 !important;
+}
+
+/* Bookmarks */
+#PlacesToolbarItems > .bookmark-item {
+  color: #8F93A2 !important;
+}
+
+/* Sidebar */
+#sidebar-box {
+  background-color: #181A1F !important;
+  color: #8F93A2 !important;
+}
+
+/* Scrollbars */
+scrollbar {
+  background-color: #0F111A !important;
+}
+
+scrollbar thumb {
+  background-color: #464B5D !important;
+}
+
+/* Menus */
+menupopup {
+  background-color: #181A1F !important;
+  color: #8F93A2 !important;
+  border-color: #0F111A !important;
+}
+
+menuitem:hover {
+  background-color: #1A1C25 !important;
+}
+
+/* Notifications */
+.notification-message {
+  background-color: #090B10 !important;
+  color: #8F93A2 !important;
+}
+
+/* Links */
+:link {
+  color: #80cbc4 !important;
+}
+
+/* Error pages */
+.certerror-body {
+  background-color: #0F111A !important;
+  color: #8F93A2 !important;
+}
+
+.certerror-body button {
+  background-color: #191A21 !important;
+  color: #8F93A2 !important;
+}

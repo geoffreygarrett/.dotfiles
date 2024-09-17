@@ -1,9 +1,8 @@
-{
-  config,
-  lib,
-  pkgs,
-  inputs,
-  ...
+{ config
+, lib
+, pkgs
+, inputs
+, ...
 }:
 let
   importModule =
@@ -29,6 +28,7 @@ in
     (importModule ./nushell.nix)
     (importModule ./nvim.nix)
     (importModule ./starship.nix)
+    #(importModule ./mdt.nix)
     #    (importModule ./firefox.nix)
     #    (importModule ./htop.nix)
     (importModule ./vscode.nix)

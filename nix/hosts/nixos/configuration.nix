@@ -92,12 +92,14 @@ in
       enable = true;
       displayManager = {
         gdm.enable = true;
-        sessionCommands = ''
-          ${pkgs.xorg.xset}/bin/xset r rate 225 30
-          ${pkgs.xorg.setxkbmap}/bin/setxkbmap -layout us -option ctrl:nocaps
-          ${pkgs.xorg.xset}/bin/xset b off  # Disable terminal bell
-        '';
+        #sessionCommands = ''
+        #  ${pkgs.xorg.xset}/bin/xset r rate 225 30
+        #  ${pkgs.xorg.setxkbmap}/bin/setxkbmap -layout us -option ctrl:nocaps
+        #  ${pkgs.xorg.xset}/bin/xset b off  # Disable terminal bell
+        #'';
       };
+      #autoRepeatDelay = 225;
+      #autoRepeatInterval = 30;
       desktopManager.gnome.enable = true;
       xkb = {
         layout = "us";

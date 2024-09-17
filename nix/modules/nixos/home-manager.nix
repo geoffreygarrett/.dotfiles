@@ -1,12 +1,11 @@
-{
-  config,
-  self,
-  pkgs,
-  lib,
-  home-manager,
-  inputs,
-  user,
-  ...
+{ config
+, self
+, pkgs
+, lib
+, home-manager
+, inputs
+, user
+, ...
 }:
 let
 in
@@ -33,8 +32,9 @@ in
       cursor-blink = false;
     };
     "org/gnome/desktop/peripherals/keyboard" = {
-      repeat-interval = 30;
-      delay = 225;
+      repeat-interval = lib.hm.gvariant.mkUint32 25;
+      delay = lib.hm.gvariant.mkUint32 225;
+      repeat = true;
     };
     "org/gnome/desktop/search-providers" = {
       disabled = [
