@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
 
 let
-  keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITvBraRmM6IvQFt8VUHRx9hZ5DZVkPX3ORlfVqGa05z" ];
+  keys = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN4Uy9fE/YF8/puhUOwOcHKqDzDW75zt9DndypPEhQaG nix-on-droid@localhost" 
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITvBraRmM6IvQFt8VUHRx9hZ5DZVkPX3ORlfVqGa05z" ];
   hyperfluent-theme = pkgs.fetchFromGitHub {
     owner = "Coopydood";
     repo = "HyperFluent-GRUB-Theme";
