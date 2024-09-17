@@ -1,9 +1,8 @@
-{
-  self,
-  config,
-  pkgs,
-  user,
-  ...
+{ self
+, config
+, pkgs
+, user
+, ...
 }:
 
 {
@@ -51,6 +50,13 @@
     #      ];
     #    };
     #
+    # Nixus/flake related
+    cdf = {
+      command = "cd ~/.dotfiles";
+      description = "Enter directory with dotfiles flake";
+      tags = [ "zsh" "nu" "bash" "navigation" ];
+    };
+
     # File and Directory Operations
     ls = {
       command = "${pkgs.eza}/bin/eza --icons --group-directories-first";
