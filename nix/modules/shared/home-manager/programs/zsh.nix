@@ -6,9 +6,6 @@
   ...
 }:
 
-let
-  shellAliasesConfig = import ./shell-aliases.nix { inherit pkgs lib; };
-in
 {
   programs.direnv = {
     enableZshIntegration = true;

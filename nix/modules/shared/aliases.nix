@@ -1,6 +1,7 @@
 {
   self,
   config,
+  inputs,
   pkgs,
   user,
   ...
@@ -167,21 +168,21 @@
       ];
     };
 
-    # Text Editing and Viewing
-    nvim = {
-      command = "${pkgs.neovim}/bin/nvim";
-      description = "Launch Neovim.";
-      tags = [
-        "editor"
-        "zsh"
-        "bash"
-        "fish"
-        "nu"
-      ];
-    };
+   # # Text Editing and Viewing
+   # nvim = {
+   #   command = "${pkgs.neovim-unwrapped}/bin/nvim";
+   #   description = "Launch Neovim.";
+   #   tags = [
+   #     "editor"
+   #     "zsh"
+   #     "bash"
+   #     "fish"
+   #     "nu"
+   #   ];
+   # };
 
     holdnvim = {
-      command = "${pkgs.neovim}/bin/nvim";
+      command = "nvim";
       description = "Alias for Neovim.";
       tags = [
         "editor"
@@ -193,7 +194,7 @@
     };
 
     n = {
-      command = "${pkgs.neovim}/bin/nvim";
+      command = "nvim";
       description = "Alias for Neovim.";
       tags = [
         "editor"

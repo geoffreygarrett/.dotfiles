@@ -1,40 +1,39 @@
 { pkgs, ... }:
 {
   programs.nixvim = {
-    # Enable Material theme
-    #    colorschemes.material = {
-    #      enable = true;
-    #      style = "deep-ocean";
-    #      # You can add more Material-specific settings here if needed
-    #    };
 
-    # Set theme priority and custom initialization
+    # colorschemes.catppuccin.enable = true;
+    plugins.lualine.enable = true;
+
+    # Add the Material theme plugin
     extraPlugins = [
-      {
-        plugin = pkgs.vimPlugins.material-nvim;
-        config = ''
-          lua <<EOF
-            vim.g.material_style = "deep ocean"
-            vim.cmd.colorscheme("material")
-            -- You can configure highlights by doing something like:
-            vim.cmd.hi("Comment gui=none")
-          EOF
-        '';
-      }
+      pkgs.vimPlugins.material-nvim
     ];
 
-    colorscheme = "material-nvim";
+    # Configure and apply the Material theme
+    extraConfigLua = ''
+      require("material").setup()
 
-    # Ensure the theme is loaded before other plugins
-    extraConfigVim = ''
-      " Set Material theme as a high priority to load before other start plugins
-      let g:material_priority = 1000
+      -- Set up Material theme
+      vim.g.material_style = "deep ocean"
+
+      -- Load the colorscheme
+      vim.cmd.colorscheme("material")
+
+      -- Custom highlight groups
+      vim.cmd.hi("Comment gui=none")
+
+      -- Set Material theme as a high priority to load before other start plugins
+      vim.g.material_priority = 1000
+
+      -- Additional Material theme settings can be added here
+      -- For example:
+      -- vim.g.material_terminal_italics = 1
+      -- vim.g.material_theme_style = 'palenight'
+      -- vim.g.material_variable_color = '#ff0000'
     '';
 
-    # Optional: If you want to keep Tokyonight as an alternative, you can add it like this:
-    # colorschemes.tokyonight = {
-    #   enable = false;  # Set to true if you want to use it instead of Material
-    #   style = "night";
-    # };
+    # Optionally, you can set the colorscheme here as well
+    # colorscheme = "material";
   };
 }

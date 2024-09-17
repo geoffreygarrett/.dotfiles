@@ -56,6 +56,7 @@ in
         "Alacritty.desktop"
         "mendeley-reference-manager.desktop"
         "obsidian.desktop"
+        "alacritty-neovim.desktop"
       ];
     };
     "org/gnome/desktop/interface" = {

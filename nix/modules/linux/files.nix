@@ -15,7 +15,7 @@ icon-files
       Version=1.0
       Name=Alacritty with Neovim
       Comment=Open files with Neovim inside Alacritty
-      Exec=${pkgs.alacritty}/bin/alacritty -e ${pkgs.neovim}/bin/nvim %F
+      Exec=${pkgs.alacritty}/bin/alacritty -e nvim %F
       Terminal=false
       Type=Application
       MimeType=text/plain;application/x-shellscript;

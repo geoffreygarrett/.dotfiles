@@ -300,7 +300,7 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            nixvim.nixosModules.nixvim
+           #nixvim.nixosModules.nixvim
             ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {

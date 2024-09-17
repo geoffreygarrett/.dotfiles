@@ -37,6 +37,8 @@ in
       "networkmanager"
       "wheel"
       "docker"
+      "libvirtd"
+      "kvm"
       "tailscale"
     ];
     shell = pkgs.zsh;

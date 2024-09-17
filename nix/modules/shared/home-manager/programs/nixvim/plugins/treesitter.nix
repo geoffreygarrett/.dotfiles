@@ -53,8 +53,8 @@
     };
 
     # Add this if you want to ensure Treesitter is updated
-    extraConfigLua = ''
-      vim.cmd('TSUpdate')
-    '';
+    #    extraConfigLua = ''
+    #      vim.cmd('TSUpdate')
+    #    '';
   };
 }

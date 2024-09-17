@@ -20,10 +20,15 @@ let
   loginWallpaperPath = ../../../modules/shared/assets/wallpaper/login-wallpaper.png;
 in
 {
+  imports = [
+    ./nvidia.nix
+    ./vm-passthrough.nix
+  ]; # Import the NVIDIA configuration
+
+  services.libinput.enable = true;
   services.xserver = {
     enable = true;
     videoDrivers = [ "nvidia" ];
-
     displayManager =
       if useGnome then
         {
@@ -38,10 +43,9 @@ in
             )}
             ${pkgs.feh}/bin/feh --bg-scale ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
           '';
-
           gdm = {
             enable = true;
-            wayland = true;
+            wayland = false; # Changed to false to use X11 instead of Wayland
             settings = {
               "org/gnome/desktop/background" = {
                 picture-uri = "file:///etc/login-wallpaper.png";
@@ -49,7 +53,6 @@ in
                 picture-options = "spanned";
                 primary-color = "#000000";
               };
-              # Add any other GDM settings here
             };
           };
         }
@@ -73,33 +76,25 @@ in
             ${pkgs.feh}/bin/feh --bg-scale ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
           '';
         };
-
     desktopManager.gnome.enable = useGnome;
-
     windowManager.bspwm = {
       enable = !useGnome;
       configFile = "/etc/bspwmrc";
       sxhkd.configFile = "/etc/sxhkdrc";
     };
-
-    libinput.enable = true;
-
     xkb = {
       layout = "us";
       options = "ctrl:nocaps";
     };
   };
 
-  # Copy the login wallpaper to the Nix store
   environment.etc."login-wallpaper.png".source = loginWallpaperPath;
 
   services.picom.enable = !useGnome;
 
   environment.systemPackages =
     with pkgs;
-    [
-      firefox
-    ]
+    [ firefox ]
     ++ (
       if !useGnome then
         [
@@ -116,19 +111,14 @@ in
         [ ]
     );
 
-  hardware.nvidia = {
-    modesetting.enable = true;
-    open = false;
-    nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-  };
+  powerManagement.enable = true;
+  powerManagement.cpuFreqGovernor = "ondemand";
 
-  boot.kernelParams =
-    builtins.concatMap (s: [
-      "video=${s.output}:${s.mode}@${s.rate}"
-    ]) screens
-    ++ [
-      "console=tty0"
-      "console=ttyS0,115200n8"
-    ];
+  services.acpid.enable = true;
+
+  # Optionally, you can try updating to the latest kernel
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  # Or, if you want to try a specific kernel version:
+  # boot.kernelPackages = pkgs.linuxPackages_5_15;
 }

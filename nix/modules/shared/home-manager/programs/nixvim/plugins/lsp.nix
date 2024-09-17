@@ -72,7 +72,63 @@
         # clangd.enable = true;
         # gopls.enable = true;
         # pyright.enable = true;
-        # rust_analyzer.enable = true;
+        rust-analyzer = {
+          enable = true; # Best for Rust
+          installRustc = true;
+          installCargo = true;
+        };
+        html.enable = true; # Handles both HTML and CSS
+        bashls.enable = true;
+        clangd.enable = true; # Best for C/C++
+        java-language-server.enable = true; # Or jdt-language-server, both are good
+        jsonls.enable = true;
+        nil-ls.enable = true; # Best for Nix
+
+        # Adding the best options for the languages you asked about:
+        pyright.enable = true; # Best for Python, offers type checking
+        # Special handling for TypeScript language server
+        #        ts-ls = {
+        #          enable = true;
+        #          extraOptions = {
+        #            cmd = [
+        #              "${pkgs.nodePackages.typescript-language-server}/bin/typescript-language-server"
+        #              "--stdio"
+        #            ];
+        #          };
+        #          onAttach = {
+        #            function = ''
+        #              client.server_capabilities.documentFormattingProvider = false
+        #              client.server_capabilities.documentRangeFormattingProvider = false
+        #            '';
+        #            override = true;
+        #          };
+        #        };
+        #
+        gopls.enable = true; # Best for Go
+        # sourcekit.enable = true;  # Best for Swift
+        dartls.enable = true; # Best for Dart
+        zls.enable = true; # Best for Zig
+        yamlls.enable = true; # Best for YAML
+        marksman.enable = true; # Good for Markdown
+        texlab.enable = true; # Best for LaTeX
+        svelte.enable = true; # Best for Svelte
+        graphql.enable = true; # Best for GraphQL
+        sqls.enable = true; # Good for SQL (including PostgreSQL)
+        docker-compose-language-service.enable = true; # Best for Docker Compose files
+        dockerls.enable = true; # For Dockerfile
+        fortls.enable = true; # Best for Fortran
+        nushell.enable = true; # Best for Nushell
+        taplo.enable = true; # Best for TOML
+        cmake.enable = true; # Best for CMake
+        tailwindcss.enable = true; # Best for Tailwind CSS
+        nginx-language-server.enable = true; # Best for Nginx config files
+        htmx.enable = true; # Best for HTMX
+        bufls.enable = true; # Best for Protocol Buffers
+        gdscript.enable = true; # Best for Godot/GDScript
+        helm-ls.enable = true; # Best for Helm charts
+        ltex.enable = true; # Best for LaTeX/text spell and grammar checking
+        ast-grep.enable = true; # Useful for AST-based code searching and rewriting
+
         # ...etc. See `https://nix-community.github.io/nixvim/plugins/lsp` for a list of pre-configured LSPs
         #
         # Some languages (like typescript) have entire language plugins that can be useful:

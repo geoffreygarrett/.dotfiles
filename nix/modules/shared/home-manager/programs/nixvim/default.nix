@@ -5,7 +5,7 @@
     # depending on which module you chose to use to install Nixvim.
     #
     # Uncomment if you are using the home-manager module
-    #inputs.nixvim.homeManagerModules.nixvim
+    # inputs.nixvim.homeManagerModules.nixvim
     # Uncomment if you are using the nixos module
     #inputs.nixvim.nixosModules.nixvim
     # Uncomment if you are using the nix-darwin module
@@ -20,7 +20,7 @@
     ./plugins/nvim-cmp.nix
     ./plugins/mini.nix
     ./plugins/treesitter.nix
-    ./plugins/oil.nix 
+    ./plugins/oil.nix
     ./plugins/material.nix
 
     # NOTE: Add/Configure additional plugins for Kickstart.nixvim
@@ -40,23 +40,24 @@
   programs.nixvim = {
     enable = true;
     defaultEditor = true;
+    package = pkgs.neovim-unwrapped;
 
     # You can easily change to a different colorscheme.
     # Add your colorscheme here and enable it.
     # Don't forget to disable the colorschemes you arent using
     #
     # If you want to see what colorschemes are already installed, you can use `:Telescope colorschme`.
-    colorschemes = {
-      # https://nix-community.github.io/nixvim/colorschemes/tokyonight/index.html
-      tokyonight = {
-        enable = true;
-        settings = {
-          # Like many other themes, this one has different styles, and you could load
-          # any other, such as 'storm', 'moon', or 'day'.
-          style = "night";
-        };
-      };
-    };
+    #  colorschemes = {
+    #    # https://nix-community.github.io/nixvim/colorschemes/tokyonight/index.html
+    #    tokyonight = {
+    #      enable = true;
+    #      settings = {
+    #        # Like many other themes, this one has different styles, and you could load
+    #        # any other, such as 'storm', 'moon', or 'day'.
+    #        style = "night";
+    #      };
+    #    };
+    #  };
 
     # https://nix-community.github.io/nixvim/NeovimOptions/index.html?highlight=globals#globals
     globals = {
@@ -79,7 +80,7 @@
       number = true;
       # You can also add relative line numbers, to help with jumping.
       #  Experiment for yourself to see if you like it!
-      #relativenumber = true
+      relativenumber = true;
 
       # Enable mouse mode, can be useful for resizing splits for example!
       mouse = "a";
@@ -265,7 +266,7 @@
       # https://nix-community.github.io/nixvim/plugins/todo-comments/index.html
       todo-comments = {
         enable = true;
-        signs = true;
+        settings.signs = true;
       };
     };
 
@@ -279,8 +280,15 @@
     # https://nix-community.github.io/nixvim/NeovimOptions/index.html?highlight=extraplugins#extraconfigluapre
     extraConfigLuaPre = ''
       if vim.g.have_nerd_font then
-        require('nvim-web-devicons').setup {}
+         require('nvim-web-devicons').setup {}
       end
+       -- Sync clipboard between OS and Neovim.
+       --  Schedule the setting after `UiEnter` because it can increase startup-time.
+       --  Remove this option if you want your OS clipboard to remain independent.
+       --  See `:help 'clipboard'`
+       vim.schedule(function()
+       	vim.opt.clipboard = "unnamedplus"
+       end)
     '';
 
     # The line beneath this is called `modeline`. See `:help modeline`
