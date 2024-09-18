@@ -32,7 +32,7 @@ in
   services.xremap = {
     withHypr = false;
     withGnome = true;
-    withX11 = true;
+    withX11 = false;
     userName = "${user}";
     config = {
       keymap = [
