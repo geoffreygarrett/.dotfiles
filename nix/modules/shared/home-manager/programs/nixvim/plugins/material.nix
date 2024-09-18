@@ -4,7 +4,7 @@
     plugins = {
       lualine = {
         enable = true;
-        theme = "material";
+        # theme = "material";
       };
     };
 
@@ -45,7 +45,7 @@
           term_colors = false,
           eob_lines = false,
         },
-        lualine_style = "default",
+        -- lualine_style = "default",
       })
       vim.cmd 'colorscheme material'
       vim.g.material_style = "deep ocean"

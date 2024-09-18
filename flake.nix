@@ -76,10 +76,10 @@
     };
 
     # NixOS
-    nixos-hardware = {
-      url = "github:NixOS/nixos-hardware/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    #nixos-hardware = {
+    #  url = "github:NixOS/nixos-hardware/master";
+    #  inputs.nixpkgs.follows = "nixpkgs";
+    #};
 
     # CLI
     rust-overlay = {
@@ -114,7 +114,6 @@
       disko,
       nixvim,
       darwin,
-      nixos-hardware,
       nix-homebrew,
       nix-on-droid,
       rust-overlay,
@@ -307,8 +306,6 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            nixos-hardware.nixosModules.common-cpu-intel
-            nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
             ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
