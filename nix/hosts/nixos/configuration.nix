@@ -37,7 +37,10 @@ in
       keymap = [
         {
           name = "apps";
-          remap.ctrl-alt-t.launch = [ "${pkgs.alacritty}/bin/alacritty" ];
+          remap = {
+            super-y.launch = [ "firefox" ];
+            C-alt-t.launch = [ "${pkgs.alacritty}/bin/alacritty" ];
+          };
         }
       ];
     };

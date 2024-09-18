@@ -25,6 +25,7 @@
           "javascript"
           "sql"
           "tsx"
+          "tmux"
         ];
         autoInstall = true;
         highlight = {
@@ -56,5 +57,10 @@
     #    extraConfigLua = ''
     #      vim.cmd('TSUpdate')
     #    '';
+
+    extraConfigLua = ''
+      -- Enable tmux highlighting within Nix strings (has unintended effects throughout nix code)
+      -- vim.treesitter.language.register('tmux', 'nix')
+    '';
   };
 }
