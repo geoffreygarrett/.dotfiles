@@ -8,6 +8,7 @@
   swiftlint,
   ruby,
   bundler,
+  makeWrapper,
 }:
 
 stdenv.mkDerivation rec {
@@ -28,10 +29,12 @@ stdenv.mkDerivation rec {
     swiftlint
     ruby
     bundler
+    makeWrapper
   ];
 
   buildPhase = ''
     export HOME=$TMPDIR
+    bundle config set --local path 'vendor/bundle'
     bundle install
     ./build-release.sh
   '';
@@ -39,6 +42,13 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out/bin
     cp .build/release/aerospace $out/bin/
+    wrapProgram $out/bin/aerospace \
+      --prefix PATH : ${
+        lib.makeBinPath [
+          swift
+          xcbuild
+        ]
+      }
   '';
 
   meta = with lib; {
@@ -46,6 +56,6 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/nikitabobko/AeroSpace";
     license = licenses.mit;
     platforms = platforms.darwin;
-    maintainers = with maintainers; [ ]; # Add your name if you plan to maintain this package
+    maintainers = with maintainers; [ "geoffreygarrett" ];
   };
 }
