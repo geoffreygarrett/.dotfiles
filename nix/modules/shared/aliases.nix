@@ -26,7 +26,7 @@
     #        "system"
     #        "rgb"
     #        "zsh"
-    #        "bash"
+    #        
     #        "fish"
     #        "nu"
     #      ];
@@ -46,7 +46,7 @@
     #        "system"
     #        "rgb"
     #        "zsh"
-    #        "bash"
+    #        
     #        "fish"
     #        "nu"
     #      ];
@@ -59,7 +59,7 @@
       tags = [
         "zsh"
         "nu"
-        "bash"
+
         "navigation"
       ];
     };
@@ -72,7 +72,7 @@
         "file"
         "list"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -85,7 +85,7 @@
         "file"
         "list"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -98,7 +98,7 @@
         "file"
         "list"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -111,7 +111,7 @@
         "file"
         "list"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -124,7 +124,7 @@
         "file"
         "view"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -137,7 +137,7 @@
         "file"
         "view"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -149,7 +149,6 @@
       tags = [
         "search"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -162,24 +161,24 @@
         "system"
         "disk"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
     };
 
-   # # Text Editing and Viewing
-   # nvim = {
-   #   command = "${pkgs.neovim-unwrapped}/bin/nvim";
-   #   description = "Launch Neovim.";
-   #   tags = [
-   #     "editor"
-   #     "zsh"
-   #     "bash"
-   #     "fish"
-   #     "nu"
-   #   ];
-   # };
+    # # Text Editing and Viewing
+    # nvim = {
+    #   command = "${pkgs.neovim-unwrapped}/bin/nvim";
+    #   description = "Launch Neovim.";
+    #   tags = [
+    #     "editor"
+    #     "zsh"
+    #     
+    #     "fish"
+    #     "nu"
+    #   ];
+    # };
 
     holdnvim = {
       command = "nvim";
@@ -187,7 +186,7 @@
       tags = [
         "editor"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -199,7 +198,7 @@
       tags = [
         "editor"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -235,7 +234,7 @@
         "system"
         "disk"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -248,7 +247,7 @@
         "system"
         "disk"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -261,7 +260,7 @@
         "system"
         "monitor"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -274,7 +273,7 @@
         "system"
         "admin"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -287,7 +286,7 @@
       tags = [
         "network"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -300,7 +299,7 @@
         "network"
         "share"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -312,7 +311,7 @@
       tags = [
         "network"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -324,7 +323,7 @@
       tags = [
         "network"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -349,7 +348,7 @@
       tags = [
         "network"
         "zsh"
-        "bash"
+
         "nu"
       ];
     };
@@ -361,7 +360,7 @@
       tags = [
         "git"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -373,7 +372,7 @@
       tags = [
         "git"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -385,7 +384,7 @@
       tags = [
         "git"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -398,7 +397,7 @@
       tags = [
         "kubernetes"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -410,7 +409,7 @@
       tags = [
         "container"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -422,20 +421,20 @@
       tags = [
         "kubernetes"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
     };
 
     # Miscellaneous
+    # NOTE: Following was causing nix-shell -p to break with syntax errors.
     grep = {
       command = "${pkgs.ripgrep}/bin/rg";
       description = "Search for patterns in files.";
       tags = [
         "search"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -448,7 +447,7 @@
         "image"
         "view"
         "zsh"
-        "bash"
+
         "fish"
         "nu"
       ];
@@ -487,7 +486,6 @@
         "utilities"
         "images"
         "zsh"
-        "bash"
       ];
     };
 
@@ -499,7 +497,6 @@
         "search"
         "productivity"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -512,7 +509,6 @@
         "json"
         "data"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -525,7 +521,6 @@
         "documentation"
         "help"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -538,7 +533,6 @@
         "performance"
         "benchmark"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -551,7 +545,6 @@
         "git"
         "diff"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -564,7 +557,6 @@
         "file"
         "productivity"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -577,7 +569,6 @@
         "navigation"
         "productivity"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -590,7 +581,6 @@
         "csv"
         "data"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -603,7 +593,6 @@
         "file"
         "manager"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -616,7 +605,6 @@
         "documentation"
         "help"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];
@@ -628,7 +616,6 @@
       tags = [
         "system"
         "zsh"
-        "bash"
         "fish"
         "nu"
       ];

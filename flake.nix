@@ -44,10 +44,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-   nixvim = {
-     url = "github:nix-community/nixvim";
-     inputs.nixpkgs.follows = "nixpkgs";
-   };
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # macOS-specific
     nix-homebrew = {
@@ -73,6 +73,12 @@
     # Linux-specific
     nixgl = {
       url = "github:guibou/nixGL";
+    };
+
+    # NixOS
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # CLI
@@ -108,6 +114,7 @@
       disko,
       nixvim,
       darwin,
+      nixos-hardware,
       nix-homebrew,
       nix-on-droid,
       rust-overlay,
@@ -261,7 +268,7 @@
           modules = [
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
-            #nixvim.nixDarwinModules.nixvim
+            nixvim.nixDarwinModules.nixvim
             {
               nix-homebrew = {
                 inherit user;
@@ -300,14 +307,14 @@
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-           #nixvim.nixosModules.nixvim
+            nixos-hardware.nixosModules.common-cpu-intel
+            nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
             ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
                 backupFileExtension = "nixus.bak";
                 sharedModules = [
                   nixvim.homeManagerModules.nixvim
-
                   inputs.sops-nix.homeManagerModules.sops
                   ./nix/packages/shared/shell-aliases
                 ];

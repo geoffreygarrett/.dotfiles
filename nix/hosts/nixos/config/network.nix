@@ -10,7 +10,7 @@ in
     hostName = hostName;
     networkmanager.enable = true;
     interfaces."${mainInterface}".wakeOnLan.enable = true;
-
+    useDHCP = false;
     dhcpcd.wait = "background";
     firewall = {
       enable = true;
