@@ -363,7 +363,6 @@
               "100.112.193.127" = [ "voyager.tail" ];
             };
           }
-
           {
             home-manager.extraSpecialArgs = {
               inherit self inputs user;
