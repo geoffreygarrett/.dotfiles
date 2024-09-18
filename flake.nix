@@ -316,7 +316,7 @@
               home-manager = {
                 backupFileExtension = "nixus.bak";
                 sharedModules = [
-                  nixvim.homeManagerModules.nixvim
+                  inputs.nixvim.homeManagerModules.nixvim
                   inputs.sops-nix.homeManagerModules.sops
                   ./nix/packages/shared/shell-aliases
                 ];
@@ -370,7 +370,8 @@
             };
             home-manager.sharedModules = [
               inputs.sops-nix.homeManagerModules.sops
-              #nixvim.homeManagerModules.nixvim
+              inputs.nixvim.homeManagerModules.nixvim
+              ./nix/packages/shared/shell-aliases
             ];
           }
         ];
@@ -386,7 +387,7 @@
           modules =
             [
               inputs.sops-nix.homeManagerModules.sops
-              #nixvim.homeManagerModules.nixvim
+              inputs.nixvim.homeManagerModules.nixvim
               ./nix/packages/shared/shell-aliases
             ]
             ++ lib.filter (m: m != null) [
