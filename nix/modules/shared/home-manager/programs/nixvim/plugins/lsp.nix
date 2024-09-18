@@ -72,11 +72,11 @@
         # clangd.enable = true;
         # gopls.enable = true;
         # pyright.enable = true;
-        rust-analyzer = {
-          enable = true; # Best for Rust
-          installRustc = true;
-          installCargo = true;
-        };
+        # rust-analyzer = {
+        #   enable = true; # Best for Rust
+        #   installRustc = true;
+        #   installCargo = true;
+        # };
         html.enable = true; # Handles both HTML and CSS
         bashls.enable = true;
         clangd.enable = true; # Best for C/C++

@@ -13,6 +13,7 @@
 
     # Plugins
     ./plugins/gitsigns.nix
+    ./plugins/dashboard.nix
     ./plugins/which-key.nix
     ./plugins/telescope.nix
     ./plugins/conform.nix
@@ -23,6 +24,8 @@
     ./plugins/oil.nix
     ./plugins/material.nix
     ./plugins/copilot.nix
+    ./plugins/duck.nix
+    ./plugins/rustaceanvim.nix
 
     # NOTE: Add/Configure additional plugins for Kickstart.nixvim
     #

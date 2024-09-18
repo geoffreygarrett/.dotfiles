@@ -75,9 +75,6 @@
         thickness = 0.15;
       };
       shell = {
-
-        #program = "zsh";
-        #args = [ "--login" ];
         program = "tmux";
         args = [
           "new-session"
@@ -94,6 +91,11 @@
           key = "V";
           mods = "Control|Shift";
           action = "Paste";
+        }
+        {
+          key = "F11";
+          mods = "None";
+          action = "ToggleFullscreen";
         }
         {
           key = "C";

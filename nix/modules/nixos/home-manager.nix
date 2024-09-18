@@ -19,6 +19,31 @@ in
   ];
   # TODO: Decide whether we want this system-wide or only user-specific later.
 
+  xdg.desktopEntries = {
+    alacritty = {
+      name = "Alacritty";
+      genericName = "Terminal";
+      icon = ../shared/assets/alacritty/flat/alacritty_flat_512.png;
+      exec = "alacritty";
+      terminal = false;
+      categories = [
+        "System"
+        "TerminalEmulator"
+      ];
+    };
+
+    # firefox = {
+    #   name = "Firefox";
+    #   genericName = "Web Browser";
+    #   icon = "/path/to/your/new/firefox-icon.png";
+    #   exec = "firefox %U";
+    #   categories = [
+    #     "Network"
+    #     "WebBrowser"
+    #   ];
+    # };
+  };
+
   # # Ensure the custom icon is copied to the proper location
   # environment.etc."icons/alacritty-neovim.png".source = ../shared/assets/alacritty/flat/alacritty_flat_512.png;
 

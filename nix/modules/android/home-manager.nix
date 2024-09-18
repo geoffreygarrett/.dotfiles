@@ -16,11 +16,14 @@
     ../shared/home-manager/programs/gh.nix
     ../shared/home-manager/programs/htop.nix
     ../shared/home-manager/programs/nushell.nix
-    ../shared/home-manager/programs/nvim.nix
+    ../shared/home-manager/programs/nixvim
+    #../shared/home-manager/programs/nvim.nix
     ../shared/home-manager/programs/starship.nix
     ../shared/home-manager/programs/zellij.nix
     ../shared/home-manager/programs/zsh.nix
+    ../shared/home-manager/programs/bash.nix
     ../shared/secrets.nix
+    ../shared/aliases.nix
   ];
   programs.bash = {
     enable = true;

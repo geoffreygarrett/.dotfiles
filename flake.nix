@@ -225,6 +225,7 @@
               ;
           };
           hosts = pkgs.writeShellScriptBin "hosts" (builtins.readFile ./scripts/print_hosts.sh);
+          alacritty = pkgs.alacritty;
         }
       );
 
