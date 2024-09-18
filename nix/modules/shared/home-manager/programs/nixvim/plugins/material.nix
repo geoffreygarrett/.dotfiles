@@ -41,13 +41,13 @@
           darker = false,
         },
         disable = {
-          background = false,
+          background = true,
           term_colors = false,
           eob_lines = false,
         },
         lualine_style = "default",
       })
-
+      vim.cmd 'colorscheme material'
       vim.g.material_style = "deep ocean"
       vim.cmd.colorscheme("material")
     '';
