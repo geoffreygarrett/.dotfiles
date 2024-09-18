@@ -24,7 +24,7 @@ in
     displayManager = {
       gdm = {
         enable = true;
-        wayland = false;
+        wayland = true;
         settings = {
           "org/gnome/desktop/background" = {
             picture-uri = "file:///etc/login-wallpaper.png";
