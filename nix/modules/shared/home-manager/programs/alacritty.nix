@@ -11,11 +11,17 @@
     enable = true;
     settings = {
       window = {
-        dimensions = { columns = 80; lines = 24; };
-        padding = { x = 10; y = 10; };
+        dimensions = {
+          columns = 80;
+          lines = 24;
+        };
+        padding = {
+          x = 10;
+          y = 10;
+        };
         dynamic_padding = false;
         decorations = "full";
-        opacity = 0.90;
+        opacity = 0.95;
         startup_mode = "Windowed";
         title = "Alacritty";
         dynamic_title = true;
@@ -26,13 +32,36 @@
         multiplier = 3;
       };
       font = {
-        normal = { family = "JetBrainsMono Nerd Font"; style = "Regular"; };
-        bold = { family = "JetBrainsMono Nerd Font"; style = "Bold"; };
-        italic = { family = "JetBrainsMono Nerd Font"; style = "Italic"; };
-        bold_italic = { family = "JetBrainsMono Nerd Font"; style = "Bold Italic"; };
+        normal = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Regular";
+        };
+        bold = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Bold";
+        };
+        italic = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Italic";
+        };
+        bold_italic = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Bold Italic";
+        };
         size = 12.0;
-        offset = { x = 0; y = 0; };
-        glyph_offset = { x = 0; y = 0; };
+        offset = {
+          x = 0;
+          y = 0;
+        };
+        glyph_offset = {
+          x = 0;
+          y = 0;
+        };
+      };
+      env = {
+        # Fix for Alacritty + tmux colorscheme clashes.
+        # https://www.reddit.com/r/neovim/comments/13thfol/help_same_colorscheme_of_neovim_showing_different/ 
+        TERM = "xterm-256color";
       };
       bell = {
         animation = "EaseOutExpo";
@@ -46,19 +75,51 @@
         thickness = 0.15;
       };
       shell = {
+
+        #program = "zsh";
+        #args = [ "--login" ];
         program = "tmux";
-        args = ["new-session" "-A" "-s" "main"];
+        args = [
+          "new-session"
+          "-A"
+          "-s"
+          "main"
+        ];
       };
       mouse = {
         hide_when_typing = false;
       };
       keyboard.bindings = [
-        { key = "V"; mods = "Control|Shift"; action = "Paste"; }
-        { key = "C"; mods = "Control|Shift"; action = "Copy"; }
-        { key = "Insert"; mods = "Shift"; action = "PasteSelection"; }
-        { key = "Key0"; mods = "Control"; action = "ResetFontSize"; }
-        { key = "Equals"; mods = "Control"; action = "IncreaseFontSize"; }
-        { key = "Minus"; mods = "Control"; action = "DecreaseFontSize"; }
+        {
+          key = "V";
+          mods = "Control|Shift";
+          action = "Paste";
+        }
+        {
+          key = "C";
+          mods = "Control|Shift";
+          action = "Copy";
+        }
+        {
+          key = "Insert";
+          mods = "Shift";
+          action = "PasteSelection";
+        }
+        {
+          key = "Key0";
+          mods = "Control";
+          action = "ResetFontSize";
+        }
+        {
+          key = "Equals";
+          mods = "Control";
+          action = "IncreaseFontSize";
+        }
+        {
+          key = "Minus";
+          mods = "Control";
+          action = "DecreaseFontSize";
+        }
       ];
       debug = {
         render_timer = false;

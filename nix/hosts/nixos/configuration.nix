@@ -1,4 +1,10 @@
-{ config, pkgs, ... }:
+{
+  config,
+  user,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
   keys = [
@@ -14,8 +20,28 @@ in
     ./config/gnome.nix
     ./config/nvidia.nix
     ./config/services.nix
+    inputs.xremap-flake.nixosModules.default
     #./modules/tailscale-nix.nix
   ];
+
+  # Xremap needed configs
+  hardware.uinput.enable = true;
+  users.groups.uinput.members = [ "${user}" ];
+  users.groups.input.members = [ "${user}" ];
+
+  services.xremap = {
+    withHypr = false;
+    withGnome = true;
+    userName = "${user}";
+    config = {
+      keymap = [
+        {
+          name = "apps";
+          remap.ctrl-alt-t.launch = [ "${pkgs.alacritty}/bin/alacritty" ];
+        }
+      ];
+    };
+  };
 
   # System-wide configurations
   system.stateVersion = "24.05";

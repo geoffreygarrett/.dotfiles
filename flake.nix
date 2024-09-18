@@ -74,6 +74,9 @@
     nixgl = {
       url = "github:guibou/nixGL";
     };
+    xremap-flake = {
+      url = "github:xremap/nix-flake";
+    };
 
     # NixOS
     #nixos-hardware = {
@@ -114,6 +117,7 @@
       disko,
       nixvim,
       darwin,
+      xremap-flake,
       nix-homebrew,
       nix-on-droid,
       rust-overlay,

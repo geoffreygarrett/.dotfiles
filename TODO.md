@@ -31,3 +31,5 @@
 
   - Download link:
     https://github.com/ryanoasis/nerd-fonts/releases/download/v3.2.1/JetBrainsMono.zip
+
+- [ ] Change `deep ocean` theme style to the color assignments of Jetbrains, rather than vscode.

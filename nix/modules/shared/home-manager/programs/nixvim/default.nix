@@ -22,6 +22,7 @@
     ./plugins/treesitter.nix
     ./plugins/oil.nix
     ./plugins/material.nix
+    ./plugins/copilot.nix
 
     # NOTE: Add/Configure additional plugins for Kickstart.nixvim
     #
@@ -205,6 +206,16 @@
       }
       {
         mode = "n";
+        key = "<leader>tw";
+        action = ''
+          <cmd>lua if vim.wo.wrap then vim.wo.wrap = false; print("Wrap OFF") else vim.wo.wrap = true; print("Wrap ON") end<CR>
+        '';
+        options = {
+          desc = "Toggle wrap";
+        };
+      }
+      {
+        mode = "n";
         key = "<C-l>";
         action = "<C-w><C-l>";
         options = {
@@ -260,6 +271,21 @@
       # https://nix-community.github.io/nixvim/plugins/sleuth/index.html
       sleuth = {
         enable = true;
+      };
+
+      # https://nix-community.github.io/nixvim/plugins/indent-blankline/settings/index.html
+      indent-blankline = {
+        enable = true;
+        settings = {
+          indent = {
+            char = "│";
+          };
+          scope = {
+            show_end = false;
+            show_exact_scope = true;
+            show_start = false;
+          };
+        };
       };
 
       # Highlight todo, notes, etc in comments

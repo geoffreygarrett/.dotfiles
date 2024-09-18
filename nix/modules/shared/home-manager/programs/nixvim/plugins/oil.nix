@@ -4,7 +4,6 @@
       enable = true;
 
       settings = {
-        # Your current settings
         default_file_explorer = true;
         columns = [ "icon" ];
         buf_options = {
@@ -28,72 +27,78 @@
         constrain_cursor = "editable";
         experimental_watch_for_changes = false;
 
-        keymaps = {
-          "g?" = "actions.show_help";
-          "<CR>" = "actions.select";
-          "<C-s>" = {
-            callback = ''
-              function()
-                require("oil.actions").select({ vertical = true })
-              end
-            '';
-            desc = "Open the entry in a vertical split";
-          };
-          "<C-h>" = {
-            callback = ''
-              function()
-                require("oil.actions").select({ horizontal = true })
-              end
-            '';
-            desc = "Open the entry in a horizontal split";
-          };
-          "<C-t>" = {
-            callback = ''
-              function()
-                require("oil.actions").select({ tab = true })
-              end
-            '';
-            desc = "Open the entry in new tab";
-          };
-          "<C-p>" = "actions.preview";
-          "<C-c>" = "actions.close";
-          "<C-l>" = "actions.refresh";
-          "-" = "actions.parent";
-          "_" = "actions.open_cwd";
-          "`" = "actions.cd";
-          "~" = {
-            callback = ''
-              function()
-                require("oil.actions").cd({ scope = "tab" })
-              end
-            '';
-            desc = ":tcd to the current oil directory";
-          };
-          "gs" = "actions.change_sort";
-          "gx" = "actions.open_external";
-          "g." = "actions.toggle_hidden";
-          "g\\" = "actions.toggle_trash";
-        };
-        use_default_keymaps = true;
+        ##        keymaps = {
+        #  "g?" = "actions.show_help";
+        #  "<CR>" = "actions.select";
+        #  "<C-s>" = {
+        #    callback = ''
+        #      function()
+        #        require("oil.actions").select({ vertical = true })
+        #      end
+        #    '';
+        #    desc = "Open the entry in a vertical split";
+        #  };
+        #  "<C-h>" = {
+        #    callback = ''
+        #      function()
+        #        require("oil.actions").select({ horizontal = true })
+        #      end
+        #    '';
+        #    desc = "Open the entry in a horizontal split";
+        #  };
+        #  "<C-t>" = {
+        #    callback = ''
+        #      function()
+        #        require("oil.actions").select({ tab = true })
+        #      end
+        #    '';
+        #    desc = "Open the entry in new tab";
+        #  };
+        #  "<C-p>" = "actions.preview";
+        #  "<C-c>" = "actions.close";
+        #  "<C-l>" = "actions.refresh";
+        #  "-" = "actions.parent";
+        #  "_" = "actions.open_cwd";
+        #  "`" = "actions.cd";
+        #  "~" = {
+        #    callback = ''
+        #      function()
+        #        require("oil.actions").cd({ scope = "tab" })
+        #      end
+        #    '';
+        #    desc = ":tcd to the current oil directory";
+        #  };
+        #  "gs" = "actions.change_sort";
+        #  "gx" = "actions.open_external";
+        #  "g." = "actions.toggle_hidden";
+        #  "g\\" = "actions.toggle_trash";
+        #};
+        #use_default_keymaps = true;
 
-        view_options = {
-          show_hidden = false;
-          is_hidden_file = ''
-            function(name, bufnr)
-              return vim.startswith(name, ".")
-            end
-          '';
-          is_always_hidden = ''
-            function(name, bufnr)
-              return false
-            end
-          '';
-          natural_order = true;
-          sort = [
-            ["type" "asc"]
-            ["name" "asc"]
-          ];
-        };
+        #view_options = {
+        #  show_hidden = false;
+        #  is_hidden_file = ''
+        #    function(name, bufnr)
+        #      return vim.startswith(name, ".")
+        #    end
+        #  '';
+        #  is_always_hidden = ''
+        #    function(name, bufnr)
+        #      return false
+        #    end
+        #  '';
+        #  natural_order = true;
+        #  sort = [
+        #    [
+        #      "type"
+        #      "asc"
+        #    ]
+        #    [
+        #      "name"
+        #      "asc"
+        #    ]
+        #  ];
+        #};
 
         # Additional available options (commented out)
         # lsp_file_method = {
