@@ -9,6 +9,11 @@ let
 in
 icon-files
 // {
+
+  #$  ".config/gtk-4.0/settings.ini".text = ''
+  #$    [Settings]
+  #$    gtk-application-prefer-dark-theme=1
+  #$  '';
   # "${config.home.profileDirectory}/share/applications/alacritty-neovim.desktop" = {
   #   text = ''
   #     [Desktop Entry]

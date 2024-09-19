@@ -44,13 +44,14 @@ in
   fileSystems =
     let
       common = [
-        "auto" # Do not mount on boot
         "nofail" # Do not fail if the mount fails
         "x-gvfs-show" # Show in file manager
         "x-systemd.automount" # Mount on access
         "x-systemd.idle-timeout=60"
         "x-systemd.device-timeout=5s"
         "x-systemd.mount-timeout=5s"
+        "x-systemd.requires=network-online.target"
+        "x-systemd.after=network-online.target"
         "credentials=${config.sops.secrets.smb-secrets.path}"
         "uid=${toString config.users.users.${user}.uid}"
         "gid=${toString config.users.groups.wheel.gid}"

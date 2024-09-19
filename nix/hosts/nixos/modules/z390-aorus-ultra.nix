@@ -35,7 +35,7 @@ in
     };
   };
 
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     boot = {
       kernelModules =
         [
@@ -44,6 +44,9 @@ in
         ++ optionals cfg.enableOptane [
           "dm_cache"
           "dm_writecache"
+        ]
+        ++ optionals cfg.enableWifi [
+          "iwlwifi"
         ];
       kernelParams = [
         "intel_iommu=on"
@@ -64,9 +67,9 @@ in
     #};
 
     # Bluetooth
-    hardware.bluetooth = mkif cfg.enablebluetooth {
+    hardware.bluetooth = lib.mkIf cfg.enableBluetooth {
       enable = true;
-      poweronboot = true;
+      powerOnBoot = true;
     };
 
     # audio: alc1220-vb
@@ -91,7 +94,7 @@ in
     services.hardware.openrgb.enable = cfg.enablergb;
 
     # power management: cec 2019 ready
-    powermanagement.enable = true;
+    # powermanagement.enable = true;
     services.tlp.enable = true;
 
     # Additional packages for hardware management
@@ -102,7 +105,7 @@ in
         usbutils
         lm_sensors
       ]
-      ++ mkIf cfg.enableRgb (
+      ++ lib.mkIf cfg.enableRgb (
         with pkgs;
         [
           openrgb

@@ -26,19 +26,34 @@ in
   imports = [
     ./hardware-configuration.nix
     ./config/base.nix
+    ./modules/z390-aorus-ultra.nix
+    ./modules/focusrite-scarlett-solo-gen3.nix
     ./config/network.nix
     ./config/gnome.nix
     ./config/nvidia.nix
     ./config/services.nix
     ./config/samba.nix
+
     ../../modules/shared/secrets.nix
     inputs.xremap-flake.nixosModules.default
   ];
 
+  hardware.enableAllFirmware = true;
+
+  # Set Qt theme to match GTK
+  qt.platformTheme = "gtk";
   # Xremap needed configs
   hardware.uinput.enable = true;
   users.groups.uinput.members = [ "${user}" ];
   users.groups.input.members = [ "${user}" ];
+
+  hardware.focusrite-scarlett-solo-gen3 = {
+    enable = true;
+    defaultSampleRate = 44100;
+    useAlsa = true;
+    usePulseAudio = true;
+    usePipeWire = true;
+  };
 
   services.xremap = {
     withHypr = false;
