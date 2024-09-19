@@ -10,6 +10,16 @@
 }:
 let
   linux-desktop-files = import ../linux/files.nix { inherit config user pkgs; };
+  mergeDesktopEntry =
+    name: newConfig:
+    lib.mkMerge [
+      (lib.mkIf (config.xdg.desktopEntries ? ${name}) {
+        ${name} = lib.recursiveUpdate config.xdg.desktopEntries.${name} newConfig;
+      })
+      (lib.mkIf (!config.xdg.desktopEntries ? ${name}) {
+        ${name} = newConfig;
+      })
+    ];
 in
 {
   imports = [
@@ -17,32 +27,59 @@ in
     ../shared/secrets.nix
     ../shared/home-manager/programs
   ];
-  # TODO: Decide whether we want this system-wide or only user-specific later.
 
-  xdg.desktopEntries = {
-    alacritty = {
-      name = "Alacritty";
-      genericName = "Terminal";
-      icon = ../shared/assets/alacritty/flat/alacritty_flat_512.png;
-      exec = "alacritty";
-      terminal = false;
-      categories = [
-        "System"
-        "TerminalEmulator"
-      ];
-    };
-
-    # firefox = {
-    #   name = "Firefox";
-    #   genericName = "Web Browser";
-    #   icon = "/path/to/your/new/firefox-icon.png";
-    #   exec = "firefox %U";
-    #   categories = [
-    #     "Network"
-    #     "WebBrowser"
-    #   ];
-    # };
-  };
+  # xdg.desktopEntries = lib.mkMerge [
+  #   (mergeDesktopEntry "alacritty" {
+  #     name = "Alacritty";
+  #     genericName = "Terminal";
+  #     icon = ../shared/assets/alacritty/smooth/alacritty_smooth_512.png;
+  #     exec = "alacritty";
+  #     terminal = false;
+  #     categories = [
+  #       "System"
+  #       "TerminalEmulator"
+  #     ];
+  #   })
+  #   (mergeDesktopEntry "nvim" {
+  #     name = "Neovim";
+  #     genericName = "Terminal with Neovim";
+  #     icon = ../shared/assets/neovim/neovim_512x512x32.png;
+  #     exec = "alacritty -e nvim";
+  #     terminal = false;
+  #     categories = [
+  #       "System"
+  #       "TerminalEmulator"
+  #     ];
+  #     associations = [
+  #       "text/english"
+  #       "text/plain"
+  #       "text/x-makefile"
+  #       "text/x-c++hdr"
+  #       "text/x-c++src"
+  #       "text/x-chdr"
+  #       "text/x-csrc"
+  #       "text/x-java"
+  #       "text/x-moc"
+  #       "text/x-pascal"
+  #       "text/x-tcl"
+  #       "text/x-tex"
+  #       "application/x-shellscript"
+  #       "text/x-c"
+  #       "text/x-c++"
+  #     ];
+  #   })
+  #   # Uncomment and adjust the following block if you want to include Firefox
+  #   # (mergeDesktopEntry "firefox" {
+  #   #   name = "Firefox";
+  #   #   genericName = "Web Browser";
+  #   #   icon = "/path/to/your/new/firefox-icon.png";
+  #   #   exec = "firefox %U";
+  #   #   categories = [
+  #   #     "Network"
+  #   #     "WebBrowser"
+  #   #   ];
+  #   # })
+  # ];
 
   # # Ensure the custom icon is copied to the proper location
   # environment.etc."icons/alacritty-neovim.png".source = ../shared/assets/alacritty/flat/alacritty_flat_512.png;

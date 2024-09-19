@@ -9,18 +9,18 @@ let
 in
 icon-files
 // {
-  "local/share/applications/alacritty-neovim.desktop" = {
-    text = ''
-      [Desktop Entry]
-      Version=1.0
-      Name=Alacritty with Neovim
-      Comment=Open files with Neovim inside Alacritty
-      Exec=${pkgs.alacritty}/bin/alacritty -e nvim %F
-      Terminal=false
-      Type=Application
-      MimeType=text/plain;application/x-shellscript;
-      Icon=local/share/icons/alacritty_flat_512.png
-      Categories=Utility;TextEditor;
-    '';
-  };
+  # "${config.home.profileDirectory}/share/applications/alacritty-neovim.desktop" = {
+  #   text = ''
+  #     [Desktop Entry]
+  #     Version=1.0
+  #     Name=Alacritty with Neovim
+  #     Comment=Open files with Neovim inside Alacritty
+  #     Exec=${pkgs.alacritty}/bin/alacritty -e nvim %F
+  #     Terminal=false
+  #     Type=Application
+  #     MimeType=text/plain;application/x-shellscript;
+  #     Icon=local/share/icons/alacritty_flat_512.png
+  #     Categories=Utility;TextEditor;
+  #   '';
+  # };
 }

@@ -35,6 +35,41 @@
       # You can put your default mappings / updates / etc. in here
       #  See `:help telescope.builtin`
       keymaps = {
+        #        "<C-j>" = {
+        #          mode = "n";
+        #          action = "move_selection_next";
+        #          options.desc = "Move selection [D]own";
+        #        };
+        #        "<C-k>" = {
+        #          mode = "n";
+        #          action = "move_selection_previous";
+        #          options.desc = "Move selection [U]p";
+        #        };
+        #        "<C-n>" = {
+        #          mode = "n";
+        #          action = "cycle_history_next";
+        #          options.desc = "Cycle [N]ext history";
+        #        };
+        #        "<C-p>" = {
+        #          mode = "n";
+        #          action = "cycle_history_prev";
+        #          options.desc = "Cycle [P]revious history";
+        #        };
+        #        "<C-c>" = {
+        #          mode = "n";
+        #          action = "close";
+        #          options.desc = "[C]lose";
+        #        };
+        #        "<C-q>" = {
+        #          mode = "n";
+        #          action = "smart_send_to_qflist";
+        #          options.desc = "[Q]uickfix";
+        #        };
+        "<leader>fr" = {
+          mode = "n";
+          action = "lsp_references";
+          options.desc = "[F]ind [R]eferences";
+        };
         "<leader>sh" = {
           mode = "n";
           action = "help_tags";

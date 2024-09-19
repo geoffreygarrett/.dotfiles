@@ -9,6 +9,7 @@
 {
   programs.alacritty = {
     enable = true;
+    package = pkgs.alacritty;
     settings = {
       window = {
         dimensions = {
@@ -34,21 +35,21 @@
       font = {
         normal = {
           family = "JetBrainsMono Nerd Font";
-          style = "Regular";
+          style = "Medium";
         };
         bold = {
           family = "JetBrainsMono Nerd Font";
-          style = "Bold";
+          style = "Medium Bold";
         };
         italic = {
           family = "JetBrainsMono Nerd Font";
-          style = "Italic";
+          style = "Medium Italic";
         };
         bold_italic = {
           family = "JetBrainsMono Nerd Font";
-          style = "Bold Italic";
+          style = "Medium Bold Italic";
         };
-        size = 12.0;
+        size = 11.0;
         offset = {
           x = 0;
           y = 0;

@@ -21,6 +21,8 @@ final: prev: {
     postInstall =
       (oldAttrs.postInstall or "")
       + ''
+        # Remove the original icons (128, 16, 24, 256, 32, 48, 512, 64, scalable)
+        rm -f $out/share/icons/hicolor/*/apps/obsidian.*
         mkdir -p $out/share/icons/hicolor/scalable/apps
         cp -f ${../modules/shared/assets/obsidian/obsidian-icon.svg} $out/share/icons/hicolor/scalable/apps/obsidian.svg
         mkdir -p $out/share/icons/hicolor/256x256/apps
@@ -62,6 +64,32 @@ final: prev: {
 
         # Set the default icon (using the 256x256 version)
         cp -f ${../modules/shared/assets/firefox/firefox_nightly_256.png} $out/share/icons/hicolor/firefox.png
+      '';
+  });
+
+  neovim-wrapped = prev.neovim-wrapped.overrideAttrs (oldAttrs: {
+    postInstall =
+      (oldAttrs.postInstall or "")
+      + ''
+        rm -f $out/share/icons/hicolor/*/apps/nvim.*
+        mkdir -p $out/share/icons/hicolor/scalable/apps
+        cp -f ${../modules/shared/assets/neovim/neovim_512x512x32.png} $out/share/icons/hicolor/scalable/apps/nvim.png
+        mkdir -p $out/share/icons/hicolor/256x256/apps
+        cp -f ${../modules/shared/assets/neovim/neovim_256x256x32.png} $out/share/icons/hicolor/256x256/apps/nvim.png
+        # For macOS
+        mkdir -p $out/Applications/Neovim.app/Contents/Resources
+        cp -f ${../modules/shared/assets/neovim/neovim_512x512x32.png} $out/Applications/Neovim.app/Contents/Resources/nvim.icns
+        # For Windows
+        mkdir -p $out/share/icons
+        cp -f ${../modules/shared/assets/neovim/neovim_512x512x32.png} $out/share/icons/nvim.ico
+        # Modify desktop entry
+        sed -i '
+            s/^Name=.*/Name=Neovim/
+            s/^GenericName=.*/GenericName=Terminal with Neovim/
+            s/^Exec=.*/Exec=alacritty -e nvim %F/
+            s|^Icon=.*|Icon='"$out"'/share/icons/hicolor/scalable/apps/nvim.png|
+            s/^Terminal=.*/Terminal=false/
+        ' "$out/share/applications/nvim.desktop"
       '';
   });
 }
