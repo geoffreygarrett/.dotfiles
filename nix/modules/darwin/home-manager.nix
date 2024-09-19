@@ -7,10 +7,27 @@
   inputs,
   ...
 }:
+let
+  yaml2json = pkgs.writeShellScriptBin "yaml2json" ''
+    ${pkgs.remarshal}/bin/remarshal -if yaml -of json "$1"
+  '';
+
+  yamlContent = builtins.fromJSON (
+    builtins.readFile (
+      pkgs.runCommand "ssh-keys.json" { } ''
+        ${yaml2json}/bin/yaml2json ${self}/keyring.yaml > $out
+      ''
+    )
+  );
+
+  # Extract only the keys from the YAML content
+  keys = map (entry: entry.key) yamlContent;
+in
 {
   home-manager = {
     useGlobalPkgs = true;
     sharedModules = [
+      inputs.nixvim.homeManagerModules.nixvim
       inputs.sops-nix.homeManagerModules.sops
       ../../packages/shared/shell-aliases
     ];
@@ -77,6 +94,7 @@
     home = "/Users/${user}";
     isHidden = false;
     shell = pkgs.zsh;
+    openssh.authorizedKeys.keys = keys;
   };
 
   # Homebrew configuration

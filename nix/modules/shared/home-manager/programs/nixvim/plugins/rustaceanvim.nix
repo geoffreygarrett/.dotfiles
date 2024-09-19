@@ -16,7 +16,7 @@
 
   # Add VSCode C/C++ tools
   home.packages = with pkgs; [
-    vscode-extensions.ms-vscode.cpptools
+    #vscode-extensions.ms-vscode.cpptools # NOTE: Not compatible with aarch64-darwin
   ];
 
 }

@@ -4,7 +4,7 @@
     plugins = {
       lualine = {
         enable = true;
-        theme = "material";
+        settings.options.theme = "material";
       };
     };
 

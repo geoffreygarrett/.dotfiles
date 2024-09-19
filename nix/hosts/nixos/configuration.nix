@@ -1,16 +1,26 @@
 {
   config,
   user,
+  self,
   pkgs,
   inputs,
   ...
 }:
-
 let
-  keys = [
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN4Uy9fE/YF8/puhUOwOcHKqDzDW75zt9DndypPEhQaG nix-on-droid@localhost"
-    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITvBraRmM6IvQFt8VUHRx9hZ5DZVkPX3ORlfVqGa05z"
-  ];
+  yaml2json = pkgs.writeShellScriptBin "yaml2json" ''
+    ${pkgs.remarshal}/bin/remarshal -if yaml -of json "$1"
+  '';
+
+  yamlContent = builtins.fromJSON (
+    builtins.readFile (
+      pkgs.runCommand "ssh-keys.json" { } ''
+        ${yaml2json}/bin/yaml2json ${self}/keyring.yaml > $out
+      ''
+    )
+  );
+
+  # Extract only the keys from the YAML content
+  keys = map (entry: entry.key) yamlContent;
 in
 {
   imports = [

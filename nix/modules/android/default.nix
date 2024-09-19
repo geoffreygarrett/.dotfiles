@@ -56,6 +56,22 @@ let
       )
     )
   );
+
+  yaml2json = pkgs.writeShellScriptBin "yaml2json" ''
+    ${pkgs.remarshal}/bin/remarshal -if yaml -of json "$1"
+  '';
+
+  yamlContent = builtins.fromJSON (
+    builtins.readFile (
+      pkgs.runCommand "ssh-keys.json" { } ''
+        ${yaml2json}/bin/yaml2json ${self}/keyring.yaml > $out
+      ''
+    )
+  );
+
+  # Extract only the keys from the YAML content
+  keys = map (entry: entry.key) yamlContent;
+
 in
 {
   imports = [
@@ -74,9 +90,7 @@ in
   services.ssh = {
     enable = true;
     port = 22;
-    authorizedKeys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7"
-    ];
+    authorizedKeys = keys;
     aliases = {
       sshd-start = "sshd-start";
       sshd-stop = "pkill sshd";
