@@ -317,7 +317,7 @@
                 backupFileExtension = "nixus.bak";
                 sharedModules = [
                   inputs.nixvim.homeManagerModules.nixvim
-                  inputs.sops-nix.homeManagerModules.sops
+                  # inputs.sops-nix.homeManagerModules.sops
                   ./nix/packages/shared/shell-aliases
                 ];
                 useGlobalPkgs = true;

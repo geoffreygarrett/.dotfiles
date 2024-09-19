@@ -19,3 +19,14 @@ Solved by
 sudo rm /etc/ssl/certs/ca-certificates.crt
 sudo ln -s /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /etc/ssl/certs/ca-certificates.crt
 ```
+
+# NixOS
+
+## Samba share not working
+
+```
+> sudo dmesg | grep CIFS 
+[  592.762763] CIFS: VFS: Malformed UNC in devname
+```
+
+Can only mount shares from Samba, [not the server](https://forums.raspberrypi.com/viewtopic.php?t=351118).

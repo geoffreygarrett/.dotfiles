@@ -31,6 +31,7 @@ in
     ./config/nvidia.nix
     ./config/services.nix
     ./config/samba.nix
+    ../../modules/shared/secrets.nix
     inputs.xremap-flake.nixosModules.default
   ];
 
@@ -123,6 +124,14 @@ in
           commands = [
             {
               command = "${pkgs.systemd}/bin/reboot";
+              options = [ "NOPASSWD" ];
+            }
+            {
+              command = "/run/current-system/sw/bin/mount.cifs";
+              options = [ "NOPASSWD" ];
+            }
+            {
+              command = "/run/current-system/sw/bin/umount";
               options = [ "NOPASSWD" ];
             }
           ];

@@ -58,7 +58,7 @@ in
       };
 
       "smb-secrets" = {
-        mode = "0400"; # read permission for owner only
+        mode = "0400"; # read permission for owner and group
         key = "smb-secrets";
       };
     };

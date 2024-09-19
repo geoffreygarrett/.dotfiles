@@ -24,7 +24,6 @@ in
 {
   imports = [
     ../shared/aliases.nix
-    ../shared/secrets.nix
     ../shared/home-manager/programs
   ];
 
