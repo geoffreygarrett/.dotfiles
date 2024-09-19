@@ -56,6 +56,11 @@ in
         mode = "0400"; # read permission for owner only
         key = "tailscale-auth-key-value";
       };
+
+      "smb-secrets" = {
+        mode = "0400"; # read permission for owner only
+        key = "smb-secrets";
+      };
     };
   };
 }

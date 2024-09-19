@@ -30,8 +30,8 @@ in
     ./config/gnome.nix
     ./config/nvidia.nix
     ./config/services.nix
+    ./config/samba.nix
     inputs.xremap-flake.nixosModules.default
-    #./modules/tailscale-nix.nix
   ];
 
   # Xremap needed configs
