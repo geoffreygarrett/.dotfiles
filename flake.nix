@@ -79,10 +79,10 @@
     };
 
     # NixOS
-    #nixos-hardware = {
-    #  url = "github:NixOS/nixos-hardware/master";
-    #  inputs.nixpkgs.follows = "nixpkgs";
-    #};
+    nixos-hardware = {
+      url = "github:NixOS/nixos-hardware/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # CLI
     rust-overlay = {
@@ -96,13 +96,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Add the apple-fonts input
-    apple-fonts = {
-      url = "git+https://codeberg.org/adamcstephens/apple-fonts.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      # Optionally, specify the branch if it's not the default
-      # url = "git+https://codeberg.org/adamcstephens/apple-fonts.nix?ref=main";
-    };
   };
 
   outputs =
@@ -111,7 +104,6 @@
       nixpkgs,
       home-manager,
       pre-commit-hooks,
-      sops-nix,
       treefmt-nix,
       nixgl,
       disko,
@@ -197,7 +189,7 @@
               }
             )
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
-            ++ lib.optional (lib.isAndroid system) sops-nix.overlays.default
+            ++ lib.optional (lib.isAndroid system) inputs.sops-nix.overlays.default
             ++ lib.optional (lib.isLinux system) nixgl.overlay;
         };
       treefmtEval = forAllSystems (
@@ -310,14 +302,12 @@
           modules = [
             disko.nixosModules.disko
             home-manager.nixosModules.home-manager
-            sops-nix.nixosModules.sops
             ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
                 backupFileExtension = "nixus.bak";
                 sharedModules = [
                   inputs.nixvim.homeManagerModules.nixvim
-                  # inputs.sops-nix.homeManagerModules.sops
                   ./nix/packages/shared/shell-aliases
                 ];
                 useGlobalPkgs = true;

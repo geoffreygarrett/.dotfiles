@@ -24,25 +24,35 @@ let
 in
 {
   imports = [
+    ############################
+    # Hardware
+    ############################
     ./hardware-configuration.nix
+    inputs.nixos-hardware.nixosModules.common-pc
+    inputs.nixos-hardware.nixosModules.common-pc-ssd
+    inputs.nixos-hardware.nixosModules.common-cpu-intel
+    inputs.nixos-hardware.nixosModules.common-gpu-intel
+    inputs.nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
+    inputs.nixos-hardware.nixosModules.common-hidpi
+    inputs.sops-nix.nixosModules.default
+    inputs.xremap-flake.nixosModules.default
     ./config/base.nix
     ./modules/z390-aorus-ultra.nix
     ./modules/focusrite-scarlett-solo-gen3.nix
     ./config/network.nix
     ./config/gnome.nix
-    ./config/nvidia.nix
+    #./config/nvidia.nix
     ./config/services.nix
     ./config/samba.nix
-
     ../../modules/shared/secrets.nix
-    inputs.xremap-flake.nixosModules.default
+
   ];
 
+  hardware.nvidia.open = false; # Disable open source
   hardware.enableAllFirmware = true;
 
   # Set Qt theme to match GTK
   qt.platformTheme = "gtk";
-  # Xremap needed configs
   hardware.uinput.enable = true;
   users.groups.uinput.members = [ "${user}" ];
   users.groups.input.members = [ "${user}" ];
@@ -78,38 +88,6 @@ in
   time.timeZone = "Africa/Johannesburg";
   i18n.defaultLocale = "en_GB.UTF-8";
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-
-  # Tailscale
-  # services.nixos-tailscale = {
-  #   enable = true;
-  #   authKeyFile = config.sops.secrets.tailscale-auth-key.path;
-  #   autoconnect = true;
-  #   extraPackages = with pkgs; [
-  #     openrgb-with-all-plugins
-  #     linuxPackages.v4l2loopback
-  #     v4l-utils
-  #     inetutils
-  #   ];
-  # };
-
-  # Graphics card
-  #hardware.video.nvidia.gtx1080ti = {
-  #  enable = true;
-  #  enableCuda = true; # Enable if you need CUDA support
-  #  enableVulkan = true;
-  #  enable32bit = true;
-  #  forceFullCompositionPipeline = true;
-  #  powerManagement = false;
-  #};
-
-  # Motherboard
-  #hardware.motherboards.z390AorusUltra = {
-  #  enable = true;
-  #  enableWifi = true;
-  #  enableBluetooth = true;
-  #  enableRgb = false;
-  #  enableOptane = false;
-  #};
 
   # User-specific configuration
   users.users.geoffrey = {
