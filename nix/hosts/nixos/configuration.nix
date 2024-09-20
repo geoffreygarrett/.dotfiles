@@ -40,14 +40,16 @@ in
     ./modules/z390-aorus-ultra.nix
     ./modules/focusrite-scarlett-solo-gen3.nix
     ./config/network.nix
-    ./config/gnome.nix
+    #./config/gnome.nix
     #./config/nvidia.nix
+    ./modules/desktop-environment.nix
     ./config/services.nix
     ./config/samba.nix
     ../../modules/shared/secrets.nix
 
   ];
 
+  desktopEnvironment.use = "gnome"; # or "i3" or "gnome"
   hardware.nvidia.open = false; # Disable open source
   hardware.enableAllFirmware = true;
 
