@@ -20,7 +20,7 @@ in
 {
   imports = [
     (importModule ./alacritty.nix)
-    (importModule ./zellij.nix)
+    # (importModule ./zellij.nix)
     (importModule ./git.nix)
     (importModule ./gh.nix)
     (importModule ./tmux.nix)
