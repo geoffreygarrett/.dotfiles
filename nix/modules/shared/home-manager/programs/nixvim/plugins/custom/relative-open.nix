@@ -14,14 +14,17 @@
         end
       end
 
+      -- Key mappings for [R] operations
+      vim.keymap.set('n', '<leader>r', '<nop>', { desc = "[R]elative/Rename operations" })
+
       -- Key mappings for relative file opening
-      vim.keymap.set('n', '<leader>re', edit_relative('edit'), { desc = "Edit file relative to current" })
-      vim.keymap.set('n', '<leader>rv', edit_relative('vsplit'), { desc = "Vertical split file relative to current" })
-      vim.keymap.set('n', '<leader>rs', edit_relative('split'), { desc = "Horizontal split file relative to current" })
-      vim.keymap.set('n', '<leader>rt', edit_relative('tabedit'), { desc = "Open in new tab file relative to current" })
+      vim.keymap.set('n', '<leader>re', edit_relative('edit'), { desc = "[R]elative: [E]dit file" })
+      vim.keymap.set('n', '<leader>rv', edit_relative('vsplit'), { desc = "[R]elative: [V]ertical split file" })
+      vim.keymap.set('n', '<leader>rs', edit_relative('split'), { desc = "[R]elative: [S]plit file horizontally" })
+      vim.keymap.set('n', '<leader>rt', edit_relative('tabedit'), { desc = "[R]elative: Open file in new [T]ab" })
 
       -- Command to change directory to current file's directory
-      vim.api.nvim_create_user_command('CDC', 'cd %:p:h', { desc = "Change directory to current file's directory" })
+      vim.api.nvim_create_user_command('CDC', 'cd %:p:h', { desc = "[C]hange [D]irectory to [C]urrent file's location" })
     '';
   };
 }
