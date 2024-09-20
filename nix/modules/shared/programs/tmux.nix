@@ -121,7 +121,7 @@ in
       bind-key ( switch-client -p\; refresh-client -S  # Switch to previous session and refresh
       bind-key ) switch-client -n\; refresh-client -S  # Switch to next session and refresh
 
-      # todo.md, complements of ThePrimeagen 
+      # TODO.md, complements of ThePrimeagen
       # https://github.com/ThePrimeagen/.dotfiles/blob/602019e902634188ab06ea31251c01c1a43d1621/tmux/.tmux.conf#L24
       bind -r D neww -c "#{pane_current_path}" "[[ -e TODO.md ]] && nvim TODO.md || nvim ~/.dotfiles/personal/todo.md"
     '';
