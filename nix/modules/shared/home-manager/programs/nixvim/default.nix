@@ -29,8 +29,7 @@
     ./plugins/code-runner.nix
 
     #  Custom plugin configs
-    ./plugins/config/code-runner.nix
-    ./plugins/relative-open.nix
+    ./plugins/custom/relative-open.nix
 
     # NOTE: Add/Configure additional plugins for Kickstart.nixvim
     #
