@@ -1,7 +1,19 @@
 { pkgs, ... }:
+let
+  code-runner-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "duck-nvim";
+    src = pkgs.fetchFromGitHub {
+      owner = "CRAG666";
+      repo = "code_runner.nvim";
+      rev = "dcedccbf969a0f3bc00db446172b4966e83101dd";
+      sha256 = "0n6vv6nwslr5agy2xdlq4gnhl7vawbs4qzwnwg2156qgdg5b85f7";
+    };
+  };
+in
 {
+
   programs.nixvim = {
-    extraPlugins = with pkgs.vimPlugins; [
+    extraPlugins = [
       code-runner-nvim
     ];
 
