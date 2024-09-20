@@ -1,7 +1,7 @@
 { pkgs, ... }:
 let
   code-runner-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "duck-nvim";
+    name = "code_runner";
     src = pkgs.fetchFromGitHub {
       owner = "CRAG666";
       repo = "code_runner.nvim";
