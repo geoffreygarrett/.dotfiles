@@ -22,8 +22,6 @@ proper attribution is maintained for each asset listed below.
     [Original post](https://www.reddit.com/r/unixporn/comments/1cs8zev/oc_i_made_my_own_interpretation_of_alacrittys/)
   - GitHub: [mac-icons repository](https://github.com/dfl0/mac-icons)
 
-
-
   https://obsidian.md/blog/new-obsidian-icon/
 
   https://icon-icons.com/download/189478/PNG/32/

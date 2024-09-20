@@ -26,16 +26,21 @@
     ./plugins/copilot.nix
     ./plugins/duck.nix
     ./plugins/rustaceanvim.nix
+    ./plugins/code-runner.nix
+
+    #  Custom plugin configs
+    ./plugins/config/code-runner.nix
+    ./plugins/relative-open.nix
 
     # NOTE: Add/Configure additional plugins for Kickstart.nixvim
     #
     #  Here are some example plugins that I've included in the Kickstart repository.
     #  Uncomment any of the lines below to enable them (you will need to restart nvim).
     #
-    # ./plugins/kickstart/plugins/debug.nix
-    # ./plugins/kickstart/plugins/indent-blankline.nix
-    # ./plugins/kickstart/plugins/lint.nix
-    # ./plugins/kickstart/plugins/autopairs.nix
+    ./plugins/kickstart/plugins/debug.nix
+    ./plugins/kickstart/plugins/indent-blankline.nix
+    ./plugins/kickstart/plugins/lint.nix
+    ./plugins/kickstart/plugins/autopairs.nix
     ./plugins/kickstart/plugins/neo-tree.nix
     #
     # NOTE: Configure your own plugins `see https://nix-community.github.io/nixvim/`
@@ -274,38 +279,6 @@
       # https://nix-community.github.io/nixvim/plugins/sleuth/index.html
       sleuth = {
         enable = true;
-      };
-
-      # https://nix-community.github.io/nixvim/plugins/indent-blankline/settings/index.html
-      indent-blankline = {
-        enable = true;
-        settings = {
-          exclude = {
-            buftypes = [
-              "terminal"
-              "quickfix"
-            ];
-            filetypes = [
-              "checkhealth"
-              "help"
-              "lspinfo"
-              "packer"
-              "TelescopePrompt"
-              "TelescopeResults"
-              "yaml"
-              "dashboard"
-            ];
-          };
-
-          indent = {
-            char = "│";
-          };
-          scope = {
-            show_end = false;
-            show_exact_scope = true;
-            show_start = false;
-          };
-        };
       };
 
       # Highlight todo, notes, etc in comments

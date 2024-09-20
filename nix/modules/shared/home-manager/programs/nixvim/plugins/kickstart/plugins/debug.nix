@@ -8,7 +8,6 @@
     # https://nix-community.github.io/nixvim/plugins/dap/index.html
     plugins.dap = {
       enable = true;
-
       extensions = {
         # Creates a beautiful debugger UI
         dap-ui = {

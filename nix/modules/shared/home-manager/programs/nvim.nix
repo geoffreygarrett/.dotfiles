@@ -1,8 +1,9 @@
-{ config
-, pkgs
-, lib
-, inputs
-, ...
+{
+  config,
+  pkgs,
+  lib,
+  inputs,
+  ...
 }:
 let
   # Define a script that returns either the GitHub token or OpenAI API key
@@ -12,8 +13,7 @@ let
       pkgs.lib.hasAttrByPath [
         "sops"
         "secrets"
-      ]
-        config
+      ] config
     then
       pkgs.writeShellScriptBin "key-fetcher" ''
         #!/bin/sh
@@ -93,11 +93,9 @@ let
 
   pluginList =
     plugins:
-    lib.strings.concatMapStrings
-      (
-        plugin: "  [\"${sanitizePluginName plugin.name}\"] = \"${plugin.outPath}\",\n"
-      )
-      plugins;
+    lib.strings.concatMapStrings (
+      plugin: "  [\"${sanitizePluginName plugin.name}\"] = \"${plugin.outPath}\",\n"
+    ) plugins;
 in
 {
   programs.neovim = {
@@ -105,12 +103,12 @@ in
     viAlias = true;
     vimAlias = true;
     extraPackages = with pkgs; [
-          ripgrep # Requirement for telescope
-    lua-language-server
-    nil
-    stylua
-    bash-language-server
-    rust-analyzer  # Add this line
+      ripgrep # Requirement for telescope
+      lua-language-server
+      nil
+      stylua
+      bash-language-server
+      rust-analyzer # Add this line
       #         <lsps, etc.>
     ];
     plugins = with pkgs.vimPlugins; [
