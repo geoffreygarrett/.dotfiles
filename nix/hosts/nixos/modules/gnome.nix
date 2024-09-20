@@ -6,7 +6,6 @@
 }:
 
 with lib;
-
 let
   cfg = config.desktopEnvironment.gnome;
   screens = [
@@ -36,14 +35,6 @@ in
         gdm = {
           enable = true;
           wayland = true;
-          settings = {
-            "org/gnome/desktop/background" = {
-              picture-uri = "file:///etc/login-wallpaper.png";
-              picture-uri-dark = "file:///etc/login-wallpaper.png";
-              picture-options = "spanned";
-              primary-color = "#000000";
-            };
-          };
         };
         sessionCommands = ''
           ${builtins.concatStringsSep "\n" (
@@ -57,9 +48,34 @@ in
           ${pkgs.feh}/bin/feh --bg-scale ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
         '';
       };
-      desktopManager.gnome.enable = true;
+      desktopManager.gnome = {
+        enable = true;
+        extraGSettingsOverrides = ''
+          [org.gnome.desktop.interface]
+          color-scheme='prefer-dark'
+          gtk-theme='Adwaita-dark'
+
+          [org.gnome.desktop.background]
+          picture-uri='file:///etc/login-wallpaper.png'
+          picture-uri-dark='file:///etc/login-wallpaper.png'
+          picture-options='spanned'
+          primary-color='#000000'
+        '';
+      };
     };
 
     environment.systemPackages = with pkgs; [ firefox ];
+
+    # Force Gtk applications to use dark theme
+    environment.sessionVariables = {
+      GTK_THEME = "Adwaita:dark";
+    };
+
+    # Set dark theme for Qt applications
+    qt = {
+      enable = true;
+      platformTheme = "gnome";
+      style = "adwaita-dark";
+    };
   };
 }

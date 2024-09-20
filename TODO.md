@@ -34,3 +34,10 @@
 
 - \[ \] Change `deep ocean` theme style to the color assignments of Jetbrains,
   rather than vscode.
+
+
+- [ ] Add proper itnegration for nix-colors and sort out a consistent color scheming throughout my configuration. 
+
+- [ ] Additionally for the color scheme, see if it's possible to hotswap color schemes throughout. [repo](https://github.com/Misterio77/nix-colors).
+
+- [ ] Spend some time learning `tmux-sessionator` and using it productively. [repo](https://github.com/jrmoulton/tmux-sessionizer).

@@ -124,6 +124,23 @@ in
       set -g @pomodoro_notifications 'off'
       set -g @pomodoro_granularity 'on'
       set -g @pomodoro_interval_display "[%s/%s]"
+
+      # Custom scripts
+      bind-key -r f run-shell "tmux neww ${pkgs.tmux-sessionizer}/bin/tmux-sessionizer"
+
+      # tmux-sessionizer [tms]
+      bind-key s display-popup -E "tms switch"  # Switch sessions
+      bind-key w display-popup -E "tms windows"  # Show windows in current session
+      bind-key R command-prompt -p "Rename session to: " "run-shell 'tms rename %1'"  # Rename session
+      bind-key F run-shell 'tms refresh'  # Refresh session (create missing worktree windows)
+      bind-key K run-shell 'tms kill'  # Kill session and switch to another
+      set -g status-right "#(tms sessions)"  # Show sessions in status bar
+      bind-key ( switch-client -p\; refresh-client -S  # Switch to previous session and refresh
+      bind-key ) switch-client -n\; refresh-client -S  # Switch to next session and refresh
+
+      # todo.md, complements of ThePrimeagen 
+      # https://github.com/ThePrimeagen/.dotfiles/blob/602019e902634188ab06ea31251c01c1a43d1621/tmux/.tmux.conf#L24
+      bind -r D neww -c "#{pane_current_path}" "[[ -e TODO.md ]] && nvim TODO.md || nvim ~/.dotfiles/personal/todo.md"
     '';
     plugins = with pkgs.tmuxPlugins; [
       tmux-mem-cpu-load

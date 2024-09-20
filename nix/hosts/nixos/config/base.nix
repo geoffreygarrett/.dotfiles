@@ -31,15 +31,15 @@ in
     };
   };
 
-  fileSystems."/boot/efi" = {
-    device = "/dev/nvme0n1p1";
-    fsType = "vfat";
-    options = [
-      "defaults"
-      "noatime"
-      "nofail"
-    ];
-  };
+  #  fileSystems."/boot/efi" = {
+  #    device = "/dev/nvme0n1p1";
+  #    fsType = "vfat";
+  #    options = [
+  #      "defaults"
+  #      "noatime"
+  #      "nofail"
+  #    ];
+  #  };
 
   nix = {
     settings = {

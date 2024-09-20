@@ -52,9 +52,6 @@ in
   desktopEnvironment.use = "gnome"; # or "i3" or "gnome"
   hardware.nvidia.open = false; # Disable open source
   hardware.enableAllFirmware = true;
-
-  # Set Qt theme to match GTK
-  qt.platformTheme = "gtk";
   hardware.uinput.enable = true;
   users.groups.uinput.members = [ "${user}" ];
   users.groups.input.members = [ "${user}" ];
@@ -135,4 +132,21 @@ in
       ];
     };
   };
+
+  # # Ensure the custom icon is copied to the proper location
+  # environment.etc."icons/alacritty-neovim.png".source = ../../modules/shared/assets/alacritty/flat/alacritty_flat_512.png;
+  #
+  # # Define the .desktop file for opening with Alacritty and Neovim
+  # environment.etc."xdg/applications/alacritty-neovim.desktop".text = ''
+  #   [Desktop Entry]
+  #   Version=1.0
+  #   Name=Alacritty with Neovim
+  #   Comment=Open files with Neovim inside Alacritty
+  #   Exec=${pkgs.alacritty}/bin/alacritty -e ${pkgs.neovim}/bin/nvim %F
+  #   Terminal=false
+  #   Type=Application
+  #   MimeType=text/plain;application/x-shellscript;
+  #   Icon=/etc/icons/alacritty-neovim.png
+  #   Categories=Utility;TextEditor;
+  # '';
 }

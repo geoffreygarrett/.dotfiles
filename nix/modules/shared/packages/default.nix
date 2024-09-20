@@ -55,4 +55,10 @@ with pkgs;
   qrcp # Transfer files over wifi by scanning a QR code from your terminal (Reqires root, breaks NixOnDroid)
   qrtool # Generate QR codes from the command line
 
+  ############################
+  # Developer productivity
+  ############################
+  tmux-sessionizer
+  # Developer productivity
+
 ]

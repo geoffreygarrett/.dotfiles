@@ -28,7 +28,6 @@ in
     (importModule ./bash.nix)
     (importModule ./nushell.nix)
     #  (importModule ./nvim.nix)
-
     (importModule ./nixvim/default.nix)
     (importModule ./starship.nix)
     #(importModule ./mdt.nix)

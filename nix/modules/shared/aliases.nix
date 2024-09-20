@@ -11,6 +11,17 @@
   aliases.enable = true;
   aliases.aliases = {
 
+    yolo = {
+      command = "git push origin master --force --no-verify";
+      description = "Force push to master branch";
+      tags = [
+        "git"
+        "zsh"
+        "fish"
+        "nu"
+      ];
+    };
+
     #    # New RGB control aliases
     #    rgb-off = {
     #      command = "${pkgs.writeShellScriptBin "rgb-off-script" ''

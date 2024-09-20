@@ -12,4 +12,7 @@ shared-packages
   testdisk
   ddrescue
   fio
+
+  # Work
+  spotify
 ]
