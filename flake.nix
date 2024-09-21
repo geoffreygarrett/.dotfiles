@@ -315,18 +315,8 @@
                   inherit inputs self user;
                 };
                 # useUserPackages = true;
-                users.${user} =
-                  {
-                    self,
-                    config,
-                    pkgs,
-                    inputs,
-                    user,
-                    ...
-                  }:
-                  {
-                    imports = [ ./nix/modules/nixos/home-manager.nix ];
-                  };
+                users.${user} = import ./nix/modules/nixos/home-manager.nix;
+
               };
             }
             ./nix/hosts/nixos

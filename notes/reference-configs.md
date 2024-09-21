@@ -12,7 +12,7 @@
 - \[4\] Uses nix-on-droid:
   https://github.com/t184256/nix-configs/blob/main/user/gpg.nix
 
--
+- https://gitlab.com/Zaney/zaneyos
 
 # Flakes
 

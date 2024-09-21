@@ -10,6 +10,18 @@
 {
   aliases.enable = true;
   aliases.aliases = {
+    fml = {
+      command = "git log --since=\"yesterday\" --pretty=format:\"%h - %an: %s\" && echo \"\\nTODOs:\" && grep -rn \"TODO\" .";
+      description = "Show recent commits and TODOs in the project";
+      tags = [
+        "git"
+        "productivity"
+        "code-review"
+        "zsh"
+        "fish"
+        "nu"
+      ];
+    };
 
     yolo = {
       command = "git push origin master --force --no-verify";
@@ -22,47 +34,6 @@
       ];
     };
 
-    #    # New RGB control aliases
-    #    rgb-off = {
-    #      command = "${pkgs.writeShellScriptBin "rgb-off-script" ''
-    #        #!/bin/sh
-    #        NUM_DEVICES=$(${pkgs.openrgb}/bin/openrgb --noautoconnect --list-devices | grep -E '^[0-9]+: ' | wc -l)
-    #
-    #        for i in $(seq 0 $(($NUM_DEVICES - 1))); do
-    #          ${pkgs.openrgb}/bin/openrgb --noautoconnect --device $i --mode static --color 000000
-    #        done
-    #      ''}/bin/rgb-off-script";
-    #      description = "Turn off all RGB lighting";
-    #      tags = [
-    #        "system"
-    #        "rgb"
-    #        "zsh"
-    #        
-    #        "fish"
-    #        "nu"
-    #      ];
-    #    };
-    #
-    #    rgb-on = {
-    #      command = "${pkgs.writeShellScriptBin "rgb-on-script" ''
-    #        #!/bin/sh
-    #        NUM_DEVICES=$(${pkgs.openrgb}/bin/openrgb --noautoconnect --list-devices | grep -E '^[0-9]+: ' | wc -l)
-    #
-    #        for i in $(seq 0 $(($NUM_DEVICES - 1))); do
-    #          ${pkgs.openrgb}/bin/openrgb --noautoconnect --device $i --mode static --color FFFFFF
-    #        done
-    #      ''}/bin/rgb-on-script";
-    #      description = "Turn on all RGB lighting (white color)";
-    #      tags = [
-    #        "system"
-    #        "rgb"
-    #        "zsh"
-    #        
-    #        "fish"
-    #        "nu"
-    #      ];
-    #    };
-    #
     # Nixus/flake related
     cdf = {
       command = "cd ~/.dotfiles";
@@ -70,7 +41,6 @@
       tags = [
         "zsh"
         "nu"
-
         "navigation"
       ];
     };
@@ -83,7 +53,6 @@
         "file"
         "list"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -96,7 +65,6 @@
         "file"
         "list"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -109,7 +77,6 @@
         "file"
         "list"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -122,7 +89,6 @@
         "file"
         "list"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -135,7 +101,6 @@
         "file"
         "view"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -148,7 +113,6 @@
         "file"
         "view"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -172,24 +136,10 @@
         "system"
         "disk"
         "zsh"
-
         "fish"
         "nu"
       ];
     };
-
-    # # Text Editing and Viewing
-    # nvim = {
-    #   command = "${pkgs.neovim-unwrapped}/bin/nvim";
-    #   description = "Launch Neovim.";
-    #   tags = [
-    #     "editor"
-    #     "zsh"
-    #     
-    #     "fish"
-    #     "nu"
-    #   ];
-    # };
 
     holdnvim = {
       command = "nvim";
@@ -197,7 +147,6 @@
       tags = [
         "editor"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -209,7 +158,6 @@
       tags = [
         "editor"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -245,7 +193,6 @@
         "system"
         "disk"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -258,7 +205,6 @@
         "system"
         "disk"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -271,7 +217,6 @@
         "system"
         "monitor"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -284,7 +229,6 @@
         "system"
         "admin"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -297,7 +241,6 @@
       tags = [
         "network"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -310,7 +253,6 @@
         "network"
         "share"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -322,7 +264,6 @@
       tags = [
         "network"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -334,7 +275,6 @@
       tags = [
         "network"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -359,7 +299,6 @@
       tags = [
         "network"
         "zsh"
-
         "nu"
       ];
     };
@@ -371,7 +310,6 @@
       tags = [
         "git"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -383,7 +321,6 @@
       tags = [
         "git"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -395,7 +332,6 @@
       tags = [
         "git"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -408,7 +344,6 @@
       tags = [
         "kubernetes"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -420,7 +355,6 @@
       tags = [
         "container"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -432,7 +366,6 @@
       tags = [
         "kubernetes"
         "zsh"
-
         "fish"
         "nu"
       ];
@@ -458,7 +391,6 @@
         "image"
         "view"
         "zsh"
-
         "fish"
         "nu"
       ];

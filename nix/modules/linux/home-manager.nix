@@ -7,7 +7,6 @@
   services,
   ...
 }:
-
 {
   home.stateVersion = "24.05";
   system.os = "linux";
@@ -26,17 +25,6 @@
   ];
   programs.bash = {
     enable = true;
-    #    shellAliases =
-    #      let
-    #        sshAliases = if services.ssh.enable then services.ssh.aliases else { };
-    #      in
-    #      {
-    #        ll = "ls -l";
-    #        hw = "echo 'Hello, World!'";
-    #        switch = "nix-on-droid switch --flake ~/.dotfiles";
-    #        cdf = "cd ~/.dotfiles";
-    #      }
-    #      // sshAliases;
   };
   home.packages = import ./packages.nix { inherit pkgs; };
 }
