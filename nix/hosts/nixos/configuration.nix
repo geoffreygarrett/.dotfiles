@@ -49,7 +49,7 @@ in
 
   ];
 
-  desktopEnvironment.use = "gnome"; # or "i3" or "gnome"
+  desktopEnvironment.use = "bspwm"; # or "i3" or "gnome"
   hardware.nvidia.open = false; # Disable open source
   hardware.enableAllFirmware = true;
   hardware.uinput.enable = true;

@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  user,
   ...
 }:
 
@@ -73,7 +74,7 @@ in
       git
     ];
 
-    home-manager.users.${config.user.name} =
+    home-manager.users.${user} =
       { pkgs, ... }:
       {
         services.sxhkd.enable = true;
