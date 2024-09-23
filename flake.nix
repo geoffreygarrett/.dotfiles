@@ -300,12 +300,17 @@
           inherit system;
           pkgs = pkgsFor system;
           specialArgs = {
-            inherit inputs self user;
+            inherit
+              inputs
+              self
+              user
+              keys
+              ;
           };
           modules = [
             {
               home-manager = {
-                backupFileExtension = "nixus.bak";
+                backupFileExtension = "bak";
                 sharedModules = [
                   inputs.nixvim.homeManagerModules.nixvim
                   ./nix/packages/shared/shell-aliases

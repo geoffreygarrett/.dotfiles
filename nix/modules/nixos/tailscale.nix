@@ -1,14 +1,14 @@
 { config, pkgs, ... }:
 {
-  networking = {
-    trustedInterfaces = [
-      "tailscale0"
-    ];
-    allowedUDPPorts = [
-      53 # DNS
-      41641 # Tailscale
-    ];
-  };
+  # networking = {
+  #   trustedInterfaces = [
+  #     "tailscale0"
+  #   ];
+  #   # allowedUDPPorts = [
+  #   #   53 # DNS
+  #   #   41641 # Tailscale
+  #   # ];
+  # };
 
   services.tailscale = {
     enable = true;

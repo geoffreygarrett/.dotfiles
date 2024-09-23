@@ -31,3 +31,7 @@ sudo ln -s /nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt /etc/ssl/ce
 
 Can only mount shares from Samba,
 [not the server](https://forums.raspberrypi.com/viewtopic.php?t=351118).
+
+## NetworkManager wait online fails
+
+- [Relevant discussion](https://discourse.nixos.org/t/nixos-rebuild-switch-upgrade-networkmanager-wait-online-service-failure/30746)

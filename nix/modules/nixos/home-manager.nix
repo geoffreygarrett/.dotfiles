@@ -6,6 +6,7 @@
   home-manager,
   inputs,
   user,
+  keys,
   ...
 }:
 let
@@ -14,7 +15,7 @@ in
 {
   imports = [
     ../shared/aliases.nix
-    ../shared/home-manager/programs
+    ../shared/programs
   ];
 
   xdg.mimeApps = {
@@ -31,8 +32,6 @@ in
 
   home = {
     enableNixpkgsReleaseCheck = false;
-    username = "${user}";
-    homeDirectory = "/home/${user}";
     packages = pkgs.callPackage ./packages.nix { };
 
     file = lib.mkMerge [

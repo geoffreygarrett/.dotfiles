@@ -66,7 +66,7 @@
       };
 
       # Custom CSS
-      userChrome = builtins.readFile ./userChrome.css;
+      #userChrome = builtins.readFile ./userChrome.css;
 
       # Extensions
       extensions = with inputs.firefox-addons.packages."x86_64-linux"; [

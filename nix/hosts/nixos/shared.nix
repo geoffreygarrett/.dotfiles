@@ -12,7 +12,7 @@
     inputs.home-manager.nixosModules.home-manager
 
     # Keyboard remapping
-    inputs.xremap-flake.nixosModules.default
+    #inputs.xremap-flake.nixosModules.default
 
     # Dependencies across my nixos modules
     ../../modules/shared/secrets.nix
