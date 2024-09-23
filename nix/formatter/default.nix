@@ -22,6 +22,10 @@
           "*.jpeg"
           "*.gif"
           "*.svg"
+          "*.bak"
+          "*.off"
+          "*.png"
+          ".DS_Store"
         ];
       };
     in
