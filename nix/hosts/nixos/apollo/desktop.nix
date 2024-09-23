@@ -20,9 +20,9 @@ let
   addOpacity =
     color: opacity:
     let
-      r = lib.toInt ("16#" + builtins.substring 1 2 color);
-      g = lib.toInt ("16#" + builtins.substring 3 2 color);
-      b = lib.toInt ("16#" + builtins.substring 5 2 color);
+      # r = lib.toInt ("16#" + builtins.substring 1 2 color);
+      # g = lib.toInt ("16#" + builtins.substring 3 2 color);
+      # b = lib.toInt ("16#" + builtins.substring 5 2 color);
       a = builtins.floor (255 * opacity);
     in
     "${color}${lib.toHexString (builtins.floor a)}";
@@ -56,11 +56,26 @@ in
 
   services.xserver = {
     enable = true;
+    # Key repeat settings
+    autoRepeatDelay = 225; # Delay before key repeat starts (in milliseconds)
+    autoRepeatInterval = 30; # Interval between key repeats (in milliseconds)
     displayManager = {
       gdm.enable = true;
       defaultSession = "none+bspwm";
     };
     windowManager.bspwm.enable = true;
+
+    videoDrivers = [ "nvidia" ];
+
+    # Better support for general peripherals
+    libinput.enable = true;
+
+    # This helps fix tearing of windows for Nvidia cards
+    screenSection = ''
+      Option       "metamodes" "nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
+      Option       "AllowIndirectGLXProtocol" "off"
+      Option       "TripleBuffer" "on"
+    '';
   };
 
   services.picom = {
@@ -85,6 +100,7 @@ in
       "class_g ?= 'Notify-osd'"
       "class_g = 'Cairo-clock'"
       "_GTK_FRAME_EXTENTS@:c"
+      "class_g ?= 'firefox' && argb"
     ];
     settings = {
       shadow-radius = 7;
@@ -92,6 +108,13 @@ in
       rounded-corners-exclude = [
         "window_type = 'dock'"
         "window_type = 'desktop'"
+        "class_g ?= 'firefox' && window_type = 'utility'"
+        "class_g ?= 'firefox' && window_type = 'popup_menu'"
+      ];
+      round-borders = 1;
+      round-borders-exclude = [
+        "class_g ?= 'firefox' && window_type = 'utility'"
+        "class_g ?= 'firefox' && window_type = 'popup_menu'"
       ];
       blur = {
         method = "dual_kawase";
@@ -104,10 +127,11 @@ in
         "window_type = 'dock'"
         "window_type = 'desktop'"
         "_GTK_FRAME_EXTENTS@:c"
+        "class_g ?= 'firefox' && window_type = 'utility'"
+        "class_g ?= 'firefox' && window_type = 'popup_menu'"
       ];
     };
   };
-
   home-manager.users.${user} =
     {
       pkgs,
@@ -116,6 +140,25 @@ in
       ...
     }:
     {
+
+      gtk = {
+        enable = true;
+        gtk3.extraConfig = {
+          gtk-key-theme-name = "Default";
+          gtk-repeat-delay = 200;
+          gtk-repeat-interval = 30;
+        };
+      };
+
+      # Keyboard settings for X11 and some Wayland compositors
+      home.keyboard = {
+        layout = "us";
+        repeat = {
+          delay = 200;
+          rate = 30;
+        };
+      };
+
       xsession.windowManager.bspwm = {
         enable = true;
         settings = {
@@ -210,6 +253,20 @@ in
           # Polybar
           "super + p" = "polybar-msg cmd toggle";
           "super + shift + p" = "killall polybar; polybar main &";
+
+          # Media control
+          "XF86AudioPlay" = "playerctl play-pause";
+          "XF86AudioNext" = "playerctl next";
+          "XF86AudioPrev" = "playerctl previous";
+
+          # Volume control
+          "XF86AudioRaiseVolume" = "pactl set-sink-volume @DEFAULT_SINK@ +5%";
+          "XF86AudioLowerVolume" = "pactl set-sink-volume @DEFAULT_SINK@ -5%";
+          "XF86AudioMute" = "pactl set-sink-mute @DEFAULT_SINK@ toggle";
+
+          # Brightness control
+          "XF86MonBrightnessUp" = "brightnessctl set +10%";
+          "XF86MonBrightnessDown" = "brightnessctl set 10%-";
         };
       };
 
@@ -231,15 +288,14 @@ in
             foreground = colors.foreground;
             line-size = 2;
             border-size = 0;
-            padding-left = 0;
-            padding-right = 2;
+            padding = 1;
             module-margin = 1;
             font-0 = "JetBrainsMono Nerd Font:style=Regular:size=10;2";
             font-1 = "JetBrainsMono Nerd Font:style=Bold:size=10;2";
             font-2 = "JetBrainsMono Nerd Font:size=12;3";
-            modules-left = "bspwm xwindow";
+            modules-right = "pulseaudio brightness memory cpu battery playerctl";
+            modules-left = "bspwm";
             modules-center = "date";
-            modules-right = "filesystem pulseaudio memory cpu battery spotify";
             tray-position = "right";
             tray-padding = 2;
             cursor-click = "pointer";
@@ -297,38 +353,86 @@ in
             format-prefix-foreground = colors.primary;
             label = "%percentage:2%%";
           };
-          "module/battery" = {
-            type = "internal/battery";
-            battery = "BAT0";
-            adapter = "AC";
-            full-at = 98;
-            format-charging = "<animation-charging> <label-charging>";
-            format-discharging = "<ramp-capacity> <label-discharging>";
-            format-full-prefix = "󰁹 ";
-            format-full-prefix-foreground = colors.primary;
-            ramp-capacity-0 = "󰁺";
-            ramp-capacity-1 = "󰁻";
-            ramp-capacity-2 = "󰁼";
-            ramp-capacity-3 = "󰁽";
-            ramp-capacity-4 = "󰁾";
-            ramp-capacity-foreground = colors.primary;
-            animation-charging-0 = "󰢜";
-            animation-charging-1 = "󰂆";
-            animation-charging-2 = "󰂇";
-            animation-charging-3 = "󰂈";
-            animation-charging-4 = "󰢝";
-            animation-charging-foreground = colors.primary;
-            animation-charging-framerate = 750;
+          # "module/battery" = {
+          #   type = "internal/battery";
+          #   battery = "BAT0";
+          #   adapter = "AC";
+          #   full-at = 98;
+          #   format-charging = "<animation-charging> <label-charging>";
+          #   format-discharging = "<ramp-capacity> <label-discharging>";
+          #   format-full-prefix = "󰁹 ";
+          #   format-full-prefix-foreground = colors.primary;
+          #   ramp-capacity-0 = "󰁺";
+          #   ramp-capacity-1 = "󰁻";
+          #   ramp-capacity-2 = "󰁼";
+          #   ramp-capacity-3 = "󰁽";
+          #   ramp-capacity-4 = "󰁾";
+          #   ramp-capacity-foreground = colors.primary;
+          #   animation-charging-0 = "󰢜";
+          #   animation-charging-1 = "󰂆";
+          #   animation-charging-2 = "󰂇";
+          #   animation-charging-3 = "󰂈";
+          #   animation-charging-4 = "󰢝";
+          #   animation-charging-foreground = colors.primary;
+          #   animation-charging-framerate = 750;
+          # };
+          "module/brightness" = {
+            type = "internal/backlight";
+            card = "intel_backlight"; # You may need to change this to match your system
+            format = "<ramp> <label>";
+            label = "%percentage%%";
+            ramp-0 = "🌕";
+            ramp-1 = "🌔";
+            ramp-2 = "🌓";
+            ramp-3 = "🌒";
+            ramp-4 = "🌑";
           };
-          "module/spotify" = {
+          "module/playerctl" = {
             type = "custom/script";
-            exec = "playerctl -p spotify metadata --format '{{artist}} - {{title}}'";
+            exec =
+              toString (
+                pkgs.writeShellScriptBin "playerctl-status" ''
+                                    
+                  # Function to get player status
+                  get_status() {
+                      playerctl -a metadata --format '{{status}}' 2>/dev/null | head -n1
+                  }
+
+                  # Function to get current track info
+                  get_track_info() {
+                      playerctl -a metadata --format '{{playerName}}:{{artist}} - {{title}}' 2>/dev/null | head -n1
+                  }
+
+                  # Function to replace player names with icons
+                  replace_player_name() {
+                      sed -E 's/spotify/󰓇/; s/firefox/󰈹/; s/chromium/󰊯/; s/mpv/󰐊/; s/^([^:]+):/\1 /'
+                  }
+
+                  # Main logic
+                  status=$(get_status)
+                  track_info=$(get_track_info | replace_player_name)
+
+                  case $status in
+                      Playing)
+                          echo " $track_info"
+                          ;;
+                      Paused)
+                          echo "󰏤 $track_info"
+                          ;;
+                      *)
+                          echo "󰓃 No media"
+                          ;;
+                  esac
+                ''
+              )
+              + "/bin/playerctl-status";
             interval = 1;
-            format-prefix = "󰓇 ";
-            format-prefix-foreground = colors.primary;
             format = "<label>";
+            label = "%output:0:50:...%";
             format-foreground = colors.foreground;
-            label = "%output:0:30:...%";
+            click-left = "${pkgs.playerctl}/bin/playerctl play-pause";
+            click-right = "${pkgs.playerctl}/bin/playerctl next";
+            click-middle = "${pkgs.playerctl}/bin/playerctl previous";
           };
         };
       };
