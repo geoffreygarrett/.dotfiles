@@ -10,25 +10,6 @@ in
 icon-files
 // {
 
-  #$  ".config/gtk-4.0/settings.ini".text = ''
-  #$    [Settings]
-  #$    gtk-application-prefer-dark-theme=1
-  #$  '';
-  # "${config.home.profileDirectory}/share/applications/alacritty-neovim.desktop" = {
-  #   text = ''
-  #     [Desktop Entry]
-  #     Version=1.0
-  #     Name=Alacritty with Neovim
-  #     Comment=Open files with Neovim inside Alacritty
-  #     Exec=${pkgs.alacritty}/bin/alacritty -e nvim %F
-  #     Terminal=false
-  #     Type=Application
-  #     MimeType=text/plain;application/x-shellscript;
-  #     Icon=local/share/icons/alacritty_flat_512.png
-  #     Categories=Utility;TextEditor;
-  #   '';
-  # };
-  #
   # TODO: Add some build-time gurantee as to whether the directory exists here. 
   # Ideally I start using impermanence later down the line.
   ".config/tms/config.toml".text = ''

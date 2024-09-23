@@ -67,6 +67,9 @@ in
 
     # Custom host level configuration options and settings
     ../shared/nixos
+
+    # Shared between nixos
+    ../shared.nix
   ];
 
   hardware.nvidia.open = false; # Disable open source

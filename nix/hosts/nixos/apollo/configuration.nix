@@ -20,11 +20,4 @@
     );
   };
 
-  # SSH Server
-  services.openssh = {
-    enable = true;
-    permitRootLogin = "no";
-    passwordAuthentication = false;
-  };
-
 }

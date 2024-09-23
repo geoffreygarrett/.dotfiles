@@ -120,8 +120,6 @@
       ...
     }@inputs:
     let
-      inherit (self) outputs;
-      user = "geoffrey";
       systems.linux = [
         "aarch64-linux"
         "x86_64-linux"
@@ -144,7 +142,6 @@
       ];
       systems.supported = systems.linux ++ systems.darwin ++ systems.android;
 
-      forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
       lib =
         nixpkgs.lib
         // home-manager.lib
@@ -152,9 +149,14 @@
           isLinux = system: builtins.elem system systems.linux;
           isDarwin = system: builtins.elem system systems.darwin;
           isAndroid = system: builtins.elem system systems.android;
-          forAllSystems = forAllSystems;
+          forAllSystems = f: nixpkgs.lib.genAttrs systems.supported f;
+          forAllDarwinSystems = f: nixpkgs.lib.genAttrs systems.darwin f;
+          forAllLinuxSystems = f: nixpkgs.lib.genAttrs systems.linux f;
+          forAllAndroidSystems = f: nixpkgs.lib.genAttrs systems.android f;
+          readSSHKeys = path: lib.splitString "\n" (builtins.readFile path);
         };
-      sharedConfig = import ./nix/modules/shared/default.nix;
+      user = "geoffrey";
+      keys = lib.readSSHKeys ./authorized_keys;
       pkgsFor =
         system:
         import nixpkgs {
@@ -192,7 +194,7 @@
             ++ lib.optional (lib.isAndroid system) inputs.sops-nix.overlays.default
             ++ lib.optional (lib.isLinux system) nixgl.overlay;
         };
-      treefmtEval = forAllSystems (
+      treefmtEval = lib.forAllSystems (
         system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
       );
     in
@@ -201,7 +203,7 @@
       ##############################
       # Packages Configuration
       ##############################
-      packages = forAllSystems (
+      packages = lib.forAllSystems (
         system:
         let
           pkgs = pkgsFor system;
@@ -224,7 +226,7 @@
       ##############################
       # Apps Configuration
       ##############################
-      apps = forAllSystems (
+      apps = lib.forAllSystems (
         system:
         let
           pkgs = pkgsFor system;
@@ -256,15 +258,12 @@
       ##############################
       # Darwin Configuration
       ##############################
-      darwinConfigurations = nixpkgs.lib.genAttrs systems.darwin (
+      darwinConfigurations = lib.forAllDarwinSystems (
         system:
         darwin.lib.darwinSystem {
           inherit system;
           pkgs = pkgsFor system;
           modules = [
-            home-manager.darwinModules.home-manager
-            nix-homebrew.darwinModules.nix-homebrew
-            nixvim.nixDarwinModules.nixvim
             {
               nix-homebrew = {
                 inherit user;
@@ -280,18 +279,22 @@
               };
             }
             ./nix/hosts/darwin
-
           ];
           specialArgs = {
-            inherit inputs self user;
+            inherit
+              inputs
+              self
+              user
+              keys
+              ;
           };
         }
       );
 
       ##############################
-      # NixOS Configuration
+      # NixOS Configuration :nixos
       ##############################
-      nixosConfigurations = nixpkgs.lib.genAttrs systems.linux (
+      nixosConfigurations = lib.forAllLinuxSystems (
         system:
         nixpkgs.lib.nixosSystem {
           inherit system;
@@ -300,8 +303,6 @@
             inherit inputs self user;
           };
           modules = [
-            disko.nixosModules.disko
-            home-manager.nixosModules.home-manager
             ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
@@ -325,7 +326,7 @@
       );
 
       ##############################
-      # Nix-on-Droid Configuration
+      # Nix-on-Droid Configuration :android
       ##############################
       nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
         pkgs = pkgsFor "aarch64-linux";
@@ -357,9 +358,9 @@
       };
 
       ##############################
-      # Home Configuration
+      # Home Configuration :home
       ##############################
-      homeConfigurations = forAllSystems (
+      homeConfigurations = lib.forAllSystems (
         system:
         lib.homeManagerConfiguration {
           pkgs = pkgsFor system;
@@ -384,11 +385,11 @@
       );
 
       ##############################
-      # Checks Configuration
+      # Checks Configuration :checks
       ##############################
       checks =
         nixpkgs.lib.mapAttrs (name: config: config.activationPackage) self.homeConfigurations
-        // forAllSystems (system: {
+        // lib.forAllSystems (system: {
           pre-commit-check = pre-commit-hooks.lib.${system}.run {
             src = ./.;
             hooks = {
@@ -400,14 +401,14 @@
         });
 
       ##############################
-      # Formatter Configuration
+      # Formatter Configuration :formatter
       ##############################
-      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+      formatter = lib.forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
 
       ##############################
-      # Dev Shell Configuration
+      # Dev Shell Configuration :devShells
       ##############################
-      devShells = forAllSystems (system: {
+      devShells = lib.forAllSystems (system: {
         default = (pkgsFor system).mkShell {
           buildInputs = self.checks.${system}.pre-commit-check.enabledPackages;
           shellHook = self.checks.${system}.pre-commit-check.shellHook;

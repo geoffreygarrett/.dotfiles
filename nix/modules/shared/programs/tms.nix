@@ -1,4 +1,10 @@
-{config, pkgs, lib, ... }:{
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+{
   # Install Tailscale for the user
   home.packages = with pkgs; [ tmux-sessionizer ];
 

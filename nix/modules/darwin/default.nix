@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   user,
   inputs,
@@ -8,9 +6,12 @@
 }:
 {
   imports = [
+    inputs.home-manager.darwinModules.home-manager
+    inputs.nix-homebrew.darwinModules.nix-homebrew
+    inputs.nixvim.nixDarwinModules.nixvim
+    ./dock.nix
+    ./config/dock.nix
     ./home-manager.nix
-    #    ./config/dock.nix
-    #    ./dock.nix
   ];
 
   # System-wide Darwin configuration.
@@ -42,10 +43,10 @@
         AppleShowAllExtensions = true;
         ApplePressAndHoldEnabled = false;
 
-        # 120, 90, 60, 30, 12, 6, 2
+        # SLIDER POSITIONS: 120, 90, 60, 30, 12, 6, 2
         KeyRepeat = 2;
 
-        # 120, 94, 68, 35, 25, 15
+        # SLIDER POSITIONS: 120, 94, 68, 35, 25, 15
         InitialKeyRepeat = 15;
 
         "com.apple.mouse.tapBehavior" = 1;
@@ -81,7 +82,7 @@
     package = pkgs.nix;
     settings.trusted-users = [
       "@admin"
-      "${user}"
+      "geoffrey"
     ];
 
     gc = {
@@ -102,7 +103,4 @@
 
   # Other system-wide configurations
   system.checks.verifyNixPath = false;
-
-  # Placeholder for additional Darwin-specific configurations
-  # ...
 }

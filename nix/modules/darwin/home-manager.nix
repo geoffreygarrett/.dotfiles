@@ -4,25 +4,10 @@
   pkgs,
   home-manager,
   user,
+  keys,
   inputs,
   ...
 }:
-let
-  yaml2json = pkgs.writeShellScriptBin "yaml2json" ''
-    ${pkgs.remarshal}/bin/remarshal -if yaml -of json "$1"
-  '';
-
-  yamlContent = builtins.fromJSON (
-    builtins.readFile (
-      pkgs.runCommand "ssh-keys.json" { } ''
-        ${yaml2json}/bin/yaml2json ${self}/keyring.yaml > $out
-      ''
-    )
-  );
-
-  # Extract only the keys from the YAML content
-  keys = map (entry: entry.key) yamlContent;
-in
 {
   home-manager = {
     useGlobalPkgs = true;
@@ -43,7 +28,7 @@ in
         imports = [
           ../shared/aliases.nix
           ../shared/secrets.nix
-          ../shared/home-manager/programs
+          ../shared/programs
         ];
 
         home = {
