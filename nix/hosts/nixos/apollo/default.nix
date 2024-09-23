@@ -59,17 +59,9 @@ in
 
     # (Dell Inc. 32"): 3840x2160 @ 60 Hz in 32″ [External]
     inputs.nixos-hardware.nixosModules.common-hidpi
-    ./config/base.nix
-    ./config/network.nix
-    ./modules/desktop-environment.nix
-    ./config/services.nix
-    ./config/samba.nix
-
-    # Custom host level configuration options and settings
-    ../shared/nixos
-
-    # Shared between nixos
-    ../shared.nix
+    ../../../modules/nixos/openrgb.nix
+    ../../../modules/nixos/tailscale.nix
+    ../../../modules/nixos/samba.nix
   ];
 
   hardware.nvidia.open = false; # Disable open source

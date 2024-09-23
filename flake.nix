@@ -303,7 +303,6 @@
             inherit inputs self user;
           };
           modules = [
-            ./nix/hosts/nixos/configuration.nix
             {
               home-manager = {
                 backupFileExtension = "nixus.bak";
@@ -320,7 +319,7 @@
 
               };
             }
-            ./nix/hosts/nixos
+            ./nix/hosts/nixos/apollo
           ];
         }
       );
