@@ -85,3 +85,8 @@ official documentation of Ubuntu and NixOS.
 ## Gnome
 
 - [Official](https://wiki.nixos.org/wiki/GNOME)
+
+
+# Good Posts
+
+- https://johns.codes/blog/organizing-system-configs-with-nixos

@@ -138,36 +138,6 @@ in
       Option       "TripleBuffer" "on"
     '';
   };
-
-  services.picom = {
-    enable = true;
-    vSync = true;
-    backend = "glx";
-    settings = {
-      shadow = false;
-      fading = false;
-      blur = {
-        method = "none";
-      };
-      opacity-rule = [
-        "90:class_g = 'Alacritty'"
-        "95:class_g = 'Rofi'"
-      ];
-      use-damage = true;
-      log-level = "warn";
-      wintypes = {
-        tooltip = {
-          opacity = 0.95;
-        };
-        popup_menu = {
-          opacity = 0.95;
-        };
-        dropdown_menu = {
-          opacity = 0.95;
-        };
-      };
-    };
-  };
   home-manager.users.${user} =
     {
       pkgs,
@@ -215,7 +185,6 @@ in
           pointer_follows_focus = false;
         };
         startupPrograms = [
-          #"${monitor-setup}/bin/monitor-setup"
           "${pkgs.sxhkd}/bin/sxhkd"
           "${pkgs.autorandr}/bin/autorandr --change"
         ];
@@ -279,8 +248,6 @@ in
 
           # Move node to next monitor
           "super + shift + backslash" = "bspc node -m next --follow";
-
-          #
 
           # Advanced window management
           "super + {_,shift + }n" = "bspc node -f {next,prev}.local";

@@ -22,6 +22,8 @@ in
   services.autorandr = {
     enable = true;
     defaultTarget = "dual-monitor";
+    wantedBy = [ "graphical.target" ];
+    after = [ "graphical.target" ];
     profiles = {
       "dual-monitor" = {
         fingerprint = {
@@ -58,10 +60,11 @@ in
     };
     hooks = {
       postswitch = {
-        "notify-polybar" = ''
+        "notify-polybar" = pkgs.writeShellScript "notify-polybar" ''
           ${pkgs.systemd}/bin/systemctl --user restart polybar
         '';
-        "notify-bspwm" = ''
+        "notify-bspwm" = pkgs.writeShellScript "notify-bspwm" ''
+          sleep 2
           ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 1 2 3
           ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 4 5 6
           ${pkgs.bspwm}/bin/bspc wm -r
