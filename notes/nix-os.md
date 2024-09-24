@@ -89,6 +89,7 @@ official documentation of Ubuntu and NixOS.
 # Good Posts
 
 - https://johns.codes/blog/organizing-system-configs-with-nixos
+
 ## Forums
 
 - https://www.reddit.com/r/linux/comments/1aq8ice/is_nix_really_all_its_cracked_up_to_be/

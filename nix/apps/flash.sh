@@ -2,7 +2,7 @@
 
 
 
- # nix build ".#nixosConfigurations.mariner-1.config.system.build.sdImage" --show-trace
+# nix build ".#nixosConfigurations.mariner-1.config.system.build.sdImage" --show-trace
 
 set -e
 
@@ -23,11 +23,11 @@ flash_image() {
     if [ "$(od -An -N4 -tx1 "$IMAGE_PATH" | tr -d ' ')" = "28b52ffd" ]; then
         echo "Flashing zstd compressed image..."
         zstd -dcf "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M status=progress conv=fsync
-    # Check if the file starts with the gzip magic number
+        # Check if the file starts with the gzip magic number
     elif [ "$(od -An -N2 -tx1 "$IMAGE_PATH" | tr -d ' ')" = "1f8b" ]; then
         echo "Flashing gzip compressed image..."
         zcat "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M status=progress conv=fsync
-    # Assume it's an uncompressed image if it doesn't match the above
+        # Assume it's an uncompressed image if it doesn't match the above
     else
         echo "Flashing uncompressed image..."
         dd if="$IMAGE_PATH" of="$SD_CARD" bs=4M status=progress conv=fsync

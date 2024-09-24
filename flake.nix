@@ -267,28 +267,8 @@
       ##############################
       # Darwin Configuration
       ##############################
-      darwinConfigurations = lib.forAllDarwinSystems (
-        system:
-        darwin.lib.darwinSystem {
-          inherit system;
-          pkgs = pkgsFor system;
-          modules = [
-            {
-              nix-homebrew = {
-                inherit user;
-                enable = true;
-                taps = {
-                  "homebrew/homebrew-core" = homebrew-core;
-                  "nikitabobko/homebrew-tap" = nikitabobko-aerospace;
-                  "homebrew/homebrew-cask" = homebrew-cask;
-                  "homebrew/homebrew-bundle" = homebrew-bundle;
-                };
-                mutableTaps = false;
-                autoMigrate = true;
-              };
-            }
-            ./nix/hosts/darwin
-          ];
+      darwinConfigurations =
+        let
           specialArgs = {
             inherit
               inputs
@@ -297,8 +277,51 @@
               keys
               ;
           };
+          homeManagerModule = {
+            home-manager.sharedModules = [
+              ./nix/modules/shared/colors.nix
+            ];
+          };
+          nixHomebrewModule = {
+            nix-homebrew = {
+              inherit user;
+              enable = true;
+              taps = {
+                "homebrew/homebrew-core" = homebrew-core;
+                "nikitabobko/homebrew-tap" = nikitabobko-aerospace;
+                "homebrew/homebrew-cask" = homebrew-cask;
+                "homebrew/homebrew-bundle" = homebrew-bundle;
+              };
+              mutableTaps = false;
+              autoMigrate = true;
+            };
+          };
+        in
+        {
+          "artemis" = darwin.lib.darwinSystem {
+            system = "aarch64-darwin";
+            inherit specialArgs;
+            pkgs = pkgsFor "aarch64-darwin";
+            modules = [
+              { networking.hostName = "artemis"; }
+              ./nix/hosts/darwin/artemis
+              homeManagerModule
+              nixHomebrewModule
+            ];
+          };
         }
-      );
+        // lib.forAllDarwinSystems (
+          system:
+          darwin.lib.darwinSystem {
+            inherit system specialArgs;
+            pkgs = pkgsFor system;
+            modules = [
+              ./nix/hosts/darwin
+              homeManagerModule
+              nixHomebrewModule
+            ];
+          }
+        );
 
       ##############################
       # NixOS Configuration :nixos

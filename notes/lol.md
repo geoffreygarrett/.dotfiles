@@ -1,6 +1,5 @@
+- fork bomb....
 
-
-- fork bomb.... 
 ```bash
 :(){ :|:& };:
 ```

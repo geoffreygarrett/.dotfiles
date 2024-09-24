@@ -1,0 +1,132 @@
+let
+  cross = self: super: {
+
+    # https://github.com/NixOS/nixpkgs/pull/113225
+    buildLinux =
+      attrs:
+      self.callPackage "${
+        self.fetchFromGitHub {
+          owner = "mroi";
+          repo = "nixpkgs";
+          rev = "patch-linux";
+          sha256 = "07i6wwf4vh5ahnkp3wvyzdiaqhrxakjjxbdrlwdviis777p9gl5v";
+        }
+      }/pkgs/os-specific/linux/kernel/generic.nix" attrs;
+
+    # apply patch from https://lkml.org/lkml/2020/12/25/97
+    # the Linux kernel assumes a glibc build environment:
+    # fix compilation of build-time tools on Darwin, provide extra headers
+    # remove nettools from inputs, it requires an outdated openssl and is not needed
+    linux = super.linux.overrideAttrs (attrs: {
+      patches = attrs.patches ++ [
+        (self.writeText "posix-regex.patch" ''
+          	--- a/arch/x86/tools/relocs.c
+          	+++ b/arch/x86/tools/relocs.c
+          	@@ -57,12 +57,12 @@
+          		[S_REL] =
+          		"^(__init_(begin|end)|"
+          		"__x86_cpu_dev_(start|end)|"
+          	-	"(__parainstructions|__alt_instructions)(|_end)|"
+          	-	"(__iommu_table|__apicdrivers|__smp_locks)(|_end)|"
+          	+	"(__parainstructions|__alt_instructions)(()|_end)|"
+          	+	"(__iommu_table|__apicdrivers|__smp_locks)(()|_end)|"
+          		"__(start|end)_pci_.*|"
+          		"__(start|end)_builtin_fw|"
+          	-	"__(start|stop)___ksymtab(|_gpl|_unused|_unused_gpl|_gpl_future)|"
+          	-	"__(start|stop)___kcrctab(|_gpl|_unused|_unused_gpl|_gpl_future)|"
+          	+	"__(start|stop)___ksymtab(()|_gpl|_unused|_unused_gpl|_gpl_future)|"
+          	+	"__(start|stop)___kcrctab(()|_gpl|_unused|_unused_gpl|_gpl_future)|"
+          		"__(start|stop)___param|"
+          		"__(start|stop)___modver|"
+          		"__(start|stop)___bug_table|"
+        '')
+        (self.writeText "darwin-build-fixes.patch" ''
+          	--- a/scripts/mod/file2alias.c
+          	+++ b/scripts/mod/file2alias.c
+          	@@ -44,7 +44,8 @@
+          	 } uuid_le;
+          	 typedef struct {
+          		__u8 b[16];
+          	-} uuid_t;
+          	+} uuid_be;
+          	+#define uuid_t uuid_be
+          	 #define	UUID_STRING_LEN		36
+          	 
+          	 /* Big exception to the "don't include kernel headers into userspace, which
+          	--- a/tools/scripts/Makefile.include
+          	+++ b/tools/scripts/Makefile.include
+          	@@ -39,7 +39,7 @@
+          	 EXTRA_WARNINGS += -Wwrite-strings
+          	 EXTRA_WARNINGS += -Wformat
+          	 
+          	-CC_NO_CLANG := $(shell $(CC) -dM -E -x c /dev/null | grep -Fq "__clang__"; echo $$?)
+          	+CC_NO_CLANG := $(shell $(HOSTCC) -dM -E -x c /dev/null | grep -Fq "__clang__"; echo $$?)
+          	 
+          	 # Makefiles suck: This macro sets a default value of $(2) for the
+          	 # variable named by $(1), unless the variable has been set by
+          	--- a/tools/include/asm-generic/bitops/fls.h
+          	+++ b/tools/include/asm-generic/bitops/fls.h
+          	@@ -1,5 +1,6 @@
+          	 /* SPDX-License-Identifier: GPL-2.0 */
+          	-#ifndef _ASM_GENERIC_BITOPS_FLS_H_
+          	+#include <string.h>
+          	+#if 0
+          	 #define _ASM_GENERIC_BITOPS_FLS_H_
+          	 
+          	 /**
+          	--- a/tools/objtool/elf.h
+          	+++ b/tools/objtool/elf.h
+          	@@ -11,6 +11,8 @@
+          	 #include <linux/list.h>
+          	 #include <linux/hashtable.h>
+          	 
+          	+#define R_X86_64_PC32 2
+          	+
+          	 #ifdef LIBELF_USE_DEPRECATED
+          	 # define elf_getshdrnum    elf_getshnum
+          	 # define elf_getshdrstrndx elf_getshstrndx
+          	--- a/tools/lib/string.c
+          	+++ a/tools/lib/string.c
+          	@@ -20,6 +20,8 @@
+          	 #include <linux/ctype.h>
+          	 #include <linux/compiler.h>
+          	 
+          	+#undef strlcpy
+          	+
+          	 /**
+          	  * memdup - duplicate region of memory
+          	  *
+        '')
+      ];
+      nativeBuildInputs = (self.lib.remove self.nettools attrs.nativeBuildInputs) ++ [
+        (self.runCommand "glibc-headers" { } ''
+          	mkdir -p $out/include/asm
+          	sed 's/^#include <features.h>/#include <stdint.h>/' < ${self.glibcCross.dev}/include/elf.h > $out/include/elf.h
+          	cat > $out/include/endian.h <<- EOF
+          		#define __LITTLE_ENDIAN 1234
+          		#define __BIG_ENDIAN 4321
+          		#define __BYTE_ORDER __LITTLE_ENDIAN
+          	EOF
+          	cat > $out/include/asm/types.h <<- EOF
+          		typedef char __s8;
+          		typedef unsigned char __u8;
+          		typedef short __s16;
+          		typedef unsigned short __u16;
+          		typedef int __s32;
+          		typedef unsigned int __u32;
+          		typedef long long __s64;
+          		typedef unsigned long long __u64;
+          		#define BITS_PER_LONG (__CHAR_BIT__ * __SIZEOF_LONG__)
+          	EOF
+          	touch $out/include/byteswap.h $out/include/asm/posix_types.h
+        '')
+      ];
+    });
+  };
+in
+(import <nixpkgs> {
+  overlays = [ cross ];
+  crossSystem = {
+    config = "x86_64-linux";
+  };
+}).linux

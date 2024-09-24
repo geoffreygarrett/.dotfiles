@@ -1,7 +1,12 @@
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  lib,
+  inputs,
+  ...
+}:
 {
   programs.firefox = {
-    enable = true;
+    enable = lib.mkIf (!pkgs.stdenv.isDarwin) true;
     profiles.geoffrey = {
       # Search settings
       search = {
