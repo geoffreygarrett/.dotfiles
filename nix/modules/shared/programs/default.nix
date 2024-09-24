@@ -35,4 +35,6 @@ in
     #    (importModule ./htop.nix)
     (importModule ./vscode.nix)
   ];
+
+  theme.enable = true;
 }

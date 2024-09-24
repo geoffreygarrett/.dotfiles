@@ -81,7 +81,6 @@
     # NixOS
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # CLI
@@ -95,6 +94,8 @@
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-colors.url = "github:misterio77/nix-colors";
 
   };
 
@@ -241,6 +242,14 @@
             type = "app";
             program = "${pkgs.writeScriptBin "switch" (builtins.readFile ./nix/apps/switch.sh)}/bin/switch";
           };
+          build = {
+            type = "app";
+            program = "${pkgs.writeScriptBin "build" (builtins.readFile ./nix/apps/build.sh)}/bin/build";
+          };
+          deploy = {
+            type = "app";
+            program = "${pkgs.writeScriptBin "deploy" (builtins.readFile ./nix/apps/deploy.sh)}/bin/deploy";
+          };
           nixus = {
             type = "app";
             program = "${nixusApp}/bin/nixus";
@@ -294,11 +303,8 @@
       ##############################
       # NixOS Configuration :nixos
       ##############################
-      nixosConfigurations = lib.forAllLinuxSystems (
-        system:
-        nixpkgs.lib.nixosSystem {
-          inherit system;
-          pkgs = pkgsFor system;
+      nixosConfigurations =
+        let
           specialArgs = {
             inherit
               inputs
@@ -307,27 +313,55 @@
               keys
               ;
           };
-          modules = [
-            {
-              home-manager = {
-                backupFileExtension = "bak";
-                sharedModules = [
-                  inputs.nixvim.homeManagerModules.nixvim
-                  ./nix/packages/shared/shell-aliases
-                ];
-                useGlobalPkgs = true;
-                extraSpecialArgs = {
-                  inherit inputs self user;
-                };
-                # useUserPackages = true;
-                users.${user} = import ./nix/modules/nixos/home-manager.nix;
-
-              };
-            }
-            ./nix/hosts/nixos/apollo
-          ];
+          homeManagerModule = {
+            home-manager = {
+              backupFileExtension = "bak";
+              sharedModules = [
+                inputs.nixvim.homeManagerModules.nixvim
+                ./nix/packages/shared/shell-aliases
+                ./nix/modules/shared/colors.nix
+              ];
+              useGlobalPkgs = true;
+              extraSpecialArgs = specialArgs;
+              users.${user} = import ./nix/modules/nixos/home-manager.nix;
+            };
+          };
+        in
+        {
+          "apollo" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "x86_64-linux";
+            pkgs = pkgsFor "x86_64-linux";
+            modules = [
+              { networking.hostName = "apollo"; }
+              ./nix/hosts/nixos/apollo
+              homeManagerModule
+            ];
+          };
+          "mariner-1" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [ ./nix/hosts/nixos/mariner-1 ];
+          };
+          "mariner-2" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [ ./nix/hosts/nixos/mariner-2 ];
+          };
         }
-      );
+        // lib.forAllLinuxSystems (
+          system:
+          nixpkgs.lib.nixosSystem {
+            inherit system specialArgs;
+            pkgs = pkgsFor system;
+            modules = [
+              ./nix/hosts/nixos
+              homeManagerModule
+            ];
+          }
+        );
 
       ##############################
       # Nix-on-Droid Configuration :android

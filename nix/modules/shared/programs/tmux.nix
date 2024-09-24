@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 let
   tmux-mem-cpu-load = pkgs.tmuxPlugins.mkTmuxPlugin {
     pluginName = "tmux-mem-cpu-load";
@@ -20,6 +20,17 @@ let
       sha256 = "sha256-QsA4i5QYOanYW33eMIuCtud9WD97ys4zQUT/RNUmGes=";
     };
   };
+  tmux-browser = pkgs.tmuxPlugins.mkTmuxPlugin {
+    pluginName = "tmux-browser";
+    version = "unstable-2022-10-24";
+    src = pkgs.fetchFromGitHub {
+      owner = "ofirgall";
+      repo = "tmux-browser";
+      rev = "c3e115f9ebc5ec6646d563abccc6cf89a0feadb8";
+      sha256 = "sha256-ngYZDzXjm4Ne0yO6pI+C2uGO/zFDptdcpkL847P+HCI=";
+    };
+  };
+
 in
 {
   programs.tmux = {
@@ -87,32 +98,12 @@ in
       unbind Left
       unbind Right
 
-      # Pomodoro settings
-      set -g @pomodoro_toggle 'C-p'
-      set -g @pomodoro_cancel 'P'
-      set -g @pomodoro_skip '_'
-      set -g @pomodoro_mins 25
-      set -g @pomodoro_break_mins 5
-      set -g @pomodoro_intervals 4
-      set -g @pomodoro_long_break_mins 25
-      set -g @pomodoro_repeat 'off'
-      set -g @pomodoro_disable_breaks 'off'
-      set -g @pomodoro_on " 🍅"
-      set -g @pomodoro_complete " ✔︎"
-      set -g @pomodoro_pause " ⏸︎"
-      set -g @pomodoro_prompt_break " ⏲︎ break?"
-      set -g @pomodoro_prompt_pomodoro " ⏱︎ start?"
-      set -g @pomodoro_menu_position "R"
-      set -g @pomodoro_sound 'off'
-      set -g @pomodoro_notifications 'off'
-      set -g @pomodoro_granularity 'on'
-      set -g @pomodoro_interval_display "[%s/%s]"
-
       # Custom scripts
       bind-key -r f run-shell "tmux neww ${pkgs.tmux-sessionizer}/bin/tms"
 
       # tmux-sessionizer [tms]
-      bind-key s display-popup -E "tms switch"  # Switch sessions
+      # FIXME: The current sessions don't show in switch and windows, but tms sessions shows them correctly.
+      # bind-key s display-popup -E "tms switch"  # Switch sessions
       bind-key w display-popup -E "tms windows"  # Show windows in current session
       bind-key R command-prompt -p "Rename session to: " "run-shell 'tms rename %1'"  # Rename session
       bind-key F run-shell 'tms refresh'  # Refresh session (create missing worktree windows)
@@ -125,14 +116,56 @@ in
       # https://github.com/ThePrimeagen/.dotfiles/blob/602019e902634188ab06ea31251c01c1a43d1621/tmux/.tmux.conf#L24
       bind -r D neww -c "#{pane_current_path}" "[[ -e TODO.md ]] && nvim TODO.md || nvim ~/.dotfiles/personal/todo.md"
     '';
-    plugins = with pkgs.tmuxPlugins; [
+    plugins = with pkgs; [
       tmux-mem-cpu-load
-      tmux-pomodoro-plus
-      continuum
       {
-        plugin = resurrect;
-        extraConfig = "set -g @resurrect-strategy-nvim 'session'";
+        plugin = tmux-pomodoro-plus;
+        extraConfig = ''
+          set -g @pomodoro_toggle 'C-p'
+          set -g @pomodoro_cancel 'P'
+          set -g @pomodoro_skip '_'
+          set -g @pomodoro_mins 25
+          set -g @pomodoro_break_mins 5
+          set -g @pomodoro_intervals 4
+          set -g @pomodoro_long_break_mins 25
+          set -g @pomodoro_repeat 'off'
+          set -g @pomodoro_disable_breaks 'off'
+          set -g @pomodoro_on " 🍅"
+          set -g @pomodoro_complete " ✔︎"
+          set -g @pomodoro_pause " ⏸︎"
+          set -g @pomodoro_prompt_break " ⏲︎ break?"
+          set -g @pomodoro_prompt_pomodoro " ⏱︎ start?"
+          set -g @pomodoro_menu_position "R"
+          set -g @pomodoro_sound 'off'
+          set -g @pomodoro_notifications 'off'
+          set -g @pomodoro_granularity 'on'
+          set -g @pomodoro_interval_display "[%s/%s]"
+        '';
       }
+      {
+        plugin = tmuxPlugins.resurrect;
+        extraConfig = ''
+          resurrect_dir="$HOME/.tmux/resurrect"
+          set -g @resurrect-dir $resurrect_dir
+          set -g @resurrect-capture-pane-contents 'on'
+          set -g @resurrect-hook-post-save-all "sed 's/--cmd[^ ]* [^ ]* [^ ]*//g' $resurrect_dir/last | sponge $resurrect_dir/last"
+          set -g @resurrect-processes '"~nvim"'
+        '';
+      }
+      {
+        plugin = tmuxPlugins.continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+          set -g @continuum-boot 'on'
+          set -g @continuum-save-interval '10'
+        '';
+      }
+      # {
+      #   plugin = tmux-browser;
+      #   extraConfig = ''
+      #     set -g @browser_close_on_deattach '1'
+      #   '';
+      # }
     ];
   };
   home.packages = with pkgs; [

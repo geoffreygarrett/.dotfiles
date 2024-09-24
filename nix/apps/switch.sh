@@ -11,16 +11,25 @@ SYSTEM=$(uname -m)
 if [ "$OS_TYPE" = "Linux" ]; then
   case "$SYSTEM" in
     x86_64)
-      FLAKE_TARGET="x86_64-linux"
+      SYSTEM_TARGET="x86_64-linux"
       ;;
     aarch64)
-      FLAKE_TARGET="aarch64-linux"
+      SYSTEM_TARGET="aarch64-linux"
       ;;
     *)
       echo -e "${RED}Unsupported Linux architecture: $SYSTEM${NC}"
       exit 1
       ;;
   esac
+
+  # Check if a host-specific configuration exists
+  if [ -e "./nix/hosts/nixos/$HOSTNAME" ]; then
+    FLAKE_TARGET="$HOSTNAME"
+    echo -e "${GREEN}Using host-specific configuration for $HOSTNAME${NC}"
+  else
+    FLAKE_TARGET="$SYSTEM_TARGET"
+    echo -e "${YELLOW}No host-specific configuration found. Using system-specific configuration: $SYSTEM_TARGET${NC}"
+  fi
 
   echo -e "${YELLOW}Starting Linux rebuild...${NC}"
   # We pass SSH from user to root so root can download secrets from our private Github
@@ -29,10 +38,10 @@ if [ "$OS_TYPE" = "Linux" ]; then
 elif [ "$OS_TYPE" = "Darwin" ]; then
   case "$SYSTEM" in
     x86_64)
-      SYSTEM_TYPE="x86_64-darwin"
+      SYSTEM_TARGET="x86_64-darwin"
       ;;
     arm64)
-      SYSTEM_TYPE="aarch64-darwin"
+      SYSTEM_TARGET="aarch64-darwin"
       ;;
     *)
       echo -e "${RED}Unsupported Darwin architecture: $SYSTEM${NC}"
@@ -40,7 +49,16 @@ elif [ "$OS_TYPE" = "Darwin" ]; then
       ;;
   esac
 
-  FLAKE_SYSTEM="darwinConfigurations.${SYSTEM_TYPE}.system"
+  # Check if a host-specific configuration exists
+  if [ -e "./nix/hosts/darwin/$HOSTNAME" ]; then
+    FLAKE_TARGET="$HOSTNAME"
+    echo -e "${GREEN}Using host-specific configuration for $HOSTNAME${NC}"
+  else
+    FLAKE_TARGET="$SYSTEM_TARGET"
+    echo -e "${YELLOW}No host-specific configuration found. Using system-specific configuration: $SYSTEM_TARGET${NC}"
+  fi
+
+  FLAKE_SYSTEM="darwinConfigurations.${FLAKE_TARGET}.system"
 
   export NIXPKGS_ALLOW_UNFREE=1
 
@@ -48,7 +66,7 @@ elif [ "$OS_TYPE" = "Darwin" ]; then
   nix --extra-experimental-features 'nix-command flakes' build .#$FLAKE_SYSTEM "$@"
 
   echo -e "${YELLOW}Switching to new generation...${NC}"
-  ./result/sw/bin/darwin-rebuild switch --flake .#${SYSTEM_TYPE} "$@"
+  ./result/sw/bin/darwin-rebuild switch --flake .#${FLAKE_TARGET} "$@"
 
   echo -e "${YELLOW}Cleaning up...${NC}"
   unlink ./result
