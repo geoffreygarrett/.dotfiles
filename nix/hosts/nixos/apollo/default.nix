@@ -9,13 +9,6 @@ let
 
   hostname = "apollo";
   mainInterface = "eno2";
-  postSwitchHook = pkgs.writeShellScriptBin "autorandr-postswitchhook" ''
-    # Reload bspwm
-    ${pkgs.bspwm}/bin/bspc wm -r
-
-    # Restart polybar
-    ${pkgs.systemd}/bin/systemctl --user restart polybar
-  '';
 
   hyperfluent-theme = pkgs.fetchFromGitHub {
     owner = "Coopydood";
@@ -65,7 +58,14 @@ in
     };
     hooks = {
       postswitch = {
-        "refresh-wm-and-bar" = "${postSwitchHook}/bin/autorandr-postswitchhook";
+        "notify-polybar" = ''
+          ${pkgs.systemd}/bin/systemctl --user restart polybar
+        '';
+        "notify-bspwm" = ''
+          ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 1 2 3
+          ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 4 5 6
+          ${pkgs.bspwm}/bin/bspc wm -r
+        '';
       };
     };
   };
@@ -98,17 +98,6 @@ in
   # Select internationalisation properties.
   i18n.defaultLocale = "en_GB.UTF-8";
 
-  # X11 display configuration
-  # services.xserver.displayManager.setupCommands = ''
-  #   ${builtins.concatStringsSep "\n" (
-  #     map (
-  #       d:
-  #       "${pkgs.xorg.xrandr}/bin/xrandr --output ${d.output} --mode ${d.mode} --rate ${d.rate} ${
-  #         if d.primary then "--primary" else ""
-  #       } --pos ${toString d.position.x}x${toString d.position.y} --scale ${toString d.scale}x${toString d.scale} --rotation ${d.rotation}"
-  #     ) displays
-  #   )}
-  # '';
   programs.zsh.enable = true;
 
   # It's me, it's you, it's everyone

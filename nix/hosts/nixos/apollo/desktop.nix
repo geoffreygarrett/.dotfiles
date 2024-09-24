@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   user,
@@ -26,16 +27,16 @@ let
      #! /bin/sh
 
     # Setup primary monitor (DP-4)
-     # ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary --mode 2560x1440 --rate 144 --rotate normal --pos 3840x360
+    ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary --mode 2560x1440 --rate 144 --rotate normal --pos 3840x360
 
      # Check if second monitor (HDMI-1) is connected
      if [[ $(${pkgs.xorg.xrandr}/bin/xrandr -q | grep 'HDMI-1 connected') ]]; then
-     # ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --mode 3840x2160 --rate 60 --rotate normal --pos 0x0
+       ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --mode 3840x2160 --rate 60 --rotate normal --pos 0x0
        # Workspaces for both monitors
        ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3
        ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 4 5 6
      else
-     #${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --off
+       ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --off
        ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3 4 5 6
      fi
 
@@ -214,8 +215,9 @@ in
           pointer_follows_focus = false;
         };
         startupPrograms = [
+          #"${monitor-setup}/bin/monitor-setup"
           "${pkgs.sxhkd}/bin/sxhkd"
-          "${monitor-setup}/bin/monitor-setup"
+          "${pkgs.autorandr}/bin/autorandr --change"
         ];
         extraConfig = ''
           bspc config normal_border_color "${addOpacity colors.background-alt 0.5}"
