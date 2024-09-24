@@ -1,21 +1,25 @@
 final: prev: {
-  #  alacritty = prev.alacritty.overrideAttrs (oldAttrs: {
-  #    postInstall =
-  #      (oldAttrs.postInstall or "")
-  #      + ''
-  #        # Remove the original SVG to ensure it's not used
-  #        rm -f $out/share/icons/hicolor/scalable/apps/Alacritty.svg
-  #        # Copy PNG icons for different resolutions
-  #        mkdir -p $out/share/icons/hicolor/512x512/apps
-  #        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_512.png} $out/share/icons/hicolor/512x512/apps/Alacritty.png
-  #        mkdir -p $out/share/icons/hicolor/256x256/apps
-  #        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_256.png} $out/share/icons/hicolor/256x256/apps/Alacritty.png
-  #        mkdir -p $out/share/icons/hicolor/64x64/apps
-  #        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_64.png} $out/share/icons/hicolor/64x64/apps/Alacritty.png
-  #        # Copy the full-size icon (assuming it's the 512x512 version)
-  #        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_512.png} $out/share/icons/hicolor/Alacritty.png
-  #      '';
-  #  });
+  alacritty = prev.alacritty.overrideAttrs (oldAttrs: {
+    postInstall =
+      (oldAttrs.postInstall or "")
+      + ''
+        # Remove the original SVG to ensure it's not used
+        rm -f $out/share/icons/hicolor/scalable/apps/Alacritty.svg
+        rm -f $out/Applications/Alacritty.app/Contents/Resources/alacritty.icns
+        # Copy PNG icons for different resolutions
+        mkdir -p $out/share/icons/hicolor/512x512/apps
+        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_512.png} $out/share/icons/hicolor/512x512/apps/Alacritty.png
+        mkdir -p $out/share/icons/hicolor/256x256/apps
+        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_256.png} $out/share/icons/hicolor/256x256/apps/Alacritty.png
+        mkdir -p $out/share/icons/hicolor/64x64/apps
+        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_64.png} $out/share/icons/hicolor/64x64/apps/Alacritty.png
+        # Copy the full-size icon (assuming it's the 512x512 version)
+        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_512.png} $out/share/icons/hicolor/Alacritty.png
+        # For macOS
+        mkdir -p $out/Applications/Alacritty.app/Contents/Resources
+        cp -f ${../modules/shared/assets/alacritty/flat/alacritty_flat_512.png} $out/Applications/Alacritty.app/Contents/Resources/alacritty.icns
+      '';
+  });
 
   obsidian = prev.obsidian.overrideAttrs (oldAttrs: {
     postInstall =

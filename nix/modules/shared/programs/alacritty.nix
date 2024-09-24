@@ -75,7 +75,7 @@
         thickness = 0.15;
       };
       shell = {
-        program = "tmux";
+        program = "${pkgs.tmux}/bin/tmux";
         args = [
           "new-session"
           "-A"

@@ -1,8 +1,8 @@
 # TODO
 
-- \[ \] picom window tiling on nixos
+- [x] picom window tiling on nixos
 
-- \[x\] Fix multiline insert in visual block mode
+- [x] Fix multiline insert in visual block mode
 
   - Issue: `<S-I>` after entering visual block mode `<C-v>` only inserts at a
     single line
@@ -17,11 +17,11 @@
 
   - Implement via gh lua plugin
 
-- \[x\] Add backup functionality to all switches
+- [x] Add backup functionality to all switches
 
   - Should force backup any files in the way
 
-- \[x\] Configure key-repeat for Ubuntu/Linux & NixOS
+- [x] Configure key-repeat for Ubuntu/Linux & NixOS
 
 - \[ \] Implement CI integration for configuration screenshots
 

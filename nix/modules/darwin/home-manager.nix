@@ -2,6 +2,7 @@
   self,
   lib,
   pkgs,
+  config,
   home-manager,
   user,
   keys,
@@ -9,6 +10,51 @@
   ...
 }:
 {
+
+  local.dock = {
+    enable = true;
+    entries = [
+      # Development tools
+      { path = "${pkgs.alacritty}/Applications/Alacritty.app/"; }
+      { path = "/Applications/Firefox.app/"; }
+      { path = "/Applications/Obsidian.app/"; }
+      { path = "/Applications/Mendeley Reference Manager.app/"; }
+      {
+        path = "${config.users.users.${user}.home}/Projects";
+        section = "others";
+        options = "--view grid --display folder";
+      }
+      {
+        path = "${config.users.users.${user}.home}/Downloads";
+        section = "others";
+        options = "--view fan --display stack";
+      }
+      {
+        path = "${pkgs.writeShellScriptBin "update-system" ''
+          ${pkgs.alacritty}/bin/alacritty -e bash -c 'cd ~/.dotfiles && nix flake update && nix run ".#switch"'
+        ''}/bin/update-system";
+        section = "others";
+      }
+    ];
+
+    #      { path = "${pkgs.docker}/Applications/Docker.app/"; }
+    #
+    #      # Browsers
+    #      { path = "/Applications/Google Chrome.app/"; }
+    #
+    #      # Communication
+    #      { path = "/System/Applications/Messages.app/"; }
+    #      { path = "/Applications/Zoom.app/"; }
+    #
+    #      # Productivity
+    #      { path = "/System/Applications/Reminders.app/"; }
+    #
+    #      # Utils
+    #      { path = "/Applications/1Password.app/"; }
+    #      { path = "/Applications/TablePlus.app/"; }
+    #
+  };
+
   home-manager = {
     useGlobalPkgs = true;
     sharedModules = [
@@ -33,7 +79,7 @@
 
         home = {
           enableNixpkgsReleaseCheck = false;
-          packages = pkgs.callPackage ./packages/user.nix { };
+          packages = pkgs.callPackage ./packages { };
           stateVersion = "23.11";
 
           # https://github.com/NixOS/nixpkgs/issues/206242
@@ -83,7 +129,6 @@
   };
 
   # Homebrew configuration
-  # Homebrew configuration
   homebrew = {
     enable = true;
     casks = pkgs.callPackage ./casks.nix { } ++ [
@@ -99,5 +144,4 @@
       "tailscale" = 1475387142;
     };
   };
-
 }

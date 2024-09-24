@@ -9,8 +9,7 @@
     inputs.home-manager.darwinModules.home-manager
     inputs.nix-homebrew.darwinModules.nix-homebrew
     inputs.nixvim.nixDarwinModules.nixvim
-    ./dock.nix
-    ./config/dock.nix
+    ./dock
     ./home-manager.nix
   ];
 
@@ -82,7 +81,7 @@
     package = pkgs.nix;
     settings.trusted-users = [
       "@admin"
-      "geoffrey"
+      "${user}"
     ];
 
     gc = {

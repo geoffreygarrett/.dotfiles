@@ -36,6 +36,7 @@ in
   programs.tmux = {
     enable = true;
     prefix = "C-Space";
+    package = pkgs.tmux;
     keyMode = "vi";
     mouse = true;
     shell = "${pkgs.zsh}/bin/zsh";
