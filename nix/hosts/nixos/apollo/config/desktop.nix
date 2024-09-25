@@ -1,5 +1,4 @@
 {
-  config,
   pkgs,
   lib,
   user,
@@ -16,7 +15,64 @@ let
     alert = "#ff5370";
     disabled = "#464B5D";
   };
-  # Function to add opacity to a hex color
+
+  brightness-control = pkgs.writeShellScriptBin "brightness-control" ''
+    #!/usr/bin/env bash
+
+    set -e
+
+    STEP=5
+    MAX_BRIGHTNESS=100
+    MIN_BRIGHTNESS=5
+
+    get_brightness() {
+      xrandr --verbose | grep -m 1 -i brightness | awk '{print int($2 * 100)}'
+    }
+
+    set_brightness() {
+      for output in $(xrandr | grep " connected" | cut -f1 -d " "); do
+        xrandr --output "$output" --brightness $(echo "scale=2; $1 / 100" | bc)
+      done
+    }
+
+    notify() {
+      brightness=$(get_brightness)
+      dunstify -a "changebrightness" -u low -i display-brightness -h string:x-dunst-stack-tag:brightness \
+        -h int:value:"$brightness" "Brightness: $brightness%"
+    }
+
+    case $1 in
+      up)
+        new=$(( $(get_brightness) + STEP ))
+        [[ $new -gt $MAX_BRIGHTNESS ]] && new=$MAX_BRIGHTNESS
+        set_brightness $new
+        notify
+        ;;
+      down)
+        new=$(( $(get_brightness) - STEP ))
+        [[ $new -lt $MIN_BRIGHTNESS ]] && new=$MIN_BRIGHTNESS
+        set_brightness $new
+        notify
+        ;;
+      set)
+        if [[ $2 -ge $MIN_BRIGHTNESS && $2 -le $MAX_BRIGHTNESS ]]; then
+          set_brightness $2
+          notify
+        else
+          echo "Invalid brightness value. Must be between $MIN_BRIGHTNESS and $MAX_BRIGHTNESS."
+          exit 1
+        fi
+        ;;
+      get)
+        get_brightness
+        ;;
+      *)
+        echo "Usage: $0 {up|down|set <value>|get}"
+        exit 1
+        ;;
+    esac
+  '';
+
   addOpacity =
     color: opacity:
     let
@@ -27,27 +83,27 @@ let
      #! /bin/sh
 
     # Setup primary monitor (DP-4)
-    ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary --mode 2560x1440 --rate 144 --rotate normal --pos 3840x360
+    # ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary --mode 2560x1440 --rate 144 --rotate normal --pos 3840x360
 
-     # Check if second monitor (HDMI-1) is connected
-     if [[ $(${pkgs.xorg.xrandr}/bin/xrandr -q | grep 'HDMI-1 connected') ]]; then
-       ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --mode 3840x2160 --rate 60 --rotate normal --pos 0x0
-       # Workspaces for both monitors
-       ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3
-       ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 4 5 6
-     else
-       ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --off
-       ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3 4 5 6
-     fi
-
+     # # Check if second monitor (HDMI-1) is connected
+     # if [[ $(${pkgs.xorg.xrandr}/bin/xrandr -q | grep 'HDMI-1 connected') ]]; then
+     #   ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --mode 3840x2160 --rate 60 --rotate normal --pos 0x0
+     #   # Workspaces for both monitors
+     #   ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3
+     #   ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 4 5 6
+     # else
+     #   ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --off
+     #   ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3 4 5 6
+     # fi
+     #
      # Set wallpaper
      ${pkgs.feh}/bin/feh --bg-fill ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
 
      # Restart Polybar
-     ${pkgs.procps}/bin/pkill polybar
-     ${pkgs.polybar}/bin/polybar main-left &
-     ${pkgs.polybar}/bin/polybar main-right &
-
+     # ${pkgs.procps}/bin/pkill polybar
+     # ${pkgs.polybar}/bin/polybar main-left &
+     # ${pkgs.polybar}/bin/polybar main-right &
+     #
      # Function to launch app and fullscreen it
      launch_and_fullscreen() {
        local app=$1
@@ -98,6 +154,9 @@ in
       xclip
       picom
       playerctl
+      wireplumber # For PulseWire
+      bc # For brightnessctl
+      brightness-control
       (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ];
   };
@@ -138,6 +197,7 @@ in
       Option       "TripleBuffer" "on"
     '';
   };
+  services.acpid.enable = true;
   home-manager.users.${user} =
     {
       pkgs,
@@ -186,7 +246,8 @@ in
         };
         startupPrograms = [
           "${pkgs.sxhkd}/bin/sxhkd"
-          "${pkgs.autorandr}/bin/autorandr --change"
+          "${monitor-setup}/bin/monitor-setup"
+          #"${pkgs.autorandr}/bin/autorandr --change"
         ];
         extraConfig = ''
           bspc config normal_border_color "${addOpacity colors.background-alt 0.5}"
@@ -263,7 +324,8 @@ in
           "XF86Audio{RaiseVolume,LowerVolume,Mute}" = "pactl set-sink-{volume @DEFAULT_SINK@ {+,-}5%,mute @DEFAULT_SINK@ toggle}";
 
           # Brightness control
-          "XF86MonBrightness{Up,Down}" = "brightnessctl set {+10%,10%-}";
+          "XF86MonBrightnessUp" = "${brightness-control}/bin/brightness-control up";
+          "XF86MonBrightnessDown" = "${brightness-control}/bin/brightness-control down";
 
           # Screenshot
           "Print" = "maim -s | xclip -selection clipboard -t image/png";
@@ -283,13 +345,9 @@ in
           "XF86AudioPrev" = "playerctl previous";
 
           # Volume control
-          "XF86AudioRaiseVolume" = "pactl set-sink-volume @DEFAULT_SINK@ +5%";
-          "XF86AudioLowerVolume" = "pactl set-sink-volume @DEFAULT_SINK@ -5%";
-          "XF86AudioMute" = "pactl set-sink-mute @DEFAULT_SINK@ toggle";
-
-          # Brightness control
-          "XF86MonBrightnessUp" = "brightnessctl set +10%";
-          "XF86MonBrightnessDown" = "brightnessctl set 10%-";
+          "XF86AudioRaiseVolume" = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+";
+          "XF86AudioLowerVolume" = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-";
+          "XF86AudioMute" = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
         };
       };
 
@@ -305,7 +363,6 @@ in
           polybar main-right &
         '';
         config = {
-
           "bar/main-left" = {
             monitor = "DP-4";
             width = "100%";
@@ -469,41 +526,42 @@ in
             label = "%percentage:2%%";
           };
           "module/brightness" = {
-            type = "internal/backlight";
-            card = "intel_backlight"; # You may need to change this to match your system
+            type = "custom/script";
+            exec = "${brightness-control}/bin/brightness-control get";
+            interval = 1;
             format = "<ramp> <label>";
-            label = "%percentage%%";
+            label = "%output%%";
             ramp-0 = "🌕";
             ramp-1 = "🌔";
             ramp-2 = "🌓";
             ramp-3 = "🌒";
             ramp-4 = "🌑";
+            format-foreground = colors.foreground;
+            scroll-up = "${brightness-control}/bin/brightness-control up";
+            scroll-down = "${brightness-control}/bin/brightness-control down";
+            click-left = "${brightness-control}/bin/brightness-control up";
+            click-right = "${brightness-control}/bin/brightness-control down";
           };
           "module/playerctl" = {
             type = "custom/script";
             exec =
-              toString (
-                pkgs.writeShellScriptBin "playerctl-status" ''
-                                    
+              let
+                script = pkgs.writeShellScriptBin "playerctl-status" ''
                   # Function to get player status
                   get_status() {
                       playerctl -a metadata --format '{{status}}' 2>/dev/null | head -n1
                   }
-
                   # Function to get current track info
                   get_track_info() {
                       playerctl -a metadata --format '{{playerName}}:{{artist}} - {{title}}' 2>/dev/null | head -n1
                   }
-
                   # Function to replace player names with icons
                   replace_player_name() {
                       sed -E 's/spotify/󰓇/; s/firefox/󰈹/; s/chromium/󰊯/; s/mpv/󰐊/; s/^([^:]+):/\1 /'
                   }
-
                   # Main logic
                   status=$(get_status)
                   track_info=$(get_track_info | replace_player_name)
-
                   case $status in
                       Playing)
                           echo " $track_info"
@@ -515,9 +573,9 @@ in
                           echo "󰓃 No media"
                           ;;
                   esac
-                ''
-              )
-              + "/bin/playerctl-status";
+                '';
+              in
+              "${script}/bin/playerctl-status";
             interval = 1;
             format = "<label>";
             label = "%output:0:50:...%";
@@ -525,6 +583,8 @@ in
             click-left = "${pkgs.playerctl}/bin/playerctl play-pause";
             click-right = "${pkgs.playerctl}/bin/playerctl next";
             click-middle = "${pkgs.playerctl}/bin/playerctl previous";
+            scroll-up = "${pkgs.playerctl}/bin/playerctl position 5+";
+            scroll-down = "${pkgs.playerctl}/bin/playerctl position 5-";
           };
         };
       };

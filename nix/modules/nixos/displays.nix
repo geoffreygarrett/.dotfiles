@@ -133,7 +133,8 @@ in
 
     systemd.services.autorandr = {
       wantedBy = [ "graphical-session.target" ];
-      partOf = [ "graphical-session.target" ];
+      # partOf = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${pkgs.autorandr}/bin/autorandr --change --default default";
