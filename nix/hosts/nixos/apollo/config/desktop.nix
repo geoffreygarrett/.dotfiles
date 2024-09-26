@@ -17,30 +17,72 @@ let
   };
 
   brightness-control = pkgs.writeShellScriptBin "brightness-control" ''
-    #!/usr/bin/env bash
-
     set -e
 
     STEP=5
     MAX_BRIGHTNESS=100
     MIN_BRIGHTNESS=5
+    LOCKFILE="/tmp/brightness-lock"
+    BRIGHTNESS_FILE="/tmp/brightness-value"
 
+    # Ensure only one instance of the script runs at a time
+    if [ -e "$LOCKFILE" ]; then
+      exit 0
+    fi
+    trap 'rm -f "$LOCKFILE"' EXIT
+    touch "$LOCKFILE"
+
+    # Use pkgs.xrandr, pkgs.gnugrep, pkgs.coreutils, pkgs.bc from Nix
+    XRANDR=${pkgs.xorg.xrandr}/bin/xrandr
+    GREP=${pkgs.gnugrep}/bin/grep
+    AWK=${pkgs.gawk}/bin/awk
+    BC=${pkgs.bc}/bin/bc
+    DUNSTIFY=${pkgs.dunst}/bin/dunstify
+
+    # Function to get the current brightness level
     get_brightness() {
-      xrandr --verbose | grep -m 1 -i brightness | awk '{print int($2 * 100)}'
+      # Read cached brightness value to avoid frequent xrandr calls
+      if [ -f "$BRIGHTNESS_FILE" ]; then
+        cat "$BRIGHTNESS_FILE"
+      else
+        current_brightness=$($XRANDR --verbose | $GREP -m 1 -i brightness | $AWK '{print int($2 * 100)}')
+        echo "$current_brightness" > "$BRIGHTNESS_FILE"
+        echo "$current_brightness"
+      fi
     }
 
+    # Function to set the brightness level
     set_brightness() {
-      for output in $(xrandr | grep " connected" | cut -f1 -d " "); do
-        xrandr --output "$output" --brightness $(echo "scale=2; $1 / 100" | bc)
+      for output in $($XRANDR | $GREP " connected" | cut -f1 -d " "); do
+        $XRANDR --output "$output" --brightness $(echo "scale=2; $1 / 100" | $BC)
       done
+      # Cache the new brightness value
+      echo "$1" > "$BRIGHTNESS_FILE"
     }
 
+    # Function to send a notification and update Polybar with the new brightness level
     notify() {
       brightness=$(get_brightness)
-      dunstify -a "changebrightness" -u low -i display-brightness -h string:x-dunst-stack-tag:brightness \
+      if [ "$brightness" -ge 80 ]; then
+        ramp=" "
+      elif [ "$brightness" -ge 60 ]; then
+        ramp=" "
+      elif [ "$brightness" -ge 40 ]; then
+        ramp=" "
+      elif [ "$brightness" -ge 20 ]; then
+        ramp=" "
+      else
+        ramp=" "
+      fi
+      $DUNSTIFY -a "changebrightness" -u low -i display-brightness -h string:x-dunst-stack-tag:brightness \
         -h int:value:"$brightness" "Brightness: $brightness%"
+
+      # Immediately update Polybar with the new brightness level
+      echo "$ramp $brightness%" > /tmp/polybar-brightness
+      polybar-msg action "#brightness.hook.0"
     }
 
+    # Main case statement for handling brightness controls
     case $1 in
       up)
         new=$(( $(get_brightness) + STEP ))
@@ -72,7 +114,6 @@ let
         ;;
     esac
   '';
-
   addOpacity =
     color: opacity:
     let
@@ -80,61 +121,43 @@ let
     in
     "${color}${lib.toHexString (builtins.floor a)}";
   monitor-setup = pkgs.writeShellScriptBin "monitor-setup" ''
-     #! /bin/sh
+    # Set wallpaper
+    ${pkgs.feh}/bin/feh --bg-fill ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
 
-    # Setup primary monitor (DP-4)
-    # ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary --mode 2560x1440 --rate 144 --rotate normal --pos 3840x360
+    # Restart Polybar
+    ${pkgs.procps}/bin/pkill polybar
+    ${pkgs.polybar}/bin/polybar main-left &
+    ${pkgs.polybar}/bin/polybar main-right &
 
-     # # Check if second monitor (HDMI-1) is connected
-     # if [[ $(${pkgs.xorg.xrandr}/bin/xrandr -q | grep 'HDMI-1 connected') ]]; then
-     #   ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --mode 3840x2160 --rate 60 --rotate normal --pos 0x0
-     #   # Workspaces for both monitors
-     #   ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3
-     #   ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 4 5 6
-     # else
-     #   ${pkgs.xorg.xrandr}/bin/xrandr --output HDMI-1 --off
-     #   ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3 4 5 6
-     # fi
-     #
-     # Set wallpaper
-     ${pkgs.feh}/bin/feh --bg-fill ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
+    # Function to launch app and fullscreen it
+    launch_and_fullscreen() {
+      local app=$1
+      local class=$2
+      local desktop=$3
 
-     # Restart Polybar
-     # ${pkgs.procps}/bin/pkill polybar
-     # ${pkgs.polybar}/bin/polybar main-left &
-     # ${pkgs.polybar}/bin/polybar main-right &
-     #
-     # Function to launch app and fullscreen it
-     launch_and_fullscreen() {
-       local app=$1
-       local class=$2
-       local desktop=$3
+      # Launch the application if it's not running
+      if ! pgrep -x $app; then
+        $app &
+      fi
 
-       # Launch the application if it's not running
-       if ! pgrep -x $app; then
-         $app &
-       fi
+      # Subscribe to the window event instead of polling
+      bspc subscribe node_add | while read -r _ _ wid; do
+        if bspc query -N -n $wid | grep -q "$class"; then
+          bspc node "$wid" -d $desktop
+          bspc node "$wid" -t fullscreen
+          break
+        fi
+      done &
+    }
 
-       # Wait for the window to appear and move it to the correct desktop
-       (
-         for i in {1..10}; do
-           if ${pkgs.bspwm}/bin/bspc query -N -n .local.$class > /dev/null; then
-             ${pkgs.bspwm}/bin/bspc node -d $desktop
-             ${pkgs.bspwm}/bin/bspc node -t fullscreen
-             break
-           fi
-           sleep 0.5
-         done
-       ) &
-     }
 
-     # Launch and fullscreen applications
-     launch_and_fullscreen "${pkgs.firefox}/bin/firefox" firefox '^1'
-     launch_and_fullscreen "${pkgs.alacritty}/bin/alacritty" Alacritty '^2'
-     launch_and_fullscreen "${pkgs.spotify}/bin/spotify" Spotify '^3'
+    # Launch and fullscreen applications
+    launch_and_fullscreen "${pkgs.firefox}/bin/firefox" firefox '^1'
+    launch_and_fullscreen "${pkgs.alacritty}/bin/alacritty" Alacritty '^2'
+    launch_and_fullscreen "${pkgs.spotify}/bin/spotify" Spotify '^3'
 
-     # Ensure the first desktop is focused at the end
-     ${pkgs.bspwm}/bin/bspc desktop '^1' --focus
+    # Ensure the first desktop is focused at the end
+    ${pkgs.bspwm}/bin/bspc desktop '^1' --focus
   '';
 in
 {
@@ -156,7 +179,6 @@ in
       playerctl
       wireplumber # For PulseWire
       bc # For brightnessctl
-      brightness-control
       (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
     ];
   };
@@ -167,6 +189,24 @@ in
     style = "adwaita-dark";
   };
   services.displayManager.defaultSession = "none+bspwm";
+  services.redshift.enable = false;
+  # services.redshift = {
+  #   enable = true; # Or set to false to disable Redshift
+  #   temperature = {
+  #     day = 5500;
+  #     night = 3700;
+  #   };
+  #   latitude = "-34.161648";
+  #   longitude = "19.067194";
+  #   brightness = {
+  #     day = "1";
+  #     night = "0.8";
+  #   };
+  #   extraOptions = [
+  #     "-v"
+  #     "-m randr"
+  #   ];
+  # };
 
   # Better support for general peripherals
   services.libinput.enable = true;
@@ -247,7 +287,7 @@ in
         startupPrograms = [
           "${pkgs.sxhkd}/bin/sxhkd"
           "${monitor-setup}/bin/monitor-setup"
-          #"${pkgs.autorandr}/bin/autorandr --change"
+          "${pkgs.autorandr}/bin/autorandr --change"
         ];
         extraConfig = ''
           bspc config normal_border_color "${addOpacity colors.background-alt 0.5}"
@@ -379,9 +419,7 @@ in
             font-2 = "JetBrainsMono Nerd Font:size=12;3";
             modules-left = "bspwm";
             modules-center = "date";
-            modules-right = "pulseaudio brightness memory cpu battery playerctl";
-            tray-position = "right";
-            tray-padding = 2;
+            modules-right = "tray pulseaudio brightness memory cpu battery spotify-volume spotify spotify-prev spotify-play-pause spotify-next";
             cursor-click = "pointer";
             enable-ipc = true;
           };
@@ -401,11 +439,16 @@ in
             font-2 = "JetBrainsMono Nerd Font:size=12;3";
             modules-left = "bspwm";
             modules-center = "date";
-            modules-right = "pulseaudio brightness memory cpu battery playerctl";
-            tray-position = "right";
-            tray-padding = 2;
+            modules-right = "tray pulseaudio brightness memory cpu battery spotify-volume spotify spotify-prev spotify-play-pause spotify-next";
             cursor-click = "pointer";
             enable-ipc = true;
+          };
+          "module/tray" = {
+            type = "internal/tray";
+            padding = 2;
+            background = colors.background;
+            foreground = colors.foreground;
+            icon-size = 16;
           };
           # "bar/main" = {
           #   monitor = "\${env:MONITOR:}";
@@ -513,79 +556,177 @@ in
           };
           "module/memory" = {
             type = "internal/memory";
-            interval = 2;
+            interval = 5; # Increase to 5 seconds
             format-prefix = "󰍛 ";
             format-prefix-foreground = colors.primary;
             label = "%percentage_used:2%%";
           };
           "module/cpu" = {
             type = "internal/cpu";
-            interval = 2;
+            interval = 5; # Increase to 5 seconds
             format-prefix = "󰻠 ";
             format-prefix-foreground = colors.primary;
             label = "%percentage:2%%";
           };
           "module/brightness" = {
             type = "custom/script";
-            exec = "${brightness-control}/bin/brightness-control get";
-            interval = 1;
-            format = "<ramp> <label>";
-            label = "%output%%";
-            ramp-0 = "🌕";
-            ramp-1 = "🌔";
-            ramp-2 = "🌓";
-            ramp-3 = "🌒";
-            ramp-4 = "🌑";
+            exec = "${pkgs.coreutils}/bin/cat /tmp/polybar-brightness";
+            hook-0 = "${pkgs.coreutils}/bin/cat /tmp/polybar-brightness";
+            format = "<label>";
+            label = "%output%";
             format-foreground = colors.foreground;
             scroll-up = "${brightness-control}/bin/brightness-control up";
             scroll-down = "${brightness-control}/bin/brightness-control down";
             click-left = "${brightness-control}/bin/brightness-control up";
             click-right = "${brightness-control}/bin/brightness-control down";
           };
-          "module/playerctl" = {
+          "module/spotify" = {
             type = "custom/script";
             exec =
               let
-                script = pkgs.writeShellScriptBin "playerctl-status" ''
-                  # Function to get player status
-                  get_status() {
-                      playerctl -a metadata --format '{{status}}' 2>/dev/null | head -n1
-                  }
-                  # Function to get current track info
-                  get_track_info() {
-                      playerctl -a metadata --format '{{playerName}}:{{artist}} - {{title}}' 2>/dev/null | head -n1
-                  }
-                  # Function to replace player names with icons
-                  replace_player_name() {
-                      sed -E 's/spotify/󰓇/; s/firefox/󰈹/; s/chromium/󰊯/; s/mpv/󰐊/; s/^([^:]+):/\1 /'
-                  }
-                  # Main logic
-                  status=$(get_status)
-                  track_info=$(get_track_info | replace_player_name)
+                script = pkgs.writeShellScriptBin "scroll_spotify_status" ''
+                  #!/usr/bin/env bash
+
+                  # Fetch the current status and track info from Spotify
+                  status=$(${pkgs.playerctl}/bin/playerctl -p spotify status 2>/dev/null || echo "No player")
+                  if [ "$status" = "No player" ]; then
+                    echo "󰓃 No media"
+                    exit 0
+                  fi
+
+                  track_info=$(${pkgs.playerctl}/bin/playerctl -p spotify metadata --format '{{artist}} - {{title}}' 2>/dev/null || echo "No media")
+
+                  # Handle edge case: when there's no track info
+                  if [ -z "$track_info" ] || [ "$track_info" = "No media" ]; then
+                    track_info="No media"
+                  fi
+
+                  # Update the output based on the current status
                   case $status in
-                      Playing)
-                          echo " $track_info"
-                          ;;
-                      Paused)
-                          echo "󰏤 $track_info"
-                          ;;
-                      *)
-                          echo "󰓃 No media"
-                          ;;
+                    Playing)
+                      icon="󰓇"
+                      ;;
+                    Paused)
+                      icon="󰏤"
+                      ;;
+                    *)
+                      icon="󰓃"
+                      ;;
                   esac
+
+                  # Output the result directly
+                  echo "$icon $track_info"
                 '';
               in
-              "${script}/bin/playerctl-status";
-            interval = 1;
+              "${script}/bin/scroll_spotify_status";
             format = "<label>";
-            label = "%output:0:50:...%";
+            label = "%output%";
             format-foreground = colors.foreground;
-            click-left = "${pkgs.playerctl}/bin/playerctl play-pause";
-            click-right = "${pkgs.playerctl}/bin/playerctl next";
-            click-middle = "${pkgs.playerctl}/bin/playerctl previous";
-            scroll-up = "${pkgs.playerctl}/bin/playerctl position 5+";
-            scroll-down = "${pkgs.playerctl}/bin/playerctl position 5-";
+            interval = 2; # Poll every 2 seconds
           };
+          "module/spotify-volume" = {
+            type = "custom/script";
+            exec =
+              let
+                script = pkgs.writeShellScriptBin "spotify_volume" ''
+                  VOLUME=$(${pkgs.playerctl}/bin/playerctl -p spotify volume 2>/dev/null || echo "N/A")
+                  if [ "$VOLUME" != "N/A" ]; then
+                    VOLUME_PERCENT=$(printf "%.0f" $(echo "$VOLUME * 100" | ${pkgs.bc}/bin/bc))
+                    echo "󰕾 $VOLUME_PERCENT%"
+                  else
+                    echo "󰕾 N/A"
+                  fi
+                '';
+              in
+              "${script}/bin/spotify_volume";
+            label = "%output%";
+            format = "<label>";
+            interval = 1;
+            click-left = "${pkgs.playerctl}/bin/playerctl -p spotify volume 0.05+";
+            click-right = "${pkgs.playerctl}/bin/playerctl -p spotify volume 0.05-";
+            scroll-up = "${pkgs.playerctl}/bin/playerctl -p spotify volume 0.05+";
+            scroll-down = "${pkgs.playerctl}/bin/playerctl -p spotify volume 0.05-";
+          };
+          "module/spotify-prev" = {
+            type = "custom/script";
+            exec = "echo '󰒮'";
+            label = "%output%";
+            format = "<label>";
+            click-left = "${pkgs.playerctl}/bin/playerctl previous -p spotify";
+          };
+          "module/spotify-play-pause" = {
+            type = "custom/script";
+            interval = 1;
+            exec =
+              let
+                play_pause_script = pkgs.writeShellScriptBin "spotify_play_pause_status" ''
+                  status=$(playerctl -p spotify status 2>/dev/null)
+                  if [ "$status" = "Playing" ]; then
+                    echo "󰐊" 
+                  elif [ "$status" = "Paused" ]; then
+                    echo "󰏤" 
+                  else
+                    echo "󰓃" 
+                  fi
+                '';
+              in
+              "${play_pause_script}/bin/spotify_play_pause_status";
+            label = "%output%";
+            format = "<label>";
+            click-left = "${pkgs.playerctl}/bin/playerctl play-pause -p spotify";
+          };
+          "module/spotify-next" = {
+            type = "custom/script";
+            exec = "echo '󰒭'";
+            label = "%output%";
+            format = "<label>";
+            click-left = "${pkgs.playerctl}/bin/playerctl next -p spotify";
+          };
+
+          # "module/playerctl" = {
+          #   type = "custom/script";
+          #   exec =
+          #     let
+          #       script = pkgs.writeShellScriptBin "playerctl-status" ''
+          #         # Function to get player status
+          #         get_status() {
+          #             playerctl -a metadata --format '{{status}}' 2>/dev/null | head -n1
+          #         }
+          #         # Function to get current track info
+          #         get_track_info() {
+          #             playerctl -a metadata --format '{{playerName}}:{{artist}} - {{title}}' 2>/dev/null | head -n1
+          #         }
+          #         # Function to replace player names with icons
+          #         replace_player_name() {
+          #             sed -E 's/spotify/󰓇/; s/firefox/󰈹/; s/chromium/󰊯/; s/mpv/󰐊/; s/^([^:]+):/\1 /'
+          #         }
+          #         # Main logic
+          #         status=$(get_status)
+          #         track_info=$(get_track_info | replace_player_name)
+          #         case $status in
+          #             Playing)
+          #                 echo " $track_info"
+          #                 ;;
+          #             Paused)
+          #                 echo "󰏤 $track_info"
+          #                 ;;
+          #             *)
+          #                 echo "󰓃 No media"
+          #                 ;;
+          #         esac
+          #       '';
+          #     in
+          #     "${script}/bin/playerctl-status";
+          #   interval = 1;
+          #   format = "<label>";
+          #   label = "%output:0:50:...%";
+          #   format-foreground = colors.foreground;
+          #   click-left = "${pkgs.playerctl}/bin/playerctl play-pause";
+          #   click-right = "${pkgs.playerctl}/bin/playerctl next";
+          #   click-middle = "${pkgs.playerctl}/bin/playerctl previous";
+          #   scroll-up = "${pkgs.playerctl}/bin/playerctl position 5+";
+          #   scroll-down = "${pkgs.playerctl}/bin/playerctl position 5-";
+          # };
         };
       };
 

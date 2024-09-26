@@ -6,3 +6,5 @@ result-*
 .direnv
 ignore
 **/gavin-nelson/
+ignore.nix
+password

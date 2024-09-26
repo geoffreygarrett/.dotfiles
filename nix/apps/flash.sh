@@ -19,7 +19,7 @@ check_root() {
 
 # Function to detect image type and flash accordingly
 flash_image() {
- # Check if the file starts with the zstd magic number
+  # Check if the file starts with the zstd magic number
   if [ "$(od -An -N4 -tx1 "$IMAGE_PATH" | tr -d ' ')" = "28b52ffd" ]; then
     echo "Flashing zstd compressed image..."
     zstd -dcf "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M status=progress conv=fsync

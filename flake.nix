@@ -97,6 +97,14 @@
 
     nix-colors.url = "github:misterio77/nix-colors";
 
+    # Custom
+    nixus = {
+      url = "path:./nixus";
+      flake = true;
+      # type = "path";
+    };
+
+    deploy-rs.url = "github:serokell/deploy-rs";
   };
 
   outputs =
@@ -323,6 +331,37 @@
           }
         );
 
+      #
+      #
+      #
+      # deploy-rs node configuration
+      deploy.nodes.mariner-1 =
+        let
+          system = "x86_64-linux";
+          pkgs = pkgsFor system;
+        in
+        {
+          hostname =
+            let
+              getTailscaleIP = pkgs.writeShellScript "get-tailscale-ip" ''
+                ${pkgs.tailscale}/bin/tailscale status --json | 
+                ${pkgs.jq}/bin/jq -r '.Peer[] | select(.HostName == "rpi") | .TailscaleIPs[0]'
+              '';
+            in
+            builtins.readFile (
+              pkgs.runCommand "tailscale-ip" { } ''
+                ${getTailscaleIP} > $out
+              ''
+            );
+          profiles.system = {
+            sshUser = "${user}";
+            sshOpts = [ "-tt" ];
+            magicRollback = false;
+            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-1;
+            user = "root";
+          };
+        };
+
       ##############################
       # NixOS Configuration :nixos
       ##############################
@@ -349,6 +388,11 @@
               users.${user} = import ./nix/modules/nixos/home-manager.nix;
             };
           };
+          mkMarinerNode = import ./nix/hosts/nixos/mariner/factory.nix {
+            inherit self inputs;
+            pkgs = pkgsFor "aarch64-linux";
+            system = "aarch64-linux";
+          };
         in
         {
           "apollo" = nixpkgs.lib.nixosSystem {
@@ -365,26 +409,36 @@
             inherit specialArgs;
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
-            modules = [ ./nix/hosts/nixos/mariner-1 ];
+            modules = [
+              (mkMarinerNode {
+                inherit user keys;
+                hostname = "mariner-1";
+              })
+            ];
           };
           "mariner-2" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
-            modules = [ ./nix/hosts/nixos/mariner-2 ];
-          };
-        }
-        // lib.forAllLinuxSystems (
-          system:
-          nixpkgs.lib.nixosSystem {
-            inherit system specialArgs;
-            pkgs = pkgsFor system;
             modules = [
-              ./nix/hosts/nixos
-              homeManagerModule
+              (mkMarinerNode {
+                inherit user keys;
+                hostname = "mariner-2";
+              })
             ];
-          }
-        );
+          };
+        };
+      # // lib.forAllLinuxSystems (
+      #   system:
+      #   nixpkgs.lib.nixosSystem {
+      #     inherit system specialArgs;
+      #     pkgs = pkgsFor system;
+      #     modules = [
+      #       ./nix/hosts/nixos
+      #       homeManagerModule
+      #     ];
+      #   }
+      # );
 
       ##############################
       # Nix-on-Droid Configuration :android

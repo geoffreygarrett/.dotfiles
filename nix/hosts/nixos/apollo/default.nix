@@ -63,23 +63,29 @@ in
             sleep 2
             ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 4 5 6
             ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3
-            ${pkgs.bspwm}/bin/bspc wm -r
+            #${pkgs.bspwm}/bin/bspc wm -r
           ''
         );
       };
     };
-
   };
 
-  systemd.services.autorandr = {
-    wantedBy = [ "graphical-session.target" ];
-    # partOf = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${pkgs.autorandr}/bin/autorandr --change --default default";
-    };
+  hardware.graphics.enable32Bit = true; # Needed for enableNvidia
+  virtualisation.docker = {
+    enable = true;
+    # enableNvidia = true; # Deprecated for below.
   };
+  hardware.nvidia-container-toolkit.enable = true;
+
+  # systemd.services.autorandr = {
+  #   wantedBy = [ "graphical-session.target" ];
+  #   partOf = [ "graphical-session.target" ];
+  #   # after = [ "graphical-session.target" ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     ExecStart = "${pkgs.autorandr}/bin/autorandr --change --default default";
+  #   };
+  # };
   imports = [
     # (Dell Inc. 32"): 3840x2160 @ 60 Hz in 32″ [External]
     # Intel(R) Core(TM) i9-9900KS (16) @ 5.00 GHz
@@ -91,7 +97,9 @@ in
     inputs.nixos-hardware.nixosModules.common-gpu-intel
     inputs.nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
     inputs.nixos-hardware.nixosModules.common-hidpi
+    inputs.nixus.nixosModules.spotify
     ../../../modules/nixos/openrgb.nix
+    ../../../modules/nixos/openssh.nix
     ../../../modules/nixos/tailscale.nix
     ../../../modules/nixos/samba.nix
     ../shared.nix
@@ -99,6 +107,18 @@ in
   ];
 
   system.stateVersion = "24.11";
+
+  # Nixus: my personal configuration module wrappers.
+  nixus.spotify = {
+    enable = true;
+    useNerdFonts = true;
+    firewall = {
+      enableLocalDiscovery = true;
+      enableLocalSync = true;
+      enableSpotifyConnect = true;
+      acknowledgeFirewallRisks = true;
+    };
+  };
 
   # FIXME: Just like with Windows, 2 hours early, maybe BIOS?
   # services.automatic-timezoned.enable = true;
@@ -141,6 +161,35 @@ in
   #   "nvidia_drm"
   # ];
 
+  environment.systemPackages = with pkgs; [
+    jdk17
+  ];
+
+  home-manager.users.${user} = {
+    home.packages = with pkgs; [
+      # Applications
+      # "firefox"
+      # "spotify"
+      # "vlc"
+      # "code"
+      # "steam"
+      # "discord"
+      # "signal-desktop"
+      # "slack"
+      # "zoom"
+      # "obs-studio"
+      # "kdenlive"
+      # "gimp"
+      # "inkscape"
+      # "krita"
+      # "blender"
+      # "darktable"
+      # "rawtherapee
+      # minecraft
+      prismlauncher
+    ];
+  };
+
   boot.loader = {
     systemd-boot.enable = false;
     efi = {
@@ -169,11 +218,29 @@ in
     useDHCP = false;
     dhcpcd.wait = "background";
     firewall = {
+      # For more information on Spotify-specific configuration, visit:
+      # https://nixos.wiki/wiki/Spotify
+      #
+      # Note: Always review and adjust firewall rules based on your specific needs and security requirements.
+      # Opening ports increases potential attack surface, so only open what's necessary for your use case.
       enable = true;
+
+      # UDP ports
+      allowedUDPPorts = [
+        # 5353
+        # mDNS (Multicast DNS)
+        # Used for local network service discovery, including:
+        # - Spotify: Discovery of Google Cast and Spotify Connect devices
+        # - Other services: Printer discovery, Apple Bonjour, etc.
+      ];
+
+      # TCP ports
       allowedTCPPorts = [
-        22 # SSH
-        80 # HTTP
-        443 # HTTPS
+        22 # SSH (Secure Shell) for remote access and management
+        80 # HTTP for web services
+        443 # HTTPS for secure web services
+        # 4070 # Spotify: General communication port
+        # 57621 # Spotify: Sync local tracks with mobile devices on the same network
       ];
     };
   };
