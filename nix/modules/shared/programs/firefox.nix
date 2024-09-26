@@ -13,6 +13,8 @@
         force = true;
         engines = {
           "Anaconda Packages" = {
+            iconUpdateURL = "https://www.google.com/s2/favicons?domain=anaconda.org";
+            updateInterval = 24 * 60 * 60 * 1000; # every day
             urls = [
               {
                 template = "https://anaconda.org/search";
@@ -25,6 +27,12 @@
               }
             ];
             definedAliases = [ "@ap" ];
+          };
+          "NixOS Wiki" = {
+            urls = [ { template = "https://nixos.wiki/index.php?search={searchTerms}"; } ];
+            iconUpdateURL = "https://nixos.wiki/favicon.png";
+            updateInterval = 24 * 60 * 60 * 1000; # every day
+            definedAliases = [ "@nw" ];
           };
           "Nix Packages" = {
             urls = [
@@ -60,6 +68,20 @@
           keyword = "wiki";
           url = "https://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go";
         }
+        # {
+        #   name = "NixOS Configuration";
+        #   folder = true;
+        #   bookmarks = [
+        #     {
+        #       name = "[myme.no] NixOS: On Raspberry Pi 3B";
+        #       url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
+        #     }
+        #     {
+        #       name = "Stack Overflow";
+        #       url = "https://stackoverflow.com";
+        #     }
+        #   ];
+        # }
       ];
 
       # Browser settings
@@ -80,6 +102,8 @@
         sponsorblock
         darkreader
         tridactyl
+        metamask
+        sidebery
         youtube-shorts-block
       ];
       #  extensions = with inputs.firefox-addons.packages.${system}; [

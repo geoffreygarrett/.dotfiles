@@ -108,6 +108,10 @@ in
 
   system.stateVersion = "24.11";
 
+  nix.settings = {
+    secret-key-files = "/etc/nix/cache-priv-key.pem";
+  };
+
   # Nixus: my personal configuration module wrappers.
   nixus.spotify = {
     enable = true;

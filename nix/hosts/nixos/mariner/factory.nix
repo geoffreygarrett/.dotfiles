@@ -59,6 +59,12 @@ in
     };
   };
 
+  nix.settings = {
+    trusted-public-keys = [
+      "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
+    ];
+  };
+
   # Network configuration
   networking = {
     hostName = hostname;

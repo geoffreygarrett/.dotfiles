@@ -341,23 +341,56 @@
           pkgs = pkgsFor system;
         in
         {
-          hostname =
-            let
-              getTailscaleIP = pkgs.writeShellScript "get-tailscale-ip" ''
-                ${pkgs.tailscale}/bin/tailscale status --json | 
-                ${pkgs.jq}/bin/jq -r '.Peer[] | select(.HostName == "rpi") | .TailscaleIPs[0]'
-              '';
-            in
-            builtins.readFile (
-              pkgs.runCommand "tailscale-ip" { } ''
-                ${getTailscaleIP} > $out
-              ''
-            );
+          hostname = "100.75.168.78";
+          # let
+          #   getTailscaleIP = pkgs.writeShellScript "get-tailscale-ip" ''
+          #     ${pkgs.tailscale}/bin/tailscale status --json | 
+          #     ${pkgs.jq}/bin/jq -r '.Peer[] | select(.HostName == "mariner-1") | .TailscaleIPs[0]'
+          #   '';
+          # in
+          # builtins.readFile (
+          #   pkgs.runCommand "tailscale-ip" { } ''
+          #     ${getTailscaleIP} > $out
+          #   ''
+          # );
           profiles.system = {
             sshUser = "${user}";
-            sshOpts = [ "-tt" ];
-            magicRollback = false;
+            # sshOpts = [
+            #   "-tt"
+            #   "-v"
+            # ];
+            magicRollback = true;
             path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-1;
+            user = "root";
+          };
+        };
+
+      deploy.nodes.mariner-2 =
+        let
+          system = "x86_64-linux";
+          pkgs = pkgsFor system;
+        in
+        {
+          hostname = "100.92.149.10";
+          # let
+          #   getTailscaleIP = pkgs.writeShellScript "get-tailscale-ip" ''
+          #     ${pkgs.tailscale}/bin/tailscale status --json | 
+          #     ${pkgs.jq}/bin/jq -r '.Peer[] | select(.HostName == "mariner-1") | .TailscaleIPs[0]'
+          #   '';
+          # in
+          # builtins.readFile (
+          #   pkgs.runCommand "tailscale-ip" { } ''
+          #     ${getTailscaleIP} > $out
+          #   ''
+          # );
+          profiles.system = {
+            sshUser = "${user}";
+            # sshOpts = [
+            #   "-tt"
+            #   "-v"
+            # ];
+            magicRollback = true;
+            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-2;
             user = "root";
           };
         };
