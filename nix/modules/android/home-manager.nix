@@ -10,20 +10,21 @@
 
 {
   home.stateVersion = "24.05";
-  system.os = "android";
+  # system.os = "android";
   imports = [
-    ../shared/home-manager/programs/git.nix
-    ../shared/home-manager/programs/gh.nix
-    ../shared/home-manager/programs/htop.nix
-    ../shared/home-manager/programs/nushell.nix
-    ../shared/home-manager/programs/nixvim
-    #../shared/home-manager/programs/nvim.nix
-    ../shared/home-manager/programs/starship.nix
-    ../shared/home-manager/programs/zellij.nix
-    ../shared/home-manager/programs/zsh.nix
-    ../shared/home-manager/programs/bash.nix
-    ../shared/secrets.nix
-    ../shared/aliases.nix
+    # ../shared/programs/git.nix
+    # ../shared/programs/gh.nix
+    # ../shared/programs/htop.nix
+    # ../shared/programs/nushell.nix
+    # ../shared/programs/nixvim
+    # #../shared/programs/nvim.nix
+    # ../shared/programs/starship.nix
+    # # ../shared/programs/zellij.nix
+    # ../shared/programs/tmux.nix
+    # ../shared/programs/zsh.nix
+    # ../shared/programs/bash.nix
+    # ../shared/secrets.nix
+    # ../shared/aliases.nix
   ];
   programs.bash = {
     enable = true;

@@ -104,26 +104,26 @@ in
             fi
     '';
 
-    aliases = {
-      enable = true;
-      list = [
-        {
-          name = "ll";
-          command = "ls -lah";
-          tags = "files, listing";
-        }
-        {
-          name = "gst";
-          command = "git status";
-          tags = "git, version-control";
-        }
-        {
-          name = "v";
-          command = "nvim";
-          tags = null;
-        }
-      ];
-    };
+    # aliases = {
+    #   enable = true;
+    #   list = [
+    #     {
+    #       name = "ll";
+    #       command = "ls -lah";
+    #       tags = "files, listing";
+    #     }
+    #     {
+    #       name = "gst";
+    #       command = "git status";
+    #       tags = "git, version-control";
+    #     }
+    #     {
+    #       name = "v";
+    #       command = "nvim";
+    #       tags = null;
+    #     }
+    #   ];
+    # };
 
     #    # Add SSH-related aliases to the custom shell aliases module
     #    custom.shellAliases.aliases = mkIf config.custom.shellAliases.enable {

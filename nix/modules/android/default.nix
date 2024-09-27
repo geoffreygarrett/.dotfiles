@@ -76,7 +76,8 @@ in
 {
   imports = [
     ./config/ssh.nix
-    ../shared/aliases.nix
+
+    # ../shared/aliases.nix
   ];
 
   # System Configuration
@@ -91,12 +92,12 @@ in
     enable = true;
     port = 22;
     authorizedKeys = keys;
-    aliases = {
-      sshd-start = "sshd-start";
-      sshd-stop = "pkill sshd";
-      sshd-restart = "sshd-stop && sshd-start";
-      ssh-keygen = "ssh-keygen -t ed25519";
-    };
+    # aliases = {
+    #   sshd-start = "sshd-start";
+    #   sshd-stop = "pkill sshd";
+    #   sshd-restart = "sshd-stop && sshd-start";
+    #   ssh-keygen = "ssh-keygen -t ed25519";
+    # };
   };
 
   # services.storage = {

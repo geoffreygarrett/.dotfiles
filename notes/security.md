@@ -6,3 +6,7 @@
 ## NixOS
 
 - https://xeiaso.net/blog/paranoid-nixos-2021-07-18/q
+
+## Sops
+
+- https://unmovedcentre.com/posts/secrets-management/

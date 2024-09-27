@@ -193,6 +193,10 @@ in
       prismlauncher
     ];
   };
+  nix.settings.trusted-users = [
+    "root"
+    "geoffrey"
+  ];
 
   boot.loader = {
     systemd-boot.enable = false;

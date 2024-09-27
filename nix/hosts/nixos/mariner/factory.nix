@@ -12,14 +12,26 @@
   extraModules ? [ ],
 }:
 { config, lib, ... }:
+
 let
+  # Common k3s configuration
+  k3sConfig = {
+    enable = true;
+    role = if config.networking.hostName == "mariner-3" then "server" else "agent";
+    token = "<randomized common secret>"; # Replace with actual shared token
+    clusterInit = if config.networking.hostName == "mariner-3" then true else false; # Initialize only on master node
+    serverAddr = lib.mkIf (
+      config.networking.hostName == "mariner-4"
+    ) "https://mariner-3.nixus.net:6443";
+    extraFlags = if config.networking.hostName == "mariner-3" then [ "--no-deploy traefik" ] else [ ];
+  };
 in
-# kubernetesClusterConfig = (import ./kubernetes-cluster.nix { inherit lib; }).kubernetes-cluster;
 {
   imports = [
     inputs.nixos-hardware.nixosModules.raspberry-pi-3
     inputs.sops-nix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
+    # impermanence.nixosModules.impermanence
     ../../../modules/shared/secrets.nix
     ../../../modules/nixos/tailscale.nix
     ../../../modules/nixos/openssh.nix
@@ -30,42 +42,10 @@ in
   system.stateVersion = "24.11";
   sdImage.compressImage = false;
 
-  # nixus.kubernetes = {
-  #   enable = true;
-  #   inherit (kubernetesClusterConfig)
-  #     clusterName
-  #     podNetworkCidr
-  #     serviceNetworkCidr
-  #     cniPlugin
-  #     ;
-  #   nodes = kubernetesClusterConfig.nodes;
-  #   firewall = {
-  #     enableAPIServer = kubernetesClusterConfig.nodes.${hostname}.type == "master";
-  #     enableKubelet = true;
-  #     enableNodePorts = true;
-  #     acknowledgeFirewallRisks = true;
-  #   };
-  # };
+  # K3s installation and configuration
+  # services.k3s = k3sConfig;
 
-  sops = {
-    defaultSopsFile = "${self}/secrets/default.yaml";
-    secrets.wireless_secrets = { };
-    secrets."users/${user}/password" = { };
-    templates."secrets-file" = {
-      path = "/etc/networks/secrets-file";
-      content = ''
-        ${config.sops.placeholder.wireless_secrets}
-      '';
-    };
-  };
-
-  nix.settings = {
-    trusted-public-keys = [
-      "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
-    ];
-  };
-
-  # Network configuration
+  # Network and firewall configuration
   networking = {
     hostName = hostname;
     useDHCP = false;
@@ -74,17 +54,31 @@ in
     wireless = {
       enable = true;
       userControlled.enable = true;
-      secretsFile = config.sops.templates."secrets-file".path;
+      secretsFile = config.sops.secrets.wireless_secrets.path;
+      networks = {
+        "Haemanthus" = {
+          priority = 90;
+          pskRaw = "ext:haemanthus_psk";
+        };
+      };
+    };
+
+    firewall = {
+      enable = true;
+      allowedTCPPorts = [
+        22 # SSH
+        80 # HTTP
+        443 # HTTPS
+        6443 # k3s: Kubernetes API server
+        10250 # Kubelet API
+      ];
+      allowedUDPPorts = [
+        # 8472  # Required if using Flannel in multi-node setup
+      ];
     };
   };
 
-  # Docker virtualisation 
-  virtualisation.docker = {
-    enable = true;
-    enableOnBoot = true;
-  };
-
-  # Create a user
+  # User configuration
   users.users.${user} = {
     isNormalUser = true;
     shell = pkgs.zsh;
@@ -95,18 +89,20 @@ in
   users.users.root.openssh.authorizedKeys.keys = keys;
   programs.zsh.enable = true;
 
-  # Allow the user to use sudo without a password (optional, remove if not needed)
+  # Sudo configuration
   security.sudo.wheelNeedsPassword = false;
 
-  # Firewall configuration
-  networking.firewall = {
-    enable = true;
-    allowedTCPPorts = [
-      22 # SSH
-      80 # HTTP
-      443 # HTTPS
-      4070 # Spotify
-      5353 # mDNS (for device discovery)
+  # SOPS secrets management
+  sops = {
+    defaultSopsFile = "${self}/secrets/default.yaml";
+    secrets.wireless_secrets = { };
+    secrets."users/${user}/password" = { };
+  };
+
+  # Trusted public keys for Nix
+  nix.settings = {
+    trusted-public-keys = [
+      "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
     ];
   };
 }

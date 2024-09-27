@@ -15,3 +15,7 @@
 
 - \[ \] CI intgeration for screenshotting configs for seeing it's evolution over
   time.
+
+- `nix run ".#switch" --show-trace --update-input nixus`
+
+- `nix build ".#nixosConfigurations.mariner-1.config.system.build.sdImage" --show-trace --out-link result-mariner-1`

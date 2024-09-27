@@ -101,7 +101,6 @@
     nixus = {
       url = "path:./nixus";
       flake = true;
-      # type = "path";
     };
 
     deploy-rs.url = "github:serokell/deploy-rs";
@@ -162,10 +161,10 @@
           forAllDarwinSystems = f: nixpkgs.lib.genAttrs systems.darwin f;
           forAllLinuxSystems = f: nixpkgs.lib.genAttrs systems.linux f;
           forAllAndroidSystems = f: nixpkgs.lib.genAttrs systems.android f;
-          readSSHKeys = path: lib.splitString "\n" (builtins.readFile path);
+          readSSHKeys = path: (builtins.fromTOML (builtins.readFile path)).authorized_keys;
         };
       user = "geoffrey";
-      keys = lib.readSSHKeys ./authorized_keys;
+      keys = lib.readSSHKeys ./.nixus.toml;
       pkgsFor =
         system:
         import nixpkgs {
@@ -206,6 +205,7 @@
       treefmtEval = lib.forAllSystems (
         system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
       );
+
     in
     {
 
@@ -258,9 +258,17 @@
             type = "app";
             program = "${pkgs.writeScriptBin "deploy" (builtins.readFile ./nix/apps/deploy.sh)}/bin/deploy";
           };
+          flash = {
+            type = "app";
+            program = "${import ./nix/apps/flash.nix { inherit pkgs; }}/bin/nixos-sd-flasher";
+          };
           nixus = {
             type = "app";
             program = "${nixusApp}/bin/nixus";
+          };
+          sync = {
+            type = "app";
+            program = "${import ./nix/apps/sync.nix { inherit pkgs; }}/bin/sync";
           };
           check = {
             type = "app";
@@ -331,66 +339,77 @@
           }
         );
 
-      #
-      #
-      #
       # deploy-rs node configuration
-      deploy.nodes.mariner-1 =
+      deploy.nodes.mariner-3 =
         let
-          system = "x86_64-linux";
+          system = "aarch64-linux";
           pkgs = pkgsFor system;
         in
         {
-          hostname = "100.75.168.78";
-          # let
-          #   getTailscaleIP = pkgs.writeShellScript "get-tailscale-ip" ''
-          #     ${pkgs.tailscale}/bin/tailscale status --json | 
-          #     ${pkgs.jq}/bin/jq -r '.Peer[] | select(.HostName == "mariner-1") | .TailscaleIPs[0]'
-          #   '';
-          # in
-          # builtins.readFile (
-          #   pkgs.runCommand "tailscale-ip" { } ''
-          #     ${getTailscaleIP} > $out
-          #   ''
-          # );
+          hostname = "mariner-3.nixus.net";
+          # ssh geoffrey@192.168.68.122 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
           profiles.system = {
             sshUser = "${user}";
-            # sshOpts = [
-            #   "-tt"
-            #   "-v"
-            # ];
             magicRollback = true;
-            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-1;
+            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-3;
             user = "root";
           };
         };
 
-      deploy.nodes.mariner-2 =
+      deploy.nodes.mariner-4 =
         let
-          system = "x86_64-linux";
+          system = "aarch64-linux";
           pkgs = pkgsFor system;
         in
         {
-          hostname = "100.92.149.10";
-          # let
-          #   getTailscaleIP = pkgs.writeShellScript "get-tailscale-ip" ''
-          #     ${pkgs.tailscale}/bin/tailscale status --json | 
-          #     ${pkgs.jq}/bin/jq -r '.Peer[] | select(.HostName == "mariner-1") | .TailscaleIPs[0]'
-          #   '';
-          # in
-          # builtins.readFile (
-          #   pkgs.runCommand "tailscale-ip" { } ''
-          #     ${getTailscaleIP} > $out
-          #   ''
-          # );
+          hostname = "mariner-4.nixus.net";
+          # ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
           profiles.system = {
             sshUser = "${user}";
-            # sshOpts = [
-            #   "-tt"
-            #   "-v"
-            # ];
             magicRollback = true;
-            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-2;
+            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-4;
+            user = "root";
+          };
+        };
+
+      deploy.nodes.pioneer =
+        let
+          system = "aarch64-linux";
+          pkgs = pkgsFor system;
+        in
+        {
+          hostname = "pioneer.nixus.net";
+          # ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
+          profiles.system = {
+            sshUser = "${user}";
+            magicRollback = true;
+            # remoteBuild = true;
+            # path = inputs.deploy-rs.lib.${system}.activate.custom (
+            #   self.nixOnDroidConfigurations.default.activationPackage
+            # );
+            pkgs = nixpkgs.legacyPackages."aarch64-linux";
+            path =
+              inputs.deploy-rs.lib.${system}.activate.custom
+                self.nixOnDroidConfigurations.default.activationPackage
+                (self.nixOnDroidConfigurations.default.activationPackage + "/activate");
+            user = "sshd";
+          };
+        };
+
+      deploy.nodes.voyager =
+        let
+          system = "aarch64-linux";
+          pkgs = pkgsFor system;
+        in
+        {
+          hostname = "voyager.nixus.net";
+          # ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
+          profiles.system = {
+            sshUser = "${user}";
+            magicRollback = true;
+            path =
+              inputs.deploy-rs.lib.${system}.activate.custom
+                self.nixOnDroidConfigurations.default.activationPackage;
             user = "root";
           };
         };
@@ -421,6 +440,63 @@
               users.${user} = import ./nix/modules/nixos/home-manager.nix;
             };
           };
+          sharedDnsmasqConfig = {
+            enable = true;
+            hosts = {
+              "pioneer.nixus.net" = {
+                addresses = [
+                  {
+                    ip = "192.168.68.113";
+                    type = "local";
+                  }
+                  {
+                    ip = "100.78.156.17";
+                    type = "tailscale";
+                  }
+                ];
+              };
+              "mariner-3.nixus.net" = {
+                addresses = [
+                  {
+                    ip = "192.168.68.122";
+                    type = "local";
+                  }
+                  {
+                    ip = "100.126.29.41";
+                    type = "tailscale";
+                  }
+                ];
+              };
+              "mariner-4.nixus.net" = {
+                addresses = [
+                  {
+                    ip = "192.168.68.121";
+                    type = "local";
+                  }
+                  {
+                    ip = "100.112.163.77";
+                    type = "tailscale";
+                  }
+                ];
+              };
+            };
+            settings = {
+              server = [
+                "1.1.1.1" # Cloudflare primary
+                "1.0.0.1" # Cloudflare secondary
+                "9.9.9.9" # Quad9 primary
+                "149.112.112.112" # Quad9 secondary
+                "8.8.8.8" # Google primary
+                "8.8.4.4" # Google secondary
+              ];
+              cache-size = 1000;
+              no-resolv = true;
+              # dnssec = true;
+              dnssec-check-unsigned = true;
+              domain-needed = true;
+              bogus-priv = true;
+            };
+          };
           mkMarinerNode = import ./nix/hosts/nixos/mariner/factory.nix {
             inherit self inputs;
             pkgs = pkgsFor "aarch64-linux";
@@ -436,28 +512,34 @@
               { networking.hostName = "apollo"; }
               ./nix/hosts/nixos/apollo
               homeManagerModule
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
-          "mariner-1" = nixpkgs.lib.nixosSystem {
+          "mariner-3" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
             modules = [
               (mkMarinerNode {
                 inherit user keys;
-                hostname = "mariner-1";
+                hostname = "mariner-3";
               })
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
-          "mariner-2" = nixpkgs.lib.nixosSystem {
+          "mariner-4" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
             modules = [
               (mkMarinerNode {
                 inherit user keys;
-                hostname = "mariner-2";
+                hostname = "mariner-4";
               })
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
         };
@@ -481,6 +563,10 @@
         modules = [
           ./nix/hosts/android
           {
+            # tailscale status --json | jq -r '
+            #   .Peer[]
+            #   | "\"\(.TailscaleIPs[0])\" = [ \"\(.DNSName | split(".")[0]).tail\" ];"
+            # '
             networking.hosts = {
               "100.116.122.19" = [ "artemis.tail" ];
               "100.64.241.11" = [ "crazy-diamond.tail" ];

@@ -1286,7 +1286,7 @@
       },
       "locked": {
         "lastModified": 1,
-        "narHash": "sha256-ZKdZLeK0siJJGJzX8Kjq7vd8K4Z6fEgPg+Ew+I6xqOY=",
+        "narHash": "sha256-Bq1y2MBLzWGipAghcTJl0ZtJotdTfPZy0BpNCnAmA3s=",
         "path": "./nixus",
         "type": "path"
       },

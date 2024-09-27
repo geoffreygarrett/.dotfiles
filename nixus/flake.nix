@@ -7,6 +7,7 @@
         spotify = import ./modules/spotify/nixos.nix;
         kubernetes = import ./modules/kubernetes/nixos.nix;
         k3s = import ./modules/k3s/nixos.nix;
+        dnsmasq = import ./modules/dnsmasq/nixos.nix;
         # tailscale = import ./modules/tailscale/nixos.nix;
         # openssh = import ./modules/openssh/nixos.nix;
       };
@@ -14,6 +15,7 @@
         spotify = import ./modules/spotify/home-manager.nix;
         kubernetes = import ./modules/kubernetes/home-manager.nix;
         k3s = import ./modules/k3s/home-manager.nix;
+        dnsmasq = import ./modules/dnsmasq/home-manager.nix;
         # tailscale = import ./modules/tailscale/home-manager.nix;
         # openssh = import ./modules/openssh/home-manager.nix;
       };
@@ -21,6 +23,7 @@
         spotify = import ./modules/spotify/darwin.nix;
         kubernetes = import ./modules/kubernetes/darwin.nix;
         k3s = import ./modules/k3s/darwin.nix;
+        dnsmasq = import ./modules/dnsmasq/darwin.nix;
         # tailscale = import ./modules/tailscale/darwin.nix;
         # openssh = import ./modules/openssh/darwin.nix;
       };
@@ -30,6 +33,7 @@
           imports = with self.nixosModules; [
             spotify
             kubernetes
+            dnsmasq
             # tailscale
             # openssh
           ];
@@ -40,6 +44,7 @@
           imports = with self.homeManagerModules; [
             spotify
             kubernetes
+            dnsmasq
             # tailscale
             # openssh
           ];
@@ -50,6 +55,7 @@
           imports = with self.darwinModules; [
             spotify
             kubernetes
+            dnsmasq
             # tailscale
             # openssh
           ];

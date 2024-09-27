@@ -15,4 +15,7 @@ shared-packages
 
   # Work
   spotify
+
+  # Deploy
+  deploy-rs
 ]

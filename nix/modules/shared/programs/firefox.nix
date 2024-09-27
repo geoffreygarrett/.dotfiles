@@ -68,6 +68,12 @@
           keyword = "wiki";
           url = "https://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go";
         }
+        {
+          name = "[myme.no] NixOS: On Raspberry Pi 3B";
+          tags = [ "nixos" ];
+          keyword = "nixos";
+          url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
+        }
         # {
         #   name = "NixOS Configuration";
         #   folder = true;

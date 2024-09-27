@@ -38,7 +38,8 @@
     #
     ./plugins/kickstart/plugins/debug.nix
     ./plugins/kickstart/plugins/indent-blankline.nix
-    ./plugins/kickstart/plugins/lint.nix
+    # TODO: I want linting for md, but need to add tools for the following.
+    #./plugins/kickstart/plugins/lint.nix
     ./plugins/kickstart/plugins/autopairs.nix
     ./plugins/kickstart/plugins/neo-tree.nix
     #
