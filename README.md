@@ -1,6 +1,6 @@
 # `nixus-core`
 
-![nix](./nix-flake-logo.png "Nixus")
+<p align="center"><img src="nix-flake-logo.png" width=300px></p>
 
 ## Table of Contents
 
