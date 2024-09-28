@@ -8,3 +8,4 @@ ignore
 **/gavin-nelson/
 ignore.nix
 password
+.DS_Store
