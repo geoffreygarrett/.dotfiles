@@ -2,4 +2,5 @@ authorized_keys = [
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7 geoffrey@artemis",
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITvBraRmM6IvQFt8VUHRx9hZ5DZVkPX3ORlfVqGa05z geoffrey@apollo",
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN4Uy9fE/YF8/puhUOwOcHKqDzDW75zt9DndypPEhQaG geoffrey@pioneer",
+  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5fIudzRgRdB5m1Mh82hn1q239LT5UVRchin/CkdUuX geoffrey@voyager"
 ]

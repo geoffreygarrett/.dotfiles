@@ -589,6 +589,7 @@
             modules = [
               ./nix/hosts/nix-on-droid
               homeManagerModule
+              { user.uid = 10701; }
             ];
           };
 
@@ -598,6 +599,7 @@
             modules = [
               ./nix/hosts/nix-on-droid
               homeManagerModule
+              { user.uid = 10403; }
             ];
           };
 
