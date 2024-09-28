@@ -29,10 +29,8 @@ let
     AuthorizedKeysFile ${config.user.home}/.ssh/authorized_keys
     UseDNS no
     StrictModes no
-    UsePrivilegeSeparation no
     PermitUserEnvironment yes
     LogLevel ${cfg.logLevel}
-    PermitTTY ${if cfg.permitTTY then "yes" else "no"}
     ${cfg.extraConfig}
   '';
 
