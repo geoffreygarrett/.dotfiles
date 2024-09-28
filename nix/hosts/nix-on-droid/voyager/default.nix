@@ -5,19 +5,19 @@
   ];
 
   user = {
-    uid = 10701;
-    gid = 10701;
+    uid = 10403;
+    gid = 10403;
   };
 
   environment.sessionVariables = {
-    hostname = "pioneer";
-    HOSTNAME = "pioneer";
-    HOST = "pioneer";
+    hostname = "voyager";
+    HOSTNAME = "voyager";
+    HOST = "voyager";
   };
 
   environment.packages = [
     (pkgs.writeShellScriptBin "hostname" ''
-      echo "pioneer"
+      echo "voyager"
     '')
   ];
 }

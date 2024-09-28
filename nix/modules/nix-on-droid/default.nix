@@ -4,6 +4,7 @@
   lib,
   pkgs,
   keys,
+  user,
   services,
   ...
 }:
@@ -61,6 +62,7 @@ let
 in
 {
   imports = [
+    ./config/services.nix
     ./config/openssh.nix
     # ../shared/aliases.nix
   ];
@@ -72,13 +74,21 @@ in
   # nixpkgs.config = { };
   # nixpkgs.overlays = [ ];
 
-  # Service Configuration
+  # # Service Configuration
+  # services.openssh = {
+  #   enable = true;
+  #   port = 8022;
+  #   authorizedKeys = keys;
+  #   permitRootLogin = "no";
+  #   passwordAuthentication = false;
+  # };
+
   services.openssh = {
     enable = true;
     port = 8022;
     authorizedKeys = keys;
-    permitRootLogin = "no";
-    passwordAuthentication = false;
+    autoStart = true;
+    keepAlive = true;
   };
 
   # # Service Configuration

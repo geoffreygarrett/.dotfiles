@@ -1,16 +1,13 @@
 {
-  self,
-  inputs,
-  config,
   lib,
   pkgs,
-  keys,
   user,
   ...
 }:
 let
   nixConfig = (import ../../modules/shared/cachix { inherit pkgs lib; }).nix.settings;
 in
+# Transformation function to convert the DNS settings to networking.extraHosts format
 {
   imports = [
     ../../modules/nix-on-droid
@@ -21,6 +18,7 @@ in
 
   # TODO: XREMAP!
 
+  time.timeZone = "Africa/Johannesburg";
   # Nix Configuration
   nix = {
     extraOptions = ''
@@ -37,18 +35,11 @@ in
   environment = {
     packages = pkgs.callPackage ./../../modules/nix-on-droid/packages.nix { inherit pkgs; };
     etcBackupExtension = ".bak";
-
-    # etc = {
-    #   "example-configuration-file" = {
-    #     source = "/nix/store/.../etc/dir/file.conf.example";
-    #   };
-    #   "default/useradd".text = "GROUP=100 ...";
-    # };
-
     sessionVariables = {
       EDITOR = "nvim";
       LANG = "en_US.UTF-8";
       PATH = "$HOME/.local/bin:$PATH";
+      USER = "${user}";
       XDG_CONFIG_HOME = "$HOME/.config";
       XDG_DATA_HOME = "$HOME/.local/share";
       XDG_CACHE_HOME = "$HOME/.cache";
@@ -57,8 +48,8 @@ in
     };
 
     motd = ''
-      Welcome to Celestial Blueprint's Nix-on-Droid!
-      Celestial Blueprint: https://github.com/geoffreygarrett/celestial-blueprint
+      \033[1;32mWelcome to Nix-on-Droid!\033[0m
+      https://github.com/geoffreygarrett/.dotfiles
       Happy hacking!
     '';
   };

@@ -277,6 +277,16 @@
           bogus-priv = true;
         };
       };
+      formatHosts =
+        dnsSettings:
+        lib.concatStringsSep "\n" (
+          lib.flatten (
+            lib.mapAttrsToList (
+              hostname: entry: map (addr: "${addr.ip} ${hostname}") entry.addresses
+            ) dnsSettings
+          )
+        );
+
     in
     {
 
@@ -454,6 +464,7 @@
             # Samsung S20 Ultra
             hostname = "pioneer.nixus.net";
             profiles.system = {
+              confirmTimeout = 60;
               sshUser = "nix-on-droid";
               user = "nix-on-droid";
               magicRollback = true;
@@ -593,15 +604,19 @@
               extraSpecialArgs = specialArgs;
             };
           };
+          networkingModule = {
+            networking.extraHosts = formatHosts sharedDnsmasqConfig.hosts;
+          };
         in
         {
+
           "pioneer" = nix-on-droid.lib.nixOnDroidConfiguration {
             pkgs = pkgsFor "aarch64-linux";
             extraSpecialArgs = specialArgs;
             modules = [
-              ./nix/hosts/nix-on-droid
+              ./nix/hosts/nix-on-droid/pioneer
               homeManagerModule
-              { user.uid = 10701; }
+              networkingModule
             ];
           };
 
@@ -609,9 +624,9 @@
             pkgs = pkgsFor "aarch64-linux";
             extraSpecialArgs = specialArgs;
             modules = [
-              ./nix/hosts/nix-on-droid
+              ./nix/hosts/nix-on-droid/voyager
               homeManagerModule
-              { user.uid = 10403; }
+              networkingModule
             ];
           };
 
@@ -621,8 +636,10 @@
             modules = [
               ./nix/hosts/nix-on-droid
               homeManagerModule
+              networkingModule
             ];
           };
+
         };
 
       ##############################

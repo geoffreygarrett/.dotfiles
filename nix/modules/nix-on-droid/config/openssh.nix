@@ -95,10 +95,15 @@ in
       default = "INFO";
       description = "Logging level for sshd.";
     };
-    permitTTY = mkOption {
+    autoStart = mkOption {
       type = types.bool;
       default = false;
-      description = "Specifies whether PTY allocation is permitted.";
+      description = "Whether to start the SSH service automatically on boot.";
+    };
+    keepAlive = mkOption {
+      type = types.bool;
+      default = false;
+      description = "Whether to keep the SSH service alive when the app is in the background.";
     };
   };
 
@@ -148,5 +153,13 @@ in
 
       echo "OpenSSH setup complete."
     '';
+
+    nix-on-droid.services.sshd = {
+      enable = cfg.enable;
+      description = "OpenSSH Daemon";
+      script = "${startScript}/bin/sshd-start";
+      autoStart = cfg.autoStart;
+      keepAlive = cfg.keepAlive;
+    };
   };
 }

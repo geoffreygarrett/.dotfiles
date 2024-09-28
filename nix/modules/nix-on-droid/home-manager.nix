@@ -5,9 +5,9 @@
   pkgs,
   inputs,
   services,
+  user,
   ...
 }:
-
 {
   home.stateVersion = "24.05";
   # system.os = "android";
@@ -16,7 +16,7 @@
     ../shared/programs/gh.nix
     ../shared/programs/htop.nix
     ../shared/programs/nushell.nix
-    # ../shared/programs/nixvim
+    ../shared/programs/nixvim
     # #../shared/programs/nvim.nix
     ../shared/programs/starship.nix
     # # ../shared/programs/zellij.nix
