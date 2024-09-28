@@ -271,7 +271,6 @@
           ];
           cache-size = 1000;
           no-resolv = true;
-          # dnssec = true;
           dnssec-check-unsigned = true;
           domain-needed = true;
           bogus-priv = true;
