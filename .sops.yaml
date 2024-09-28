@@ -1,12 +1,14 @@
 keys:
   - &geoffrey_mariner-3 age1kdp9ndxywv48mapkkejujvzfqhxzyzp6s7kp42u7ynu6q5e8sqkqp0w7sv
   - &geoffrey_mariner-4 age1tpj92c7aqe8df7g3qf58vzcyevx53vhap3qkrxa9calpdtp5vvmqrd0de7
+  - &geoffrey_voyager   age13sx384sda6z7lvg6arys4asl4j88t652y0r9km86n3xrsuh5hpzqndl9lp
 creation_rules:
   - path_regex: secrets/default.yaml
     key_groups:
       - age:
           - *geoffrey_mariner-3
           - *geoffrey_mariner-4
+          - *geoffrey_voyager
           - age10nd9h4mh8vuq7h29karutjw6227g26uuztuut82p08sdc2vel4gqr4c62e
           - age1rw2gs2s2qfvvqt7c2nls758xvta4qxphy980jz7apt3vrl0gxdvqxfplrv
           - age1a9lryzapql62vy05w9twp3kx98e4yrr8re5lu8hpgca3ccl2ns7q4yqz7r

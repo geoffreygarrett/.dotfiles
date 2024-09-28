@@ -61,8 +61,7 @@ let
 in
 {
   imports = [
-    ./config/ssh.nix
-
+    ./config/openssh.nix
     # ../shared/aliases.nix
   ];
 

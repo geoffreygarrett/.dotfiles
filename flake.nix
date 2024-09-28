@@ -214,11 +214,23 @@
           "pioneer.nixus.net" = {
             addresses = [
               {
-                ip = "192.168.68.113";
+                ip = "192.168.68.102";
                 type = "local";
               }
               {
                 ip = "100.78.156.17";
+                type = "tailscale";
+              }
+            ];
+          };
+          "voyager.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.113";
+                type = "local";
+              }
+              {
+                ip = "100.112.193.127";
                 type = "tailscale";
               }
             ];
