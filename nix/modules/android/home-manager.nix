@@ -30,7 +30,9 @@
     enable = true;
     shellAliases =
       let
-        sshAliases = if services.ssh.enable then services.ssh.aliases else { };
+        # sshAliases = if services.openssh.enable then services.openssh.aliases else { };
+
+        sshAliases = { };
       in
       {
         ll = "ls -l";

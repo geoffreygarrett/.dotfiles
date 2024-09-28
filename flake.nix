@@ -103,7 +103,10 @@
       flake = true;
     };
 
-    deploy-rs.url = "github:serokell/deploy-rs";
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -205,7 +208,63 @@
       treefmtEval = lib.forAllSystems (
         system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
       );
-
+      sharedDnsmasqConfig = {
+        enable = true;
+        hosts = {
+          "pioneer.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.113";
+                type = "local";
+              }
+              {
+                ip = "100.78.156.17";
+                type = "tailscale";
+              }
+            ];
+          };
+          "mariner-3.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.122";
+                type = "local";
+              }
+              {
+                ip = "100.126.29.41";
+                type = "tailscale";
+              }
+            ];
+          };
+          "mariner-4.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.121";
+                type = "local";
+              }
+              {
+                ip = "100.112.163.77";
+                type = "tailscale";
+              }
+            ];
+          };
+        };
+        settings = {
+          server = [
+            "1.1.1.1" # Cloudflare primary
+            "1.0.0.1" # Cloudflare secondary
+            "9.9.9.9" # Quad9 primary
+            "149.112.112.112" # Quad9 secondary
+            "8.8.8.8" # Google primary
+            "8.8.4.4" # Google secondary
+          ];
+          cache-size = 1000;
+          no-resolv = true;
+          # dnssec = true;
+          dnssec-check-unsigned = true;
+          domain-needed = true;
+          bogus-priv = true;
+        };
+      };
     in
     {
 
@@ -339,78 +398,74 @@
           }
         );
 
-      # deploy-rs node configuration
-      deploy.nodes.mariner-3 =
+      ##############################
+      # Deploy Nodes :deploy
+      ##############################
+      deploy.nodes =
         let
-          system = "aarch64-linux";
-          pkgs = pkgsFor system;
+          commonSshOpts = [
+            # "-o"
+            # "StrictHostKeyChecking=no"
+            # "-o"
+            # "UserKnownHostsFile=/dev/null"
+          ];
+          activateNixOnDroid =
+            configuration:
+            inputs.deploy-rs.lib.aarch64-linux.activate.custom configuration.activationPackage "${configuration.activationPackage}/activate";
         in
         {
-          hostname = "mariner-3.nixus.net";
-          # ssh geoffrey@192.168.68.122 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
-          profiles.system = {
-            sshUser = "${user}";
-            magicRollback = true;
-            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-3;
-            user = "root";
+          "mariner-3" = {
+            # Raspberry Pi 3B+
+            hostname = "mariner-3.nixus.net";
+            profiles.system = {
+              sshUser = "${user}";
+              user = "root";
+              magicRollback = true;
+              sshOpts = commonSshOpts;
+              path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-3;
+            };
           };
-        };
 
-      deploy.nodes.mariner-4 =
-        let
-          system = "aarch64-linux";
-          pkgs = pkgsFor system;
-        in
-        {
-          hostname = "mariner-4.nixus.net";
-          # ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
-          profiles.system = {
-            sshUser = "${user}";
-            magicRollback = true;
-            path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.mariner-4;
-            user = "root";
+          "mariner-4" = {
+            # Raspberry Pi 3B+
+            hostname = "mariner-4.nixus.net";
+            profiles.system = {
+              sshUser = "${user}";
+              user = "root";
+              magicRollback = true;
+              sshOpts = commonSshOpts;
+              path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-4;
+            };
           };
-        };
 
-      deploy.nodes.pioneer =
-        let
-          system = "aarch64-linux";
-          pkgs = pkgsFor system;
-        in
-        {
-          hostname = "pioneer.nixus.net";
-          # ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
-          profiles.system = {
-            sshUser = "${user}";
-            magicRollback = true;
-            # remoteBuild = true;
-            # path = inputs.deploy-rs.lib.${system}.activate.custom (
-            #   self.nixOnDroidConfigurations.default.activationPackage
-            # );
-            pkgs = nixpkgs.legacyPackages."aarch64-linux";
-            path =
-              inputs.deploy-rs.lib.${system}.activate.custom
-                self.nixOnDroidConfigurations.default.activationPackage
-                (self.nixOnDroidConfigurations.default.activationPackage + "/activate");
-            user = "sshd";
+          "pioneer" = {
+            # Samsung S20 Ultra
+            hostname = "pioneer.nixus.net";
+            profiles.system = {
+              sshUser = "nix-on-droid";
+              user = "nix-on-droid";
+              magicRollback = true;
+              sshOpts = commonSshOpts ++ [
+                "-p"
+                "8022"
+              ];
+              path = activateNixOnDroid self.nixOnDroidConfigurations.pioneer;
+            };
           };
-        };
 
-      deploy.nodes.voyager =
-        let
-          system = "aarch64-linux";
-          pkgs = pkgsFor system;
-        in
-        {
-          hostname = "voyager.nixus.net";
-          # ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age
-          profiles.system = {
-            sshUser = "${user}";
-            magicRollback = true;
-            path =
-              inputs.deploy-rs.lib.${system}.activate.custom
-                self.nixOnDroidConfigurations.default.activationPackage;
-            user = "root";
+          "voyager" = {
+            # Samsung Galaxy Tab S7
+            hostname = "voyager.nixus.net";
+            profiles.system = {
+              sshUser = "nix-on-droid";
+              user = "nix-on-droid";
+              magicRollback = true;
+              sshOpts = commonSshOpts ++ [
+                "-p"
+                "8022"
+              ];
+              path = activateNixOnDroid self.nixOnDroidConfigurations.voyager;
+            };
           };
         };
 
@@ -440,63 +495,7 @@
               users.${user} = import ./nix/modules/nixos/home-manager.nix;
             };
           };
-          sharedDnsmasqConfig = {
-            enable = true;
-            hosts = {
-              "pioneer.nixus.net" = {
-                addresses = [
-                  {
-                    ip = "192.168.68.113";
-                    type = "local";
-                  }
-                  {
-                    ip = "100.78.156.17";
-                    type = "tailscale";
-                  }
-                ];
-              };
-              "mariner-3.nixus.net" = {
-                addresses = [
-                  {
-                    ip = "192.168.68.122";
-                    type = "local";
-                  }
-                  {
-                    ip = "100.126.29.41";
-                    type = "tailscale";
-                  }
-                ];
-              };
-              "mariner-4.nixus.net" = {
-                addresses = [
-                  {
-                    ip = "192.168.68.121";
-                    type = "local";
-                  }
-                  {
-                    ip = "100.112.163.77";
-                    type = "tailscale";
-                  }
-                ];
-              };
-            };
-            settings = {
-              server = [
-                "1.1.1.1" # Cloudflare primary
-                "1.0.0.1" # Cloudflare secondary
-                "9.9.9.9" # Quad9 primary
-                "149.112.112.112" # Quad9 secondary
-                "8.8.8.8" # Google primary
-                "8.8.4.4" # Google secondary
-              ];
-              cache-size = 1000;
-              no-resolv = true;
-              # dnssec = true;
-              dnssec-check-unsigned = true;
-              domain-needed = true;
-              bogus-priv = true;
-            };
-          };
+
           mkMarinerNode = import ./nix/hosts/nixos/mariner/factory.nix {
             inherit self inputs;
             pkgs = pkgsFor "aarch64-linux";
@@ -504,6 +503,7 @@
           };
         in
         {
+
           "apollo" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "x86_64-linux";
@@ -516,6 +516,7 @@
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
+
           "mariner-3" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
@@ -529,6 +530,7 @@
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
+
           "mariner-4" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
@@ -542,6 +544,7 @@
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
+
         };
       # // lib.forAllLinuxSystems (
       #   system:
@@ -556,40 +559,57 @@
       # );
 
       ##############################
-      # Nix-on-Droid Configuration :android
+      # Nix-on-Droid Configuration :nix-on-droid
       ##############################
-      nixOnDroidConfigurations.default = nix-on-droid.lib.nixOnDroidConfiguration {
-        pkgs = pkgsFor "aarch64-linux";
-        modules = [
-          ./nix/hosts/android
-          {
-            # tailscale status --json | jq -r '
-            #   .Peer[]
-            #   | "\"\(.TailscaleIPs[0])\" = [ \"\(.DNSName | split(".")[0]).tail\" ];"
-            # '
-            networking.hosts = {
-              "100.116.122.19" = [ "artemis.tail" ];
-              "100.64.241.11" = [ "crazy-diamond.tail" ];
-              "100.92.233.30" = [ "crazy-phone.tail" ];
-              "100.111.132.9" = [ "dodo-iphone.tail" ];
-              "100.91.33.40" = [ "google-chromecast.tail" ];
-              "100.98.196.120" = [ "nimbus.tail" ];
-              "100.78.156.17" = [ "pioneer.tail" ];
-              "100.112.193.127" = [ "voyager.tail" ];
+      nixOnDroidConfigurations =
+        let
+          specialArgs = {
+            inherit
+              inputs
+              self
+              user
+              keys
+              ;
+          };
+          homeManagerModule = {
+            home-manager = {
+              sharedModules = [
+                inputs.sops-nix.homeManagerModules.sops
+                inputs.nixvim.homeManagerModules.nixvim
+                ./nix/packages/shared/shell-aliases
+              ];
+              extraSpecialArgs = specialArgs;
             };
-          }
-          {
-            home-manager.extraSpecialArgs = {
-              inherit self inputs user;
-            };
-            home-manager.sharedModules = [
-              inputs.sops-nix.homeManagerModules.sops
-              inputs.nixvim.homeManagerModules.nixvim
-              ./nix/packages/shared/shell-aliases
+          };
+        in
+        {
+          "pioneer" = nix-on-droid.lib.nixOnDroidConfiguration {
+            pkgs = pkgsFor "aarch64-linux";
+            extraSpecialArgs = specialArgs;
+            modules = [
+              ./nix/hosts/nix-on-droid
+              homeManagerModule
             ];
-          }
-        ];
-      };
+          };
+
+          "voyager" = nix-on-droid.lib.nixOnDroidConfiguration {
+            pkgs = pkgsFor "aarch64-linux";
+            extraSpecialArgs = specialArgs;
+            modules = [
+              ./nix/hosts/nix-on-droid
+              homeManagerModule
+            ];
+          };
+
+          default = nix-on-droid.lib.nixOnDroidConfiguration {
+            pkgs = pkgsFor "aarch64-linux";
+            extraSpecialArgs = specialArgs;
+            modules = [
+              ./nix/hosts/nix-on-droid
+              homeManagerModule
+            ];
+          };
+        };
 
       ##############################
       # Home Configuration :home
@@ -627,8 +647,8 @@
           pre-commit-check = pre-commit-hooks.lib.${system}.run {
             src = ./.;
             hooks = {
-              nixfmt-rfc-style.enable = true;
-              beautysh.enable = true;
+              # nixfmt-rfc-style.enable = true;
+              # beautysh.enable = true;
               commitizen.enable = true;
             };
           };

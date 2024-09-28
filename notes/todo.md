@@ -19,3 +19,5 @@
 - `nix run ".#switch" --show-trace --update-input nixus`
 
 - `nix build ".#nixosConfigurations.mariner-1.config.system.build.sdImage" --show-trace --out-link result-mariner-1`
+
+- `# ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)' | ssh-to-age`

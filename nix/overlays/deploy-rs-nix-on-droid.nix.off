@@ -1,0 +1,18 @@
+final: prev: {
+  deploy-rs = prev.deploy-rs.overrideAttrs (oldAttrs: {
+    passthru = (oldAttrs.passthru or { }) // {
+      lib = (oldAttrs.passthru.lib or { }) // {
+        activate = (oldAttrs.passthru.lib.activate or { }) // {
+          nix-on-droid =
+            { system }:
+            nixOnDroidConfig:
+            let
+              pkgs = final.legacyPackages.${system};
+              activationPackage = nixOnDroidConfig.config.system.build.activationPackage;
+            in
+            prev.deploy-rs.lib.${system}.activate.custom activationPackage "${activationPackage}/activate";
+        };
+      };
+    };
+  });
+}
