@@ -28,6 +28,8 @@ let
     PidFile ${runtimeDir}/sshd.pid
     AuthorizedKeysFile ${config.user.home}/.ssh/authorized_keys
     UseDNS no
+    StrictModes no
+    UsePrivilegeSeparation no
     PermitUserEnvironment yes
     LogLevel ${cfg.logLevel}
     PermitTTY ${if cfg.permitTTY then "yes" else "no"}
@@ -97,7 +99,7 @@ in
     };
     permitTTY = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       description = "Specifies whether PTY allocation is permitted.";
     };
   };
