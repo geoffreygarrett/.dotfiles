@@ -10,6 +10,8 @@ with lib;
 let
   cfg = config.services.openssh;
   sshdDirectory = "${config.user.home}/sshd";
+  runtimeDir = "${config.user.home}/.run";
+  logDir = "${config.user.home}/.local/log";
 
   sshdConfigFile = pkgs.writeText "sshd_config" ''
     HostKey ${sshdDirectory}/ssh_host_rsa_key
@@ -22,14 +24,20 @@ let
     X11Forwarding no
     PrintMotd no
     AcceptEnv LANG LC_*
-    PidFile ${cfg.runtimeDir}/sshd.pid
     Subsystem sftp ${pkgs.openssh}/libexec/sftp-server
+    PidFile ${runtimeDir}/sshd.pid
+    AuthorizedKeysFile ${config.user.home}/.ssh/authorized_keys
+    UsePrivilegeSeparation no
+    UseDNS no
+    StrictModes no
+    LogLevel DEBUG3
     ${cfg.extraConfig}
   '';
 
-  startScript = pkgs.writeShellScriptBin "sshd-start" ''
-    mkdir -p "${cfg.runtimeDir}"
-    chmod 700 "${cfg.runtimeDir}"
+  startScript = pkgs.writeScriptBin "sshd-start" ''
+    #!${pkgs.runtimeShell}
+    mkdir -p "${runtimeDir}" "${logDir}"
+    export XDG_RUNTIME_DIR="${runtimeDir}"
     echo "Starting sshd in non-daemonized way on port ${toString cfg.port}"
     ${pkgs.openssh}/bin/sshd -f ${sshdConfigFile} -D -e
   '';
@@ -53,11 +61,6 @@ in
       default = "no";
       description = "Whether and how the root user can log in via SSH.";
     };
-    runtimeDir = mkOption {
-      type = types.str;
-      default = "$XDG_RUNTIME_DIR/sshd";
-      description = "Directory to store runtime files like the PID file.";
-    };
     passwordAuthentication = mkOption {
       type = types.bool;
       default = false;
@@ -67,7 +70,7 @@ in
       type = types.listOf types.str;
       default = [ ];
       example = literalExpression ''
-        [ "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDxgVpVvAF4EmgJx5qMF4Mxr2FWluZ9..." ]
+        [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEXHjv1eLnnOF31FhCTAC/7LG7hSyyILzx/+ZgbvFhl7 geoffrey@artemis" ]
       '';
       description = "Public SSH keys that are allowed to connect.";
     };
@@ -97,40 +100,30 @@ in
 
       $VERBOSE_ECHO "Setting up OpenSSH..."
 
-      $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${config.user.home}/.ssh"
+      $DRY_RUN_CMD mkdir $VERBOSE_ARG -p "${config.user.home}/.ssh" "${sshdDirectory}" "${runtimeDir}" "${logDir}"
       $DRY_RUN_CMD echo "${concatStringsSep "\n" cfg.authorizedKeys}" > "${config.user.home}/.ssh/authorized_keys"
-      $DRY_RUN_CMD chmod 700 "${config.user.home}/.ssh"
+      $DRY_RUN_CMD chmod 700 "${config.user.home}/.ssh" "${sshdDirectory}" "${runtimeDir}" "${logDir}"
       $DRY_RUN_CMD chmod 600 "${config.user.home}/.ssh/authorized_keys"
-      $DRY_RUN_CMD chown -R nix-on-droid:nix-on-droid "${config.user.home}/.ssh"
 
-      $VERBOSE_ECHO "Setting up runtime directory..."
-      $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${cfg.runtimeDir}"
-      $DRY_RUN_CMD chmod 700 "${cfg.runtimeDir}"
-      $DRY_RUN_CMD chown nix-on-droid:nix-on-droid "${cfg.runtimeDir}"
+      if [[ ! -f "${sshdDirectory}/ssh_host_rsa_key" ]]; then
+        $VERBOSE_ECHO "Generating RSA host key..."
+        $DRY_RUN_CMD ssh-keygen -t rsa -b 4096 -f "${sshdDirectory}/ssh_host_rsa_key" -N ""
+      fi
 
-      if [[ ! -d "${sshdDirectory}" ]]; then
-        $DRY_RUN_CMD rm $VERBOSE_ARG --recursive --force "${sshdDirectory}-tmp"
-        $DRY_RUN_CMD mkdir $VERBOSE_ARG --parents "${sshdDirectory}-tmp"
-
-        $VERBOSE_ECHO "Generating host keys..."
-        $DRY_RUN_CMD ssh-keygen -t rsa -b 4096 -f "${sshdDirectory}-tmp/ssh_host_rsa_key" -N ""
-        $DRY_RUN_CMD ssh-keygen -t ed25519 -f "${sshdDirectory}-tmp/ssh_host_ed25519_key" -N ""
-
-        $DRY_RUN_CMD mv $VERBOSE_ARG "${sshdDirectory}-tmp" "${sshdDirectory}"
+      if [[ ! -f "${sshdDirectory}/ssh_host_ed25519_key" ]]; then
+        $VERBOSE_ECHO "Generating ED25519 host key..."
+        $DRY_RUN_CMD ssh-keygen -t ed25519 -f "${sshdDirectory}/ssh_host_ed25519_key" -N ""
       fi
 
       $VERBOSE_ECHO "Setting correct permissions..."
       $DRY_RUN_CMD chmod 600 "${sshdDirectory}/ssh_host_rsa_key" "${sshdDirectory}/ssh_host_ed25519_key"
       $DRY_RUN_CMD chmod 644 "${sshdDirectory}/ssh_host_rsa_key.pub" "${sshdDirectory}/ssh_host_ed25519_key.pub"
-      $DRY_RUN_CMD chown -R nix-on-droid:nix-on-droid "${sshdDirectory}"
+
+      $VERBOSE_ECHO "Creating necessary files..."
+      $DRY_RUN_CMD touch "${logDir}/lastlog"
 
       $VERBOSE_ECHO "OpenSSH setup complete."
     '';
 
-    # # Add SSH-related aliases
-    # environment.shellAliases = {
-    #   "sshd-stop" = "pkill sshd";
-    #   "sshd-restart" = "sshd-stop && sshd-start";
-    # };
   };
 }

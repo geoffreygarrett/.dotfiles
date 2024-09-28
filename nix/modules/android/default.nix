@@ -80,7 +80,6 @@ in
     authorizedKeys = keys;
     permitRootLogin = "no";
     passwordAuthentication = false;
-    runtimeDir = "$XDG_RUNTIME_DIR/sshd";
   };
 
   # # Service Configuration
