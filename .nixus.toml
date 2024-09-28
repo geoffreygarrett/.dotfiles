@@ -4,3 +4,7 @@ authorized_keys = [
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN4Uy9fE/YF8/puhUOwOcHKqDzDW75zt9DndypPEhQaG geoffrey@pioneer",
   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN5fIudzRgRdB5m1Mh82hn1q239LT5UVRchin/CkdUuX geoffrey@voyager"
 ]
+
+trusted_public_keys = [
+  "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA="
+]
