@@ -28,10 +28,9 @@ let
     PidFile ${runtimeDir}/sshd.pid
     AuthorizedKeysFile ${config.user.home}/.ssh/authorized_keys
     UseDNS no
-    StrictModes no
+    PermitUserEnvironment yes
     LogLevel ${cfg.logLevel}
     PermitTTY ${if cfg.permitTTY then "yes" else "no"}
-    PermitUserEnvironment yes
     ${cfg.extraConfig}
   '';
 
@@ -42,15 +41,6 @@ let
     export XDG_RUNTIME_DIR="${runtimeDir}"
     echo "Starting sshd in non-daemonized way on port ${toString cfg.port}"
     exec ${pkgs.openssh}/bin/sshd -f ${sshdConfigFile} -D -e
-  '';
-
-  testLoginScript = pkgs.writeScriptBin "test-login" ''
-    #!${pkgs.runtimeShell}
-    echo "Login successful. Testing environment..."
-    env
-    echo "Shell: $SHELL"
-    echo "PATH: $PATH"
-    echo "Test script completed."
   '';
 
 in
@@ -116,7 +106,6 @@ in
     environment.packages = with pkgs; [
       openssh
       startScript
-      testLoginScript
     ];
 
     build.activation.sshd = pkgs.writeShellScript "activate-sshd" ''
@@ -158,25 +147,6 @@ in
       chmod 644 "${sshdDirectory}/ssh_host_rsa_key.pub" "${sshdDirectory}/ssh_host_ed25519_key.pub"
 
       echo "OpenSSH setup complete."
-    '';
-
-    home.file.".ssh/environment".text = ''
-      PATH=${
-        lib.makeBinPath (
-          with pkgs;
-          [
-            coreutils
-            bash
-          ]
-        )
-      }:$PATH
-      SHELL=${pkgs.bash}/bin/bash
-    '';
-
-    home.file.".profile".text = ''
-      if [ -n "$SSH_CONNECTION" ]; then
-        ${testLoginScript}/bin/test-login
-      fi
     '';
   };
 }
