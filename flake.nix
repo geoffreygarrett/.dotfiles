@@ -210,6 +210,7 @@
       );
       sharedDnsmasqConfig = {
         enable = true;
+        debugMode = true;
         hosts = {
           "pioneer.nixus.net" = {
             addresses = [
@@ -260,6 +261,10 @@
             ];
           };
         };
+        extraConfig = ''
+          log-queries
+          log-facility=/var/log/dnsmasq.log
+        '';
         settings = {
           server = [
             "1.1.1.1" # Cloudflare primary
@@ -400,6 +405,8 @@
             pkgs = pkgsFor "aarch64-darwin";
             modules = [
               { networking.hostName = "artemis"; }
+              # inputs.nixus.darwinModules.dnsmasq
+              # { nixus.dnsmasq = sharedDnsmasqConfig; }
               ./nix/hosts/darwin/artemis
               homeManagerModule
               nixHomebrewModule
