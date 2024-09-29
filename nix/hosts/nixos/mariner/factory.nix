@@ -12,20 +12,6 @@
   extraModules ? [ ],
 }:
 { config, lib, ... }:
-
-let
-  # Common k3s configuration
-  k3sConfig = {
-    enable = true;
-    role = if config.networking.hostName == "mariner-3" then "server" else "agent";
-    token = "<randomized common secret>"; # Replace with actual shared token
-    clusterInit = if config.networking.hostName == "mariner-3" then true else false; # Initialize only on master node
-    serverAddr = lib.mkIf (
-      config.networking.hostName == "mariner-4"
-    ) "https://mariner-3.nixus.net:6443";
-    extraFlags = if config.networking.hostName == "mariner-3" then [ "--no-deploy traefik" ] else [ ];
-  };
-in
 {
   imports = [
     inputs.sops-nix.nixosModules.default
@@ -41,9 +27,6 @@ in
 
   system.stateVersion = "24.11";
   sdImage.compressImage = false;
-
-  # K3s installation and configuration
-  # services.k3s = k3sConfig;
 
   # Network and firewall configuration
   networking = {

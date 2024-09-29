@@ -69,5 +69,3 @@ Legend:
   clipboard sharing between devices, including Home Manager setups.
 - **GPG/YubiKey support**: Planned security enhancements for robust
   authentication and encryption capabilities across all supported platforms.
-
-

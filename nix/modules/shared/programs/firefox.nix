@@ -63,16 +63,118 @@
       # Bookmarks
       bookmarks = [
         {
-          name = "wikipedia";
-          tags = [ "wiki" ];
-          keyword = "wiki";
-          url = "https://en.wikipedia.org/wiki/Special:Search?search=%s&go=Go";
+          name = "Plan To Listen";
+          bookmarks = [
+            {
+              name = "[Podcast] FTN interview with Jonathan Ringer";
+              tags = [
+                "podcast"
+                "nixos"
+              ];
+              url = "https://fulltimenix.com/episodes/jonathan-ringer";
+            }
+          ];
         }
         {
-          name = "[myme.no] NixOS: On Raspberry Pi 3B";
-          tags = [ "nixos" ];
-          keyword = "nixos";
-          url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
+          name = "NixOS Secrets Management";
+          bookmarks = [
+            {
+              name = "Unmoved Centre - Secrets Management";
+              tags = [
+                "nixos"
+                "secrets"
+                "sops"
+              ];
+              url = "https://unmovedcentre.com/posts/secrets-management/";
+            }
+            {
+              name = "The Negation - NixOS on Raspberry Pi 4 with Encrypted Filesystem";
+              url = "https://thenegation.hashnode.dev/nixos-rpi4-luks";
+              tags = [
+                "nixos"
+                "rpi4"
+                "luks"
+              ];
+            }
+            {
+              name = "Yubikey with SOPS";
+              bookmarks = [
+                {
+                  name = "Reddit - Yubikey + gpg key + sops-nix";
+                  tags = [
+                    "nixos"
+                    "secrets"
+                    "sops"
+                    "yubikey"
+                  ];
+                  url = "https://www.reddit.com/r/NixOS/comments/1dbalru/yubikey_gpg_key_sopsnix/";
+                }
+                {
+                  name = "Reddit - Sops-nix and Yubikey";
+                  tags = [
+                    "nixos"
+                    "secrets"
+                    "sops"
+                    "yubikey"
+                  ];
+                  url = "https://www.reddit.com/r/NixOS/comments/1bqwbsj/sopsnix_and_yubikey/";
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "NixOS Configuration";
+          bookmarks = [
+            {
+              name = "Home Manager";
+              tags = [
+                "nixos"
+                "firefox"
+              ];
+              keyword = "nixos";
+              url = "https://nix-community.github.io/home-manager/options.xhtml";
+            }
+          ];
+        }
+        {
+          name = "NixOS Setup";
+          toolbar = true;
+          bookmarks = [
+            {
+              name = "[myme.no] NixOS: On Raspberry Pi 3B";
+              tags = [ "nixos" ];
+              keyword = "nixos";
+              url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
+            }
+            {
+              name = "Install NixOS with Flake configuration on Git";
+              tags = [ "nixos" ];
+              keyword = "nixos";
+              url = "https://nixos.asia/en/nixos-install-flake";
+            }
+            {
+              name = "NixOS Config (RPi4+UEFI+SSD boot)";
+              tags = [
+                "nixos"
+                "ssd"
+                "rpi4"
+                "uefi"
+              ];
+              keyword = "nixos";
+              url = "https://codeberg.org/kotatsuyaki/rpi4-usb-uefi-nixos-config";
+            }
+            {
+              name = "Install NixOS on Raspberry Pi 4 SSD";
+              url = "https://discourse.nixos.org/t/install-nixos-on-raspberry-pi-4-ssd/22788/8";
+              keyword = "nixos";
+              tags = [
+                "nixos"
+                "rpi4"
+                "ssd"
+              ];
+            }
+          ];
         }
         # {
         #   name = "NixOS Configuration";

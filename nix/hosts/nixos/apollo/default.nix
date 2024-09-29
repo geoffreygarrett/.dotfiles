@@ -3,6 +3,7 @@
   pkgs,
   inputs,
   keys,
+  lib,
   ...
 }:
 let
@@ -107,10 +108,7 @@ in
   ];
 
   system.stateVersion = "24.11";
-
-  nix.settings = {
-    secret-key-files = "/etc/nix/cache-priv-key.pem";
-  };
+  nix.settings.secret-key-files = "/etc/nix/cache-priv-key.pem";
 
   # Nixus: my personal configuration module wrappers.
   nixus.spotify = {
@@ -167,6 +165,7 @@ in
 
   environment.systemPackages = with pkgs; [
     jdk17
+    sops
   ];
 
   home-manager.users.${user} = {

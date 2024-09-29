@@ -7,7 +7,7 @@
     rustfmt.enable = true;
     yamlfmt.enable = true;
     taplo.enable = true;
-    mdformat.enable = true;
+    # mdformat.enable = true;
     stylua.enable = true;
     prettier.enable = true;
   };
@@ -56,9 +56,15 @@
         includes = [ "*.toml" ];
       };
 
-      mdformat = common // {
-        includes = [ "*.md" ];
-      };
+      # TODO: Try get github flavored markdown working
+      # mdformat = common // {
+      #   includes = [ "*.md" ];
+      #   options = [
+      #     "--wrap"
+      #     "80"
+      #     "--number"
+      #   ];
+      # };
 
       stylua = common // {
         includes = [ "*.lua" ];

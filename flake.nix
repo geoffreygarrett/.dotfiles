@@ -105,8 +105,12 @@
 
     deploy-rs = {
       url = "github:serokell/deploy-rs";
+      # url = "github:serokell/deploy-rs/pull/271/head"; # concurrent remote builds
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    argon40-nix.url = "github:guusvanmeerveld/argon40-nix";
+    impermanence.url = "github:nix-community/impermanence";
   };
 
   outputs =
@@ -210,7 +214,7 @@
       );
       sharedDnsmasqConfig = {
         enable = true;
-        debugMode = true;
+        # debugMode = true;
         hosts = {
           "pioneer.nixus.net" = {
             addresses = [
@@ -233,6 +237,14 @@
               {
                 ip = "100.112.193.127";
                 type = "tailscale";
+              }
+            ];
+          };
+          "mariner-1.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.114";
+                type = "local";
               }
             ];
           };
@@ -260,11 +272,21 @@
               }
             ];
           };
+          "cassini.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.131";
+                type = "local";
+              }
+            ];
+          };
+
         };
-        extraConfig = ''
-          log-queries
-          log-facility=/var/log/dnsmasq.log
-        '';
+
+        # extraConfig = ''
+        #   log-queries
+        #   log-facility=/var/log/dnsmasq.log
+        # '';
         settings = {
           server = [
             "1.1.1.1" # Cloudflare primary
@@ -444,12 +466,36 @@
         in
         {
 
+          "cassini" = {
+            hostname = "cassini.nixus.net";
+            profiles.system = {
+              # Build the derivation on the target system.
+              # Will also fetch all external dependencies from the target system's substituters.
+              # This default to `false`. If the target system does not have the trusted keys, set this to `true`.
+              remoteBuild = false;
+              sshUser = "${user}";
+              user = "root";
+              magicRollback = true;
+              interactiveSudo = true;
+              sshOpts = commonSshOpts;
+              # sshOpts = commonSshOpts ++ [
+              #   # # NOTE: This is a workaround for "too many root sets":
+              #   # # https://github.com/NixOS/nix/issues/7359
+              #   "-o"
+              #   "ProxyCommand=none"
+              #   "-t" # pseudo-terminal allocation for password prompt
+              # ];
+              path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.cassini;
+            };
+          };
+
           "mariner-1" = {
             # Raspberry Pi 4B
             hostname = "mariner-1.nixus.net";
             profiles.system = {
               sshUser = "${user}";
               user = "root";
+              interactiveSudo = true;
               magicRollback = true;
               sshOpts = commonSshOpts;
               path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
@@ -552,8 +598,19 @@
             system = "x86_64-linux";
             pkgs = pkgsFor "x86_64-linux";
             modules = [
-              { networking.hostName = "apollo"; }
               ./nix/hosts/nixos/apollo
+              homeManagerModule
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
+            ];
+          };
+
+          "cassini" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "x86_64-linux";
+            pkgs = pkgsFor "x86_64-linux";
+            modules = [
+              ./nix/hosts/nixos/cassini
               homeManagerModule
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
@@ -565,11 +622,13 @@
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
             modules = [
+              # ./nix/hosts/nixos/mariner/1
               (mkMarinerNode {
                 inherit user keys;
                 hostname = "mariner-1";
               })
               inputs.nixos-hardware.nixosModules.raspberry-pi-4
+              inputs.argon40-nix.nixosModules.default
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
@@ -602,6 +661,26 @@
               inputs.nixos-hardware.nixosModules.raspberry-pi-3
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
+            ];
+          };
+
+          "rpi-4-bootstrap" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [
+              ./nix/hosts/nixos/bootstrap/rpi-4.nix
+              { networking.hostName = lib.mkForce "rpi-4-bootstrap"; }
+            ];
+          };
+
+          "rpi-3-bootstrap" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [
+              ./nix/hosts/nixos/bootstrap/rpi-3.nix
+              { networking.hostName = lib.mkForce "rpi-3-bootstrap"; }
             ];
           };
 

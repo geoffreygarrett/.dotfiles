@@ -1,5 +1,3 @@
-
-
 ## Create host list from tailscale
 
 ```bash
