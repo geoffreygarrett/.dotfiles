@@ -443,6 +443,19 @@
             inputs.deploy-rs.lib.aarch64-linux.activate.custom configuration.activationPackage "${configuration.activationPackage}/activate";
         in
         {
+
+          "mariner-1" = {
+            # Raspberry Pi 4B
+            hostname = "mariner-1.nixus.net";
+            profiles.system = {
+              sshUser = "${user}";
+              user = "root";
+              magicRollback = true;
+              sshOpts = commonSshOpts;
+              path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
+            };
+          };
+
           "mariner-3" = {
             # Raspberry Pi 3B+
             hostname = "mariner-3.nixus.net";
@@ -547,6 +560,21 @@
             ];
           };
 
+          "mariner-1" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [
+              (mkMarinerNode {
+                inherit user keys;
+                hostname = "mariner-1";
+              })
+              inputs.nixos-hardware.nixosModules.raspberry-pi-4
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
+            ];
+          };
+
           "mariner-3" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
@@ -556,6 +584,7 @@
                 inherit user keys;
                 hostname = "mariner-3";
               })
+              inputs.nixos-hardware.nixosModules.raspberry-pi-3
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
@@ -570,6 +599,7 @@
                 inherit user keys;
                 hostname = "mariner-4";
               })
+              inputs.nixos-hardware.nixosModules.raspberry-pi-3
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];

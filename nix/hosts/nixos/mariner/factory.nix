@@ -28,7 +28,6 @@ let
 in
 {
   imports = [
-    inputs.nixos-hardware.nixosModules.raspberry-pi-3
     inputs.sops-nix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     ./kubernetes.nix

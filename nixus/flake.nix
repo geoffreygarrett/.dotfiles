@@ -3,6 +3,15 @@
   outputs =
     { self, nixpkgs, ... }:
     {
+
+      nixOnDroidModules = {
+        # spotify = import ./modules/spotify/nix-on-droid.nix;
+        # kubernetes = import ./modules/kubernetes/nix-on-droid.nix;
+        # k3s = import ./modules/k3s/nix-on-droid.nix;
+        # dnsmasq = import ./modules/dnsmasq/nix-on-droid.nix;
+        # tailscale = import ./modules/tailscale/nix-on-droid.nix;
+        openssh = import ./modules/openssh/nix-on-droid.nix;
+      };
       nixosModules = {
         spotify = import ./modules/spotify/nixos.nix;
         kubernetes = import ./modules/kubernetes/nixos.nix;
@@ -27,6 +36,18 @@
         # tailscale = import ./modules/tailscale/darwin.nix;
         # openssh = import ./modules/openssh/darwin.nix;
       };
+      nixOnDroidModules.default =
+        { ... }:
+        {
+          imports = with self.nixOnDroidModules; [
+            # spotify
+            # kubernetes
+            # k3s
+            # dnsmasq
+            # tailscale
+            openssh
+          ];
+        };
       nixosModules.default =
         { ... }:
         {
