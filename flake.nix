@@ -276,6 +276,7 @@
           ];
           cache-size = 1000;
           no-resolv = true;
+          # dnssec = true;
           dnssec-check-unsigned = true;
           domain-needed = true;
           bogus-priv = true;
@@ -584,7 +585,7 @@
       #       ./nix/hosts/nixos
       #       homeManagerModule
       #     ];
-      #   }
+      #   }/home/geoffrey/Downloads/nix-flake-logo.png 
       # );
 
       ##############################
