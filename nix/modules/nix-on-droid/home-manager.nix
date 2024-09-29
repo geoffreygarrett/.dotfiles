@@ -25,6 +25,8 @@
     ../shared/programs/bash.nix
     ../shared/secrets.nix
     # ../shared/aliases.nix
+    ../shared/aliases.nix
+    ../../packages/shared/shell-aliases
   ];
   programs.bash = {
     enable = true;

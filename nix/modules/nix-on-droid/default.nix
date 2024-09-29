@@ -64,7 +64,7 @@ in
   imports = [
     ./config/services.nix
     ./config/openssh.nix
-    # ../shared/aliases.nix
+
   ];
 
   # System Configuration
@@ -74,15 +74,6 @@ in
   # nixpkgs.config = { };
   # nixpkgs.overlays = [ ];
 
-  # # Service Configuration
-  # services.openssh = {
-  #   enable = true;
-  #   port = 8022;
-  #   authorizedKeys = keys;
-  #   permitRootLogin = "no";
-  #   passwordAuthentication = false;
-  # };
-
   services.openssh = {
     enable = true;
     port = 8022;
@@ -90,38 +81,6 @@ in
     autoStart = true;
     keepAlive = true;
   };
-
-  # # Service Configuration
-  # services.ssh = {
-  #   enable = true;
-  #   port = 22;
-  #   authorizedKeys = keys;
-  #   # aliases = {
-  #   #   sshd-start = "sshd-start";
-  #   #   sshd-stop = "pkill sshd";
-  #   #   sshd-restart = "sshd-stop && sshd-start";
-  #   #   ssh-keygen = "ssh-keygen -t ed25519";
-  #   # };
-  # };
-  #
-  # services.storage = {
-  #   enable = true;
-  #   showInfoOnStartup = true;
-  #   aliases = {
-  #     storage-info = "storage-info";
-  #     storage-usage = "du -h -d 2 /sdcard | sort -h";
-  #   };
-  # };
-
-  # services.battery = {
-  #   enable = true;
-  #   showInfoOnStartup = true;
-  #   aliases = {
-  #     battery-info = "battery-info";
-  #     battery-saver = "am start -a android.settings.BATTERY_SAVER_SETTINGS";
-  #     battery-full = "termux-notification -t 'Battery Full' -c 'Your battery is fully charged'";
-  #   };
-  # };
 
   # Terminal Configuration
   terminal = {
@@ -150,17 +109,6 @@ in
       color15 = "#ffffff";
     };
   };
-
-  # Networking Configuration
-  # networking = {
-  #   hostName = "nix-on-droid";
-  #   extraHosts = ''
-  #     192.168.68.1 router.haemanthus.local
-  #   '';
-  #   # hosts = {
-  #   #   "192.168.0.2" = [ "nas.local" ];
-  #   # };
-  # };
 
   # Android Integration
   android-integration = {
@@ -192,16 +140,6 @@ in
     $VERBOSE_ECHO "Setting up sops-nix for Nix-on-Droid..."
     ${script}
   '';
-
-  #  environment.packages = lib.mkIf (sops-config.secrets != { }) [
-  #    pkgs.sops
-  #    pkgs.age
-  #    (pkgs.writeScriptBin "sops-nix-run" ''
-  #      #!${pkgs.runtimeShell}
-  #      echo "Running sops-nix manually..."
-  #      ${builtins.toString script}
-  #    '')
-  #  ];
 
   # Build Configuration
   # build = {
