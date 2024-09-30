@@ -15,8 +15,8 @@ in
 {
   imports = [
     # inputs.impermanence.nixosModules.impermanence
-    inputs.argon40-nix.nixosModules.default
-    inputs.nixos-hardware.nixosModules.raspberry-pi-4
+    # inputs.argon40-nix.nixosModules.default
+    # inputs.nixos-hardware.nixosModules.raspberry-pi-4
     inputs.sops-nix.nixosModules.default
     # inputs.home-manager.nixosModules.home-manager
     # ./kubernetes.nix
@@ -26,7 +26,10 @@ in
     ../../../../modules/nixos/samba.nix
   ];
 
+  # System Configuration
   system.stateVersion = "24.11";
+  time.timeZone = "Africa/Johannesburg";
+  i18n.defaultLocale = "en_GB.UTF-8";
 
   # Boot and Filesystem Configuration
   boot.loader = {
@@ -67,6 +70,8 @@ in
     "/boot" = {
       device = "/dev/disk/by-label/BOOT";
       fsType = "vfat";
+      options = [ "noauto" ];
+
     };
   };
 
@@ -88,28 +93,68 @@ in
     "uas"
   ];
 
-  boot.kernelParams = [
+  # boot.kernelParams = [
+  #   "console=ttyS0,115200n8"
+  #   "console=ttyAMA0,115200n8"
+  #   "console=tty0"
+  #   "cma=64M"
+  # ];
+  boot.kernelParams = lib.mkForce [
+    # https://github.com/NixOS/nixpkgs/issues/123725#issuecomment-1063370870
     "console=ttyS0,115200n8"
-    "console=ttyAMA0,115200n8"
     "console=tty0"
-    "cma=64M"
   ];
 
+  systemd.services.dnsmasq = {
+    serviceConfig = {
+      TimeoutStartSec = "300s";
+    };
+  };
+
   # Filesystem and kernel options
+  systemd.services."getty@".enable = false;
   boot.supportedFilesystems = [ "btrfs" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   powerManagement.cpuFreqGovernor = "ondemand";
 
   # Networking and Services
-  services.dbus.enable = true;
   systemd.services.dbus.serviceConfig.TimeoutStartSec = "120s";
   services.udev.extraRules = ''
     # Rename the interface with the MAC address to eth0
     SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="e4:5f:01:26:7e:ad", NAME="eth0"
   '';
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   # Disable Predictable Network Interface Names
   networking.usePredictableInterfaceNames = false;
+  networking = {
+    useDHCP = false;
+    interfaces.enabcm6e4ei0 = {
+      useDHCP = true;
+    };
+    interfaces.eth0 = {
+      useDHCP = true;
+    };
+  };
+  services.timesyncd = {
+    enable = true;
+    servers = [
+      "0.nixos.pool.ntp.org"
+      "1.nixos.pool.ntp.org"
+      "2.nixos.pool.ntp.org"
+      "3.nixos.pool.ntp.org"
+    ];
+  };
+  systemd.oomd.enable = false;
+  # services.nscd.enable = false;
+  hardware.bluetooth.enable = false;
+  services.dbus.enable = true;
+  systemd.extraConfig = ''
+    DefaultTimeoutStartSec=90s
+  '';
 
   # # Networking configuration
   # networking = {

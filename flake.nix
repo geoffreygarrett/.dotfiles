@@ -213,7 +213,7 @@
         system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
       );
       sharedDnsmasqConfig = {
-        enable = true;
+        enable = false;
         # debugMode = true;
         hosts = {
           "pioneer.nixus.net" = {
