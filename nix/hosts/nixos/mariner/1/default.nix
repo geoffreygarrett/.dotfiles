@@ -24,9 +24,9 @@ in
     # ./kubernetes.nix
     # impermanence.nixosModules.impermanence
     ../../../../modules/shared/secrets.nix
-    ../../../../modules/nixos/tailscale.nix
+    # ../../../../modules/nixos/tailscale.nix
     ../../../../modules/nixos/openssh.nix
-    ../../../../modules/nixos/samba.nix
+    # ../../../../modules/nixos/samba.nix
   ];
 
   system.stateVersion = "24.11";
@@ -68,7 +68,6 @@ in
     "/boot" = {
       device = "/dev/disk/by-label/BOOT";
       fsType = "vfat";
-      options = [ "noauto" ]; # Only mount when needed
     };
   };
 
@@ -90,69 +89,61 @@ in
     "uas"
   ];
 
-  # Enable mingetty for HDMI (TTY1)
-  services.mingetty = {
-    enable = true; # Ensures TTY1 is active for login via HDMI
-    tty = "tty1"; # Default console for HDMI
-    autoLogin = false; # Set true if you want auto-login
-  };
-
   boot.kernelParams = [
-    "console=tty1" # Ensures the console output goes to tty1
-    "console=ttyS0,115200n8" # If you need serial console
-    "console=ttyAMA0,115200n8" # Serial console for Raspberry Pi
+    "console=ttyS0,115200n8"
+    "console=ttyAMA0,115200n8"
+    "console=tty0"
+    "cma=64M"
   ];
 
   # Filesystem and kernel options
   boot.supportedFilesystems = [ "btrfs" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  # Power management
   powerManagement.cpuFreqGovernor = "ondemand";
 
-  # Networking configuration
-  networking = {
-    hostName = hostname;
-    networkmanager.enable = true;
-
-    # Enable Ethernet (end0) with DHCP
-    interfaces.end0.useDHCP = true;
-
-    # Uncomment if using Ethernet and Wi-Fi with DHCP
-    # interfaces.end0.useDHCP = true;
-    # interfaces.wlan0.useDHCP = true;
-
-    # Uncomment if you need wireless configuration
-    # wireless = {
-    #   enable = true;
-    #   userControlled.enable = true;
-    #   secretsFile = config.sops.secrets.wireless_secrets.path;
-    #   networks = {
-    #     "Haemanthus" = {
-    #       priority = 90;
-    #       pskRaw = "ext:haemanthus_psk";
-    #     };
-    #   };
-    # };
-
-    # Firewall settings
-    firewall = {
-      enable = true;
-      allowedTCPPorts = [
-        22 # SSH
-        80 # HTTP
-        443 # HTTPS
-        6443 # k3s: Kubernetes API server
-        10250 # Kubelet API
-      ];
-      allowedUDPPorts = [
-        # Uncomment if using Flannel in multi-node setup
-        # 8472
-      ];
-    };
-  };
-
-  # User configuration
+  # # Networking configuration
+  # networking = {
+  #   hostName = hostname;
+  #   networkmanager.enable = true;
+  #
+  #   # Enable Ethernet (end0) with DHCP
+  #   interfaces.end0.useDHCP = true;
+  #
+  #   # Uncomment if using Ethernet and Wi-Fi with DHCP
+  #   # interfaces.end0.useDHCP = true;
+  #   # interfaces.wlan0.useDHCP = true;
+  #
+  #   # Uncomment if you need wireless configuration
+  #   # wireless = {
+  #   #   enable = true;
+  #   #   userControlled.enable = true;
+  #   #   secretsFile = config.sops.secrets.wireless_secrets.path;
+  #   #   networks = {
+  #   #     "Haemanthus" = {
+  #   #       priority = 90;
+  #   #       pskRaw = "ext:haemanthus_psk";
+  #   #     };
+  #   #   };
+  #   # };
+  #
+  #   # Firewall settings
+  #   firewall = {
+  #     enable = true;
+  #     allowedTCPPorts = [
+  #       22 # SSH
+  #       80 # HTTP
+  #       443 # HTTPS
+  #       6443 # k3s: Kubernetes API server
+  #       10250 # Kubelet API
+  #     ];
+  #     allowedUDPPorts = [
+  #       # Uncomment if using Flannel in multi-node setup
+  #       # 8472
+  #     ];
+  #   };
+  # };
+  #
+  # # User configuration
   users.users.${user} = {
     isNormalUser = true;
     shell = pkgs.zsh;
@@ -160,21 +151,21 @@ in
     initialPassword = "changeme";
     openssh.authorizedKeys.keys = keys;
   };
-
-  # Root user SSH authorized keys
+  #
+  # # Root user SSH authorized keys
   users.users.root.openssh.authorizedKeys.keys = keys;
-
-  # Enable Zsh shell
+  #
+  # # Enable Zsh shell
   programs.zsh.enable = true;
-
-  # Sudo configuration
+  #
+  # # Sudo configuration
   security.sudo.wheelNeedsPassword = false;
-
-  # SOPS secrets management
-  sops = {
-    defaultSopsFile = "${self}/secrets/default.yaml";
-    secrets.wireless_secrets = { };
-  };
+  #
+  # # SOPS secrets management
+  # sops = {
+  #   defaultSopsFile = "${self}/secrets/default.yaml";
+  #   secrets.wireless_secrets = { };
+  # };
 
   # Trusted public keys for Nix builds
   nix.settings.trusted-public-keys = [
