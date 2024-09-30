@@ -1,16 +1,18 @@
 keys:
   # User keys
-  - &geoffrey_mariner-1 age1yjgntgyscg5vw3pqpupqjcr92064a3k0d42fy6sk6lmujgv3e5fsdear9u
-  - &geoffrey_mariner-3 age1kdp9ndxywv48mapkkejujvzfqhxzyzp6s7kp42u7ynu6q5e8sqkqp0w7sv
-  - &geoffrey_mariner-4 age1tpj92c7aqe8df7g3qf58vzcyevx53vhap3qkrxa9calpdtp5vvmqrd0de7
-  - &geoffrey_voyager age13sx384sda6z7lvg6arys4asl4j88t652y0r9km86n3xrsuh5hpzqndl9lp
-  - &geoffrey_pioneer age1ahyztttw0jky84tzg5vzvhwvhy3c4ptw7zg4kv5jrn4ergjq2c3q4f76dv
-  - &geoffrey_apollo age1z09vrs2ketcn244l43fjxgzuu22yp0q0tpkmh3s2grlqn8jgypeqgnnf9f
-  - &geoffrey_artemis age18jgsuq5wf3jv426rhst5saxc3etz29te3dx3tugg7466tje3layqvtar5f
-  - &geoffrey_cassini age1mz6264gtrt32xj0hkzg620utf2eagx9p2k6yq63pxn4xnsv8jp8qn429m5
+  - &users:
+    - &geoffrey_mariner-1 age1yjgntgyscg5vw3pqpupqjcr92064a3k0d42fy6sk6lmujgv3e5fsdear9u
+    - &geoffrey_mariner-3 age1kdp9ndxywv48mapkkejujvzfqhxzyzp6s7kp42u7ynu6q5e8sqkqp0w7sv
+    - &geoffrey_mariner-4 age1tpj92c7aqe8df7g3qf58vzcyevx53vhap3qkrxa9calpdtp5vvmqrd0de7
+    - &geoffrey_voyager age13sx384sda6z7lvg6arys4asl4j88t652y0r9km86n3xrsuh5hpzqndl9lp
+    - &geoffrey_pioneer age1ahyztttw0jky84tzg5vzvhwvhy3c4ptw7zg4kv5jrn4ergjq2c3q4f76dv
+    - &geoffrey_apollo age1z09vrs2ketcn244l43fjxgzuu22yp0q0tpkmh3s2grlqn8jgypeqgnnf9f
+    - &geoffrey_artemis age18jgsuq5wf3jv426rhst5saxc3etz29te3dx3tugg7466tje3layqvtar5f
+    - &geoffrey_cassini age1mz6264gtrt32xj0hkzg620utf2eagx9p2k6yq63pxn4xnsv8jp8qn429m5
   # Host keys
-  - &apollo age13aztsk4mqshur74tqayz8svgr5d2tez86lrv70a8cc8xmshphg9spj028y
-  - &mariner-1 age1vj7hdhettxhphf26fzx66m8xf89ak2qlqt30kwfdlz8ctcnzeuqs6zqxjm
+  - &hosts:
+    - &apollo age13aztsk4mqshur74tqayz8svgr5d2tez86lrv70a8cc8xmshphg9spj028y
+    - &mariner-1 age1vj7hdhettxhphf26fzx66m8xf89ak2qlqt30kwfdlz8ctcnzeuqs6zqxjm
 creation_rules:
   - path_regex: secrets/default.yaml
     key_groups:

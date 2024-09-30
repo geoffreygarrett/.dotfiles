@@ -622,13 +622,13 @@
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
             modules = [
-              # ./nix/hosts/nixos/mariner/1
-              (mkMarinerNode {
-                inherit user keys;
-                hostname = "mariner-1";
-              })
-              inputs.nixos-hardware.nixosModules.raspberry-pi-4
-              inputs.argon40-nix.nixosModules.default
+              ./nix/hosts/nixos/mariner/1
+              # (mkMarinerNode {
+              #   inherit user keys;
+              #   hostname = "mariner-1";
+              # })
+              # inputs.nixos-hardware.nixosModules.raspberry-pi-4
+              # inputs.argon40-nix.nixosModules.default
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];

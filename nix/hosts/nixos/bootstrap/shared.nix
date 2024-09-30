@@ -11,7 +11,7 @@
 
   # Network configuration
   networking = {
-    hostName = "bootstrap";
+    hostName = "rpi-4-bootstrap";
     networkmanager.enable = true;
   };
 

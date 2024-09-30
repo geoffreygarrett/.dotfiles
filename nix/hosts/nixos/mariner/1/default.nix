@@ -2,111 +2,110 @@
   config,
   lib,
   pkgs,
+  self,
+  user,
   inputs,
   keys,
   ...
 }:
 
 let
-  mainDriveUuid = "41c98998-6a08-4389-bf74-79c9efcf0739";
+  hostname = "mariner-1";
 in
+# mainDriveUuid = "41c98998-6a08-4389-bf74-79c9efcf0739";
 {
   imports = [
-    inputs.impermanence.nixosModules.impermanence
+    # inputs.impermanence.nixosModules.impermanence
     inputs.argon40-nix.nixosModules.default
-    inputs.nixos-hardware.nixosModules.raspberry-pi-4
+    # inputs.nixos-hardware.nixosModules.raspberry-pi-4
     inputs.sops-nix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
+    # ./kubernetes.nix
+    # impermanence.nixosModules.impermanence
+    ../../../../modules/shared/secrets.nix
+    ../../../../modules/nixos/tailscale.nix
+    ../../../../modules/nixos/openssh.nix
+    ../../../../modules/nixos/samba.nix
   ];
 
-  # # Disko configuration for SSD
-  # disko.devices = {
-  #   disk = {
-  #     main = {
-  #       device = "/dev/disk/by-uuid/${mainDriveUuid}";
-  #       type = "disk";
-  #       content = {
-  #         type = "gpt";
-  #         partitions = {
-  #           boot = {
-  #             name = "boot";
-  #             size = "256M";
-  #             type = "EF00";
-  #             content = {
-  #               type = "filesystem";
-  #               format = "vfat";
-  #               mountpoint = "/boot";
-  #             };
-  #           };
-  #           root = {
-  #             name = "root";
-  #             size = "100%";
-  #             content = {
-  #               type = "filesystem";
-  #               format = "ext4";
-  #               mountpoint = "/nix";
-  #             };
-  #           };
-  #         };
-  #       };
-  #     };
-  #   };
-  # };
-  #
+  system.stateVersion = "24.11";
+  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.grub.enable = false;
+
   fileSystems = {
     "/" = {
-      device = "none";
-      fsType = "tmpfs";
+      device = "/dev/disk/by-label/ROOT";
+      fsType = "btrfs";
       options = [
-        "size=2G"
-        "mode=755"
+        "subvol=root"
+        "compress=zstd"
+        "noatime"
+      ];
+    };
+    "/home" = {
+      device = "/dev/disk/by-label/ROOT";
+      fsType = "btrfs";
+      options = [
+        "subvol=home"
+        "compress=zstd"
+        "noatime"
       ];
     };
     "/nix" = {
-      device = "/dev/disk/by-uuid/${mainDriveUuid}";
-      fsType = "ext4";
+      device = "/dev/disk/by-label/ROOT";
+      fsType = "btrfs";
+      options = [
+        "subvol=nix"
+        "compress=zstd"
+        "noatime"
+      ];
     };
-    "/boot" = lib.mkForce {
-      device = "/dev/disk/by-uuid/0F92-BECC"; # Use this UUID, but adjust to your preferred definition
+    "/boot" = {
+      device = "/dev/disk/by-label/BOOT";
       fsType = "vfat";
     };
   };
 
-  # Boot loader configuration for Raspberry Pi 4
-  # boot.loader = {
-  #   grub.enable = false;
-  #   generic-extlinux-compatible.enable = true;
-  #   raspberryPi = {
-  #     enable = true;
-  #     version = 4;
-  #   };
-  # };
+  swapDevices = [
+    { device = "/dev/disk/by-label/SWAP"; }
+  ];
 
-  # # Impermanence configuration
-  # environment.persistence."/nix/persist" = {
-  #   hideMounts = true;
-  #   directories = [
-  #     "/var/log"
-  #     "/var/lib/nixos"
-  #     "/var/lib/systemd"
-  #     "/etc/nixos"
-  #     "/var/lib/kubernetes"
-  #     "/home"
-  #   ];
-  #   files = [
-  #     "/etc/machine-id"
-  #   ];
-  # };
+  boot.initrd.availableKernelModules = [
+    # Allows early (earlier) modesetting for the Raspberry Pi
+    "vc4"
+    "bcm2835_dma"
+    "i2c_bcm2835"
 
-  # Networking
+    # Maybe needed for SSD boot?
+    "usb_storage"
+    "xhci_pci"
+    "usbhid"
+    "uas"
+  ];
+
+  boot.kernelParams = [
+    "console=ttyS0,115200n8"
+    "console=ttyAMA0,115200n8"
+    "console=tty0"
+    "cma=64M"
+  ];
+
+  # Add Btrfs support
+  boot.supportedFilesystems = [ "btrfs" ];
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  powerManagement.cpuFreqGovernor = "ondemand";
+
+  # Network and firewall configuration
   networking = {
-    hostName = "rpi4-nixos";
+    hostName = hostname;
     useDHCP = false;
     dhcpcd.wait = "background";
     interfaces.wlan0.useDHCP = true;
     wireless = {
       enable = true;
       userControlled.enable = true;
+      secretsFile = config.sops.secrets.wireless_secrets.path;
       networks = {
         "Haemanthus" = {
           priority = 90;
@@ -114,96 +113,47 @@ in
         };
       };
     };
+
     firewall = {
       enable = true;
       allowedTCPPorts = [
-        22
-        80
-        443
-        6443
-        10250
+        22 # SSH
+        80 # HTTP
+        443 # HTTPS
+        6443 # k3s: Kubernetes API server
+        10250 # Kubelet API
+      ];
+      allowedUDPPorts = [
+        # 8472  # Required if using Flannel in multi-node setup
       ];
     };
   };
 
   # User configuration
-  users = {
-    mutableUsers = false;
-    users = {
-      root = {
-        initialPassword = "changeme";
-      };
-      geoffrey = {
-        isNormalUser = true;
-        home = "/home/geoffrey";
-        shell = pkgs.zsh;
-        extraGroups = [
-          "wheel"
-          "networkmanager"
-        ];
-        initialPassword = "changeme";
-        openssh.authorizedKeys.keys = keys;
-      };
-    };
+  users.users.${user} = {
+    isNormalUser = true;
+    shell = pkgs.zsh;
+    extraGroups = [ "wheel" ];
+    initialPassword = "changeme";
+    openssh.authorizedKeys.keys = keys;
+  };
+  users.users.root.openssh.authorizedKeys.keys = keys;
+  programs.zsh.enable = true;
+
+  # Sudo configuration
+  security.sudo.wheelNeedsPassword = false;
+
+  # SOPS secrets management
+  sops = {
+    defaultSopsFile = "${self}/secrets/default.yaml";
+    secrets.wireless_secrets = { };
+    secrets."users/${user}/password" = { };
   };
 
-  # Enable SSH
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-    settings.KbdInteractiveAuthentication = false;
-  };
-
-  # Additional system packages
-  environment.systemPackages = with pkgs; [
-    vim
-    git
-    wget
-    htop
-    tmux
-  ];
-
-  # Nix settings
+  # Trusted public keys for Nix
   nix.settings = {
     trusted-public-keys = [
       "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
     ];
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
   };
-
-  # SOPS configuration
-  sops = {
-    defaultSopsFile = "${inputs.self}/secrets/default.yaml";
-    secrets = {
-      wireless_secrets = { };
-      "users/geoffrey/password" = { };
-    };
-  };
-
-  # System state version
-  system.stateVersion = "24.11";
-
-  # Additional configurations
-  programs.zsh.enable = true;
-  security.sudo.wheelNeedsPassword = false;
-
-  # Enable Raspberry Pi hardware support
-  hardware.enableRedistributableFirmware = true;
-
-  # Time zone and locale settings
-  time.timeZone = "UTC";
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  # Enable Tailscale
-  services.tailscale.enable = true;
-
-  # Home Manager configuration
-  home-manager.users.geoffrey =
-    { pkgs, ... }:
-    {
-      home.stateVersion = "24.11";
-    };
 }
