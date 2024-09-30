@@ -90,11 +90,11 @@ in
     "uas"
   ];
 
-  # Enable Getty on tty1
-  services.getty = {
-    enable = true;
-    autoLogin = false;
-    tty = "tty1";
+  # Enable mingetty for HDMI (TTY1)
+  services.mingetty = {
+    enable = true; # Ensures TTY1 is active for login via HDMI
+    tty = "tty1"; # Default console for HDMI
+    autoLogin = false; # Set true if you want auto-login
   };
 
   boot.kernelParams = [
