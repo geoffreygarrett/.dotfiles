@@ -8,7 +8,7 @@
   keys,
   ...
 }:
-
+# nix run github:numtide/nixos-anywhere -- --flake .#mariner-1 root@mariner-1.nixus.net
 let
   hostname = "mariner-1";
 in
@@ -17,15 +17,18 @@ in
     # inputs.impermanence.nixosModules.impermanence
     # inputs.argon40-nix.nixosModules.default
     # inputs.nixos-hardware.nixosModules.raspberry-pi-4
-    inputs.sops-nix.nixosModules.default
+    # inputs.sops-nix.nixosModules.default
     # inputs.home-manager.nixosModules.home-manager
     # ./kubernetes.nix
-    ../../../../modules/shared/secrets.nix
-    ../../../../modules/nixos/tailscale.nix
-    ../../../../modules/nixos/openssh.nix
-    ../../../../modules/nixos/samba.nix
+    # ../../../../modules/shared/secrets.nix
+    # ../../../../modules/nixos/tailscale.nix
+    # ../../../../modules/nixos/openssh.nix
+    # ../../../../modules/nixos/samba.nix
+    inputs.disko.nixosModules.disko
+
   ];
 
+  disko.devices = import ./disks-btrfs.nix { inherit lib; };
   # System Configuration
   system.stateVersion = "24.11";
   time.timeZone = "Africa/Johannesburg";
@@ -38,6 +41,24 @@ in
     grub.enable = false;
     generic-extlinux-compatible.enable = lib.mkForce false;
   };
+
+  #   boot.loader.efi.canTouchEfiVariables = false;
+  # boot.supportedFilesystems = [ "zfs" ];
+
+  # fileSystems = {
+  #   "/" = {
+  #     device = "/dev/disk/by-label/ROOT";
+  #     fsType = "ext4";
+  #     options = [ "noatime" ];
+  #   };
+  #   "/boot" = {
+  #     device = "/dev/disk/by-label/BOOT";
+  #     fsType = "vfat";
+  #   };
+  # };
+  # swapDevices = [
+  #   { device = "/dev/disk/by-label/SWAP"; }
+  # ];
 
   fileSystems = {
     "/" = {
@@ -70,8 +91,6 @@ in
     "/boot" = {
       device = "/dev/disk/by-label/BOOT";
       fsType = "vfat";
-      options = [ "noauto" ];
-
     };
   };
 
@@ -105,12 +124,6 @@ in
     "console=tty0"
   ];
 
-  systemd.services.dnsmasq = {
-    serviceConfig = {
-      TimeoutStartSec = "300s";
-    };
-  };
-
   # Filesystem and kernel options
   systemd.services."getty@".enable = false;
   boot.supportedFilesystems = [ "btrfs" ];
@@ -131,6 +144,7 @@ in
   # Disable Predictable Network Interface Names
   networking.usePredictableInterfaceNames = false;
   networking = {
+    hostName = hostname;
     useDHCP = false;
     interfaces.enabcm6e4ei0 = {
       useDHCP = true;
@@ -139,66 +153,8 @@ in
       useDHCP = true;
     };
   };
-  services.timesyncd = {
-    enable = true;
-    servers = [
-      "0.nixos.pool.ntp.org"
-      "1.nixos.pool.ntp.org"
-      "2.nixos.pool.ntp.org"
-      "3.nixos.pool.ntp.org"
-    ];
-  };
-  systemd.oomd.enable = false;
-  # services.nscd.enable = false;
-  hardware.bluetooth.enable = false;
-  services.dbus.enable = true;
-  systemd.extraConfig = ''
-    DefaultTimeoutStartSec=90s
-  '';
 
-  # # Networking configuration
-  # networking = {
-  #   hostName = hostname;
-  #   networkmanager.enable = true;
-  #
-  #   # Enable Ethernet (end0) with DHCP
-  #   interfaces.end0.useDHCP = true;
-  #
-  #   # Uncomment if using Ethernet and Wi-Fi with DHCP
-  #   # interfaces.end0.useDHCP = true;
-  #   # interfaces.wlan0.useDHCP = true;
-  #
-  #   # Uncomment if you need wireless configuration
-  #   # wireless = {
-  #   #   enable = true;
-  #   #   userControlled.enable = true;
-  #   #   secretsFile = config.sops.secrets.wireless_secrets.path;
-  #   #   networks = {
-  #   #     "Haemanthus" = {
-  #   #       priority = 90;
-  #   #       pskRaw = "ext:haemanthus_psk";
-  #   #     };
-  #   #   };
-  #   # };
-  #
-  #   # Firewall settings
-  #   firewall = {
-  #     enable = true;
-  #     allowedTCPPorts = [
-  #       22 # SSH
-  #       80 # HTTP
-  #       443 # HTTPS
-  #       6443 # k3s: Kubernetes API server
-  #       10250 # Kubelet API
-  #     ];
-  #     allowedUDPPorts = [
-  #       # Uncomment if using Flannel in multi-node setup
-  #       # 8472
-  #     ];
-  #   };
-  # };
-
-  # # User configuration
+  # User configuration
   users.users.${user} = {
     isNormalUser = true;
     shell = pkgs.zsh;
@@ -215,12 +171,6 @@ in
 
   # Sudo configuration
   security.sudo.wheelNeedsPassword = false;
-
-  # # SOPS secrets management
-  # sops = {
-  #   defaultSopsFile = "${self}/secrets/default.yaml";
-  #   secrets.wireless_secrets = { };
-  # };
 
   # Trusted public keys for Nix builds
   nix.settings.trusted-public-keys = [

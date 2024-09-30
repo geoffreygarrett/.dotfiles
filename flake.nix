@@ -629,8 +629,8 @@
               # })
               # inputs.nixos-hardware.nixosModules.raspberry-pi-4
               # inputs.argon40-nix.nixosModules.default
-              inputs.nixus.nixosModules.dnsmasq
-              { nixus.dnsmasq = sharedDnsmasqConfig; }
+              # inputs.nixus.nixosModules.dnsmasq
+              # { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
 
