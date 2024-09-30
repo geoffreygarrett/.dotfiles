@@ -1338,13 +1338,13 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-n1pPWtIl/HlVs2AocJzS+wm7ZisZIh60jhWAA+kQm7c=",
-        "path": "./nixus",
+        "lastModified": 1727688227,
+        "narHash": "sha256-EhTg3Xw0Gr71V9GX+c4oSUttMqFunY3sPaZFUMy6ODg=",
+        "path": "/home/geoffrey/.dotfiles/nixus",
         "type": "path"
       },
       "original": {
-        "path": "./nixus",
+        "path": "/home/geoffrey/.dotfiles/nixus",
         "type": "path"
       }
     },

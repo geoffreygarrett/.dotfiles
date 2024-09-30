@@ -99,7 +99,7 @@
 
     # Custom
     nixus = {
-      url = "path:./nixus";
+      url = "path:/home/geoffrey/.dotfiles/nixus";
       flake = true;
     };
 
