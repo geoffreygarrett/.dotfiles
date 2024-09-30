@@ -28,22 +28,6 @@
               ];
             };
           };
-          root = {
-            name = "root";
-            size = "100%-2048M";
-            content = {
-              type = "filesystem";
-              format = "ext4";
-              mountpoint = "/";
-              mountOptions = [
-                "noatime"
-              ];
-              extraArgs = [
-                "-L"
-                "ROOT"
-              ];
-            };
-          };
           swap = {
             name = "swap";
             size = "2048M";
@@ -53,6 +37,57 @@
               extraArgs = [
                 "--label"
                 "SWAP"
+              ];
+            };
+          };
+          nix = {
+            name = "nix";
+            size = "20G";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/nix";
+              mountOptions = [
+                "defaults"
+                "noatime"
+              ];
+              extraArgs = [
+                "-L"
+                "NIX"
+              ];
+            };
+          };
+          home = {
+            name = "home";
+            size = "20G";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/home";
+              mountOptions = [
+                "defaults"
+                "noatime"
+              ];
+              extraArgs = [
+                "-L"
+                "HOME"
+              ];
+            };
+          };
+          root = {
+            name = "root";
+            size = "100%";
+            content = {
+              type = "filesystem";
+              format = "ext4";
+              mountpoint = "/";
+              mountOptions = [
+                "defaults"
+                "noatime"
+              ];
+              extraArgs = [
+                "-L"
+                "ROOT"
               ];
             };
           };

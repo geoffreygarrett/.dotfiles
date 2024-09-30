@@ -16,7 +16,7 @@ in
   imports = [
     # inputs.impermanence.nixosModules.impermanence
     # inputs.argon40-nix.nixosModules.default
-    # inputs.nixos-hardware.nixosModules.raspberry-pi-4
+    inputs.nixos-hardware.nixosModules.raspberry-pi-4
     # inputs.sops-nix.nixosModules.default
     # inputs.home-manager.nixosModules.home-manager
     # ./kubernetes.nix
@@ -28,7 +28,7 @@ in
 
   ];
 
-  disko.devices = import ./disks-btrfs.nix { inherit lib; };
+  disko.devices = import ./disko-ext4.nix { inherit lib; };
   # System Configuration
   system.stateVersion = "24.11";
   time.timeZone = "Africa/Johannesburg";
@@ -60,44 +60,44 @@ in
   #   { device = "/dev/disk/by-label/SWAP"; }
   # ];
 
-  fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-label/ROOT";
-      fsType = "btrfs";
-      options = [
-        "subvol=root"
-        "compress=zstd"
-        "noatime"
-      ];
-    };
-    "/home" = {
-      device = "/dev/disk/by-label/ROOT";
-      fsType = "btrfs";
-      options = [
-        "subvol=home"
-        "compress=zstd"
-        "noatime"
-      ];
-    };
-    "/nix" = {
-      device = "/dev/disk/by-label/ROOT";
-      fsType = "btrfs";
-      options = [
-        "subvol=nix"
-        "compress=zstd"
-        "noatime"
-      ];
-    };
-    "/boot" = {
-      device = "/dev/disk/by-label/BOOT";
-      fsType = "vfat";
-    };
-  };
-
-  swapDevices = [
-    { device = "/dev/disk/by-label/SWAP"; }
-  ];
-
+  # fileSystems = {
+  #   "/" = {
+  #     device = "/dev/disk/by-label/ROOT";
+  #     fsType = "btrfs";
+  #     options = [
+  #       "subvol=root"
+  #       "compress=zstd"
+  #       "noatime"
+  #     ];
+  #   };
+  #   "/home" = {
+  #     device = "/dev/disk/by-label/ROOT";
+  #     fsType = "btrfs";
+  #     options = [
+  #       "subvol=home"
+  #       "compress=zstd"
+  #       "noatime"
+  #     ];
+  #   };
+  #   "/nix" = {
+  #     device = "/dev/disk/by-label/ROOT";
+  #     fsType = "btrfs";
+  #     options = [
+  #       "subvol=nix"
+  #       "compress=zstd"
+  #       "noatime"
+  #     ];
+  #   };
+  #   "/boot" = {
+  #     device = "/dev/disk/by-label/BOOT";
+  #     fsType = "vfat";
+  #   };
+  # };
+  #
+  # swapDevices = [
+  #   { device = "/dev/disk/by-label/SWAP"; }
+  # ];
+  #
   # Kernel Modules and Power Management
   boot.initrd.availableKernelModules = [
     # Raspberry Pi-specific modules
@@ -112,21 +112,45 @@ in
     "uas"
   ];
 
+  boot.kernelModules = [ "8021q" ];
+  boot.blacklistedKernelModules = [
+    "brcmfmac"
+    "brcmutil"
+  ];
+
   # boot.kernelParams = [
   #   "console=ttyS0,115200n8"
   #   "console=ttyAMA0,115200n8"
   #   "console=tty0"
   #   "cma=64M"
   # ];
-  boot.kernelParams = lib.mkForce [
-    # https://github.com/NixOS/nixpkgs/issues/123725#issuecomment-1063370870
+  # boot.kernelParams = lib.mkForce [
+  #   # https://github.com/NixOS/nixpkgs/issues/123725#issuecomment-1063370870
+  #   "console=ttyS0,115200n8"
+  #   "console=tty0"
+  #   "kexec-load-disabled=0"
+  # ];
+
+  boot.kernelParams = [
     "console=ttyS0,115200n8"
     "console=tty0"
+    "noirqbalance"
+    "kexec_core.loaded_kexec_image=1"
+    "kexec_core.kexec_loaded=1"
+    "kexec-syscall=on"
+    "maxcpus=1"
+    "loglevel=7"
   ];
+
+  boot.consoleLogLevel = 7;
 
   # Filesystem and kernel options
   systemd.services."getty@".enable = false;
-  boot.supportedFilesystems = [ "btrfs" ];
+  boot.supportedFilesystems = [
+    "ext4"
+    "btrfs"
+    "vfat"
+  ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   powerManagement.cpuFreqGovernor = "ondemand";
 

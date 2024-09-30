@@ -154,6 +154,9 @@
               url = "https://nixos.asia/en/nixos-install-flake";
             }
             {
+              url = "https://haseebmajid.dev/series/setup-raspberry-pi-cluster-with-k3s-and-nixos/";
+            }
+            {
               name = "NixOS Config (RPi4+UEFI+SSD boot)";
               tags = [
                 "nixos"
