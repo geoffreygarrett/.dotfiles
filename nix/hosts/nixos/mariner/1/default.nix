@@ -154,13 +154,13 @@ in
   # };
 
   # # User configuration
-  # users.users.${user} = {
-  #   isNormalUser = true;
-  #   shell = pkgs.zsh;
-  #   extraGroups = [ "wheel" ];
-  #   initialPassword = "changeme";
-  #   openssh.authorizedKeys.keys = keys;
-  # };
+  users.users.${user} = {
+    isNormalUser = true;
+    shell = pkgs.zsh;
+    extraGroups = [ "wheel" ];
+    initialPassword = "changeme";
+    openssh.authorizedKeys.keys = keys;
+  };
 
   # Root user SSH authorized keys
   users.users.root.openssh.authorizedKeys.keys = keys;
