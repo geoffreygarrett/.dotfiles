@@ -493,9 +493,9 @@
             # Raspberry Pi 4B
             hostname = "mariner-1.nixus.net";
             profiles.system = {
-              sshUser = "${user}";
+              sshUser = "root";
               user = "root";
-              interactiveSudo = true;
+              # interactiveSudo = true;
               magicRollback = true;
               sshOpts = commonSshOpts;
               path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
