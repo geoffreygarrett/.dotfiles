@@ -18,7 +18,7 @@
                 extraArgs = [
                   "-n"
                   "BOOT"
-                ]; # Corrected label for the boot partition
+                ];
               };
             };
             swap = {
@@ -30,7 +30,7 @@
                 extraArgs = [
                   "--label"
                   "SWAP"
-                ]; # Corrected label for the swap partition
+                ];
               };
             };
             root = {
@@ -42,7 +42,7 @@
                   "-f"
                   "-L"
                   "ROOT"
-                ]; # Corrected label for the root partition
+                ];
                 subvolumes = {
                   "/root" = {
                     mountpoint = "/";

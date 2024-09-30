@@ -90,11 +90,17 @@ in
     "uas"
   ];
 
+  # Enable Getty on tty1
+  services.getty = {
+    enable = true;
+    autoLogin = false;
+    tty = "tty1";
+  };
+
   boot.kernelParams = [
-    "console=ttyS0,115200n8"
-    "console=ttyAMA0,115200n8"
-    "console=tty0"
-    "cma=64M"
+    "console=tty1" # Ensures the console output goes to tty1
+    "console=ttyS0,115200n8" # If you need serial console
+    "console=ttyAMA0,115200n8" # Serial console for Raspberry Pi
   ];
 
   # Filesystem and kernel options
@@ -108,6 +114,9 @@ in
   networking = {
     hostName = hostname;
     networkmanager.enable = true;
+
+    # Enable Ethernet (end0) with DHCP
+    interfaces.end0.useDHCP = true;
 
     # Uncomment if using Ethernet and Wi-Fi with DHCP
     # interfaces.end0.useDHCP = true;
