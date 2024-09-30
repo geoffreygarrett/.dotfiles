@@ -496,7 +496,7 @@
               sshUser = "root";
               user = "root";
               # interactiveSudo = true;
-              magicRollback = true;
+              magicRollback = false;
               sshOpts = commonSshOpts;
               path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
             };

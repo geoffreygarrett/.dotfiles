@@ -14,27 +14,26 @@ let
 in
 {
   imports = [
-    # Uncomment if you need impermanence
     # inputs.impermanence.nixosModules.impermanence
     inputs.argon40-nix.nixosModules.default
-    # inputs.nixos-hardware.nixosModules.raspberry-pi-4
+    inputs.nixos-hardware.nixosModules.raspberry-pi-4
     inputs.sops-nix.nixosModules.default
-    inputs.home-manager.nixosModules.home-manager
-    # Additional configurations
+    # inputs.home-manager.nixosModules.home-manager
     # ./kubernetes.nix
-    # impermanence.nixosModules.impermanence
     ../../../../modules/shared/secrets.nix
-    # ../../../../modules/nixos/tailscale.nix
+    ../../../../modules/nixos/tailscale.nix
     ../../../../modules/nixos/openssh.nix
-    # ../../../../modules/nixos/samba.nix
+    ../../../../modules/nixos/samba.nix
   ];
 
   system.stateVersion = "24.11";
 
+  # Boot and Filesystem Configuration
   boot.loader = {
     efi.canTouchEfiVariables = true;
-    systemd-boot.enable = true;
+    systemd-boot.enable = lib.mkForce true;
     grub.enable = false;
+    generic-extlinux-compatible.enable = lib.mkForce false;
   };
 
   fileSystems = {
@@ -75,7 +74,7 @@ in
     { device = "/dev/disk/by-label/SWAP"; }
   ];
 
-  # Kernel and boot modules
+  # Kernel Modules and Power Management
   boot.initrd.availableKernelModules = [
     # Raspberry Pi-specific modules
     "vc4"
@@ -100,6 +99,17 @@ in
   boot.supportedFilesystems = [ "btrfs" ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   powerManagement.cpuFreqGovernor = "ondemand";
+
+  # Networking and Services
+  services.dbus.enable = true;
+  systemd.services.dbus.serviceConfig.TimeoutStartSec = "120s";
+  services.udev.extraRules = ''
+    # Rename the interface with the MAC address to eth0
+    SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="e4:5f:01:26:7e:ad", NAME="eth0"
+  '';
+
+  # Disable Predictable Network Interface Names
+  networking.usePredictableInterfaceNames = false;
 
   # # Networking configuration
   # networking = {
@@ -142,25 +152,25 @@ in
   #     ];
   #   };
   # };
-  #
+
   # # User configuration
-  users.users.${user} = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" ];
-    initialPassword = "changeme";
-    openssh.authorizedKeys.keys = keys;
-  };
-  #
-  # # Root user SSH authorized keys
+  # users.users.${user} = {
+  #   isNormalUser = true;
+  #   shell = pkgs.zsh;
+  #   extraGroups = [ "wheel" ];
+  #   initialPassword = "changeme";
+  #   openssh.authorizedKeys.keys = keys;
+  # };
+
+  # Root user SSH authorized keys
   users.users.root.openssh.authorizedKeys.keys = keys;
-  #
-  # # Enable Zsh shell
+
+  # Enable Zsh shell
   programs.zsh.enable = true;
-  #
-  # # Sudo configuration
+
+  # Sudo configuration
   security.sudo.wheelNeedsPassword = false;
-  #
+
   # # SOPS secrets management
   # sops = {
   #   defaultSopsFile = "${self}/secrets/default.yaml";
@@ -171,4 +181,5 @@ in
   nix.settings.trusted-public-keys = [
     "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
   ];
+
 }

@@ -170,13 +170,13 @@ in
   ];
 
   home-manager.users.${user} = {
-    home.activation.generateSopsAgeKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.config/sops/age
-      if [[ ! -f ~/.config/sops/age/keys.txt ]]; then
-        $DRY_RUN_CMD ${pkgs.ssh-to-age}/bin/ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
-        $DRY_RUN_CMD chmod 600 ~/.config/sops/age/keys.txt
-      fi
-    '';
+    # home.activation.generateSopsAgeKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    #   $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.config/sops/age
+    #   if [[ ! -f ~/.config/sops/age/keys.txt ]]; then
+    #     $DRY_RUN_CMD ${pkgs.ssh-to-age}/bin/ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
+    #     $DRY_RUN_CMD chmod 600 ~/.config/sops/age/keys.txt
+    #   fi
+    # '';
     home.packages = with pkgs; [
       # Applications
       # "firefox"
