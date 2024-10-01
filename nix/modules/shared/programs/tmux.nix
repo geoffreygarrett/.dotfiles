@@ -49,19 +49,7 @@ in
       set -as terminal-overrides ",xterm-256color:RGB"
 
       # Colors
-      # set -g status-style bg=#0F111A,fg=#8F93A2
       set -g status-style bg=default,fg=default
-      # set -g pane-border-style fg=#191A21
-      # set -g pane-active-border-style fg=#84ffff
-      # set -g message-style bg=#0F111A,fg=#f07178
-      # set -g mode-style "fg=#0F111A,bg=#84ffff"
-      # set -ga terminal-overrides ",xterm-256color:Tc"
-
-      # Set background color with 85% opacity
-      #set -g window-style "bg=#0F111AD9"
-      #set -g window-active-style "bg=#0F111AD9"
-      #set -g window-style "bg=default"
-      #set -g window-active-style "bg=default"
 
       # Status bar
       set -g status-interval 2
@@ -122,7 +110,10 @@ in
       {
         plugin = tmux-pomodoro-plus;
         extraConfig = ''
-          set -g @pomodoro_toggle 'C-p'
+          bind-key C-t run-shell -b "${tmux-pomodoro-plus}/scripts/pomodoro.sh toggle"
+          bind-key P run-shell -b "${tmux-pomodoro-plus}/scripts/pomodoro.sh cancel"
+          bind-key _ run-shell -b "${tmux-pomodoro-plus}/scripts/pomodoro.sh skip"
+          set -g @pomodoro_toggle 'C-t'
           set -g @pomodoro_cancel 'P'
           set -g @pomodoro_skip '_'
           set -g @pomodoro_mins 25

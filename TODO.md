@@ -56,6 +56,10 @@ ssh geoffrey@192.168.68.121 '[ -f ~/.ssh/id_ed25519.pub ] && cat ~/.ssh/id_ed255
 ssh geoffrey@cassini 'cat ~/.ssh/id_ed25519.pub || (ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -q && cat ~/.ssh/id_ed25519.pub)'
 ```
 
+## Other
+
+- [ ] Fix `tmux-pomodoro-plus`. Need to figure out how to integrate plugs via the `tmuxPlugins` nix abstraction.
+
 ## Completed Tasks
 
 - [x] Fix multiline insert in visual block mode
