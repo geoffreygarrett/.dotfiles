@@ -146,11 +146,13 @@ in
       {
         plugin = tmuxPlugins.resurrect;
         extraConfig = ''
-          resurrect_dir="$HOME/.tmux/resurrect"
           set -g @resurrect-dir $resurrect_dir
           set -g @resurrect-hook-post-save-all "sed -i 's/--cmd lua.*--cmd set packpath/--cmd \"lua/g; s/--cmd set rtp.*\$/\"/' $resurrect_dir/last"
           set -g @resurrect-capture-pane-contents 'on'
           set -g @resurrect-processes '"~nvim"'
+          set -g @resurrect-strategy-nvim 'session'
+          set -g @resurrect-save-shell-history 'on'
+          set -g @resurrect-restore-shell-history 'on'
         '';
       }
       {
