@@ -95,7 +95,8 @@ in
   # };
 
   swapDevices = [
-    { device = "/dev/disk/by-label/SWAP"; }
+    # { device = "/dev/disk/by-uuid/8f549645-0e82-44ae-984b-6f17ca763b22"; }
+    # { device = "/dev/disk/by-label/SWAP"; }
   ];
 
   # Kernel Modules and Power Management
@@ -159,6 +160,7 @@ in
 
   # Network and firewall configurationa
   networking.networkmanager.enable = true;
+  networking.hostName = hostname;
   # networking = {
   #   hostName = hostname;
   #   useDHCP = false;
@@ -233,26 +235,28 @@ in
   # Home Manager configuration
   home-manager.users = lib.genAttrs [ "${user}" ] (
     username:
-    { lib, ... }:
+    { lib, config, ... }:
     {
-      home.stateVersion = "24.11";
-      programs.ssh = {
-        enable = true;
 
-        matchBlocks = {
-          "*" = {
-            identityFile = "~/.ssh/id_ed25519";
-            extraOptions = {
-              AddKeysToAgent = "yes";
+      programs = {
+        ssh = {
+          enable = true;
+
+          matchBlocks = {
+            "*" = {
+              identityFile = "~/.ssh/id_ed25519";
+              extraOptions = {
+                AddKeysToAgent = "yes";
+              };
             };
           };
-        };
 
-        extraConfig = ''
-          Host github.com
-            IdentitiesOnly yes
-            IdentityFile ~/.ssh/github_ed25519
-        '';
+          extraConfig = ''
+            Host github.com
+              IdentitiesOnly yes
+              IdentityFile ~/.ssh/github_ed25519
+          '';
+        };
       };
 
       home.activation = {

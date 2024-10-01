@@ -11,14 +11,14 @@
   ];
   # NOTE: To stop zsf from building for the bootstrap.
   # https://discourse.nixos.org/t/how-to-disable-zfs-for-custom-install-image/26828
-  boot.supportedFilesystems = lib.mkForce [
-    "btrfs"
-    "cifs"
-    "f2fs"
-    "jfs"
-    "ntfs"
-    "reiserfs"
-    "vfat"
-    "xfs"
-  ];
+  # boot.supportedFilesystems = lib.mkForce [
+  #   "btrfs"
+  #   "cifs"
+  #   "f2fs"
+  #   "jfs"
+  #   "ntfs"
+  #   "reiserfs"
+  #   "vfat"
+  #   "xfs"
+  # ];
 }

@@ -36,10 +36,14 @@
     isNormalUser = true;
     extraGroups = [
       "wheel"
+      "networkmanager"
     ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = keys;
   };
+
+  # Sudo configuration
+  security.sudo.wheelNeedsPassword = false;
 
   # Trusted public key for Nix
   nix.settings = {
