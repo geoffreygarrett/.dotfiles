@@ -196,8 +196,7 @@ in
   #     day = 5500;
   #     night = 3700;
   #   };
-  #   latitude = "-34.161648";
-  #   longitude = "19.067194";
+
   #   brightness = {
   #     day = "1";
   #     night = "0.8";
@@ -213,8 +212,10 @@ in
   services.xserver = {
     enable = true;
     # Key repeat settings
-    autoRepeatDelay = 225; # Delay before key repeat starts (in milliseconds)
-    autoRepeatInterval = 30; # Interval between key repeats (in milliseconds)
+    # xset r rate 200 35
+    # chefs kiss:  xset r rate 200 45
+    autoRepeatDelay = 200; # Delay before key repeat starts (in milliseconds)
+    autoRepeatInterval = 45; # Interval between key repeats (in milliseconds)
     displayManager = {
       gdm.enable = true;
     };

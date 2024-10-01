@@ -15,6 +15,8 @@
     extraFlags = [
       # Wake-on-LAN related labels
       "--node-label=wol.mac-address=b4-2e-99-a6-54-36"
+      "--node-label=power.management=wol"
+      "--register-with-taints=power.management=wol:NoSchedule"
 
       # GPU-related labels
       "--node-label=nvidia.com/gpu=true"
