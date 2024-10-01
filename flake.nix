@@ -619,7 +619,6 @@
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
             modules = [
-              homeManagerModule
               ./nix/hosts/nixos/mariner/1
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }

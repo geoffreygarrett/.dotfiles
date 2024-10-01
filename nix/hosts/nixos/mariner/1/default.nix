@@ -237,8 +237,22 @@ in
     username:
     { lib, config, ... }:
     {
-
+      home.stateVersion = "24.11";
+      imports = [
+        ../../../../modules/shared/programs/gh.nix
+        ../../../../modules/shared/programs/git.nix
+        ../../../../modules/shared/programs/tms.nix
+        ../../../../modules/shared/programs/starship.nix
+        ../../../../modules/shared/programs/nushell.nix
+        ../../../../modules/shared/programs/zsh.nix
+      ];
       programs = {
+        zsh = {
+          enable = true;
+        };
+        neovim = {
+          enable = true;
+        };
         ssh = {
           enable = true;
 
