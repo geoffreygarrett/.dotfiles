@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 {
   imports = [
     # Disk management
@@ -16,6 +16,13 @@
     # Dependencies across my nixos modules
     ../../modules/shared/secrets.nix
   ];
+
+  services.udev.packages = [ pkgs.yubikey-personalization ];
+  services.pcscd.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
 
   nix.settings = {
     trusted-public-keys = [

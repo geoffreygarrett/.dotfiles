@@ -51,6 +51,12 @@ in
       # Colors
       set -g status-style bg=default,fg=default
 
+      # Set background color with 85% opacity
+      #set -g window-style "bg=#0F111AD9"
+      #set -g window-active-style "bg=#0F111AD9"
+      #set -g window-style "bg=default"
+      #set -g window-active-style "bg=default"
+
       # Status bar
       set -g status-interval 2
       set -g status-position top
@@ -110,10 +116,7 @@ in
       {
         plugin = tmux-pomodoro-plus;
         extraConfig = ''
-          bind-key C-t run-shell -b "${tmux-pomodoro-plus}/scripts/pomodoro.sh toggle"
-          bind-key P run-shell -b "${tmux-pomodoro-plus}/scripts/pomodoro.sh cancel"
-          bind-key _ run-shell -b "${tmux-pomodoro-plus}/scripts/pomodoro.sh skip"
-          set -g @pomodoro_toggle 'C-t'
+          set -g @pomodoro_toggle 'C-p'
           set -g @pomodoro_cancel 'P'
           set -g @pomodoro_skip '_'
           set -g @pomodoro_mins 25
@@ -137,13 +140,11 @@ in
       {
         plugin = tmuxPlugins.resurrect;
         extraConfig = ''
+          resurrect_dir="$HOME/.tmux/resurrect"
           set -g @resurrect-dir $resurrect_dir
           set -g @resurrect-hook-post-save-all "sed -i 's/--cmd lua.*--cmd set packpath/--cmd \"lua/g; s/--cmd set rtp.*\$/\"/' $resurrect_dir/last"
           set -g @resurrect-capture-pane-contents 'on'
           set -g @resurrect-processes '"~nvim"'
-          set -g @resurrect-strategy-nvim 'session'
-          set -g @resurrect-save-shell-history 'on'
-          set -g @resurrect-restore-shell-history 'on'
         '';
       }
       {

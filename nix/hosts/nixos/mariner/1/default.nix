@@ -234,7 +234,9 @@ in
   nix.settings.trusted-public-keys = [
     "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
   ];
-
+  home-manager.extraSpecialArgs = {
+    inherit inputs user;
+  };
   # Home Manager configuration
   home-manager.users = lib.genAttrs [ "${user}" ] (
     username:

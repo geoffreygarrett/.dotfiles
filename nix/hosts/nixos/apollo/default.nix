@@ -105,8 +105,10 @@ in
     ../../../modules/nixos/samba.nix
     ../shared.nix
     ./config/desktop.nix
+    ../../../scripts/network-tools.nix
   ];
 
+  services.networkTools.enable = true;
   system.stateVersion = "24.11";
   nix.settings.secret-key-files = "/etc/nix/cache-priv-key.pem";
 
@@ -162,6 +164,17 @@ in
   #   "nvidia_uvm"
   #   "nvidia_drm"
   # ];
+
+  systemd.services.wakeonlan = {
+    description = "Reenable wake on lan every boot";
+    after = [ "network.target" ];
+    serviceConfig = {
+      Type = "simple";
+      RemainAfterExit = "true";
+      ExecStart = "${pkgs.ethtool}/sbin/ethtool -s ${mainInterface} wol g";
+    };
+    wantedBy = [ "default.target" ];
+  };
 
   environment.systemPackages = with pkgs; [
     jdk17
