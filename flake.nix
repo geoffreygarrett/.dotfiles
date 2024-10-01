@@ -192,9 +192,7 @@
                   attrNames (readDir path)
                 );
             in
-            builtins.trace "Loading overlays: ${builtins.toString overlayFiles}" (
-              map (n: import (path + ("/" + n))) overlayFiles
-            )
+            map (n: import (path + ("/" + n))) overlayFiles
             ++ [
               (final: prev: {
                 nixus = self.packages.${system}.nixus;

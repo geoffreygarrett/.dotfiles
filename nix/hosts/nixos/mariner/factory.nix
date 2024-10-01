@@ -16,7 +16,7 @@
   imports = [
     inputs.sops-nix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
-    ./kubernetes.nix
+    # ./kubernetes.nix
     # impermanence.nixosModules.impermanence
     ../../../modules/shared/secrets.nix
     ../../../modules/nixos/tailscale.nix
@@ -28,6 +28,13 @@
 
   system.stateVersion = "24.11";
   sdImage.compressImage = false;
+
+  # Set kernel boot parameters for cgroup memory support (k3s)
+  boot.kernelParams = [
+    "cgroup_enable=cpuset"
+    "cgroup_memory=1"
+    "cgroup_enable=memory"
+  ];
 
   # Network and firewall configuration
   networking = {
