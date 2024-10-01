@@ -8,10 +8,10 @@
     role = "server";
     extraFlags = [
       "--cluster-init"
-      "--kube-controller-manager-arg=node-monitor-period=5s"
-      "--kube-controller-manager-arg=node-monitor-grace-period=20s"
-      "--kube-controller-manager-arg=pod-eviction-timeout=30s"
-      "--kube-controller-manager-arg=controllers=*,bootstrapsigner,tokencleaner,node-controller"
+      # "--kube-controller-manager-arg=node-monitor-period=5s"
+      # "--kube-controller-manager-arg=node-monitor-grace-period=20s"
+      # "--kube-controller-manager-arg=pod-eviction-timeout=30s"
+      # "--kube-controller-manager-arg=controllers=*,bootstrapsigner,tokencleaner,node-controller"
     ];
   };
 
