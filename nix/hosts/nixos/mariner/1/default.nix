@@ -28,9 +28,12 @@ in
     ../../../../modules/nixos/tailscale.nix
     ../../../../modules/nixos/openssh.nix
     ../../../../modules/nixos/samba.nix
+    ../../../../scripts/network-tools.nix
     ./disko-ext4.nix
     inputs.disko.nixosModules.disko
   ];
+
+  services.networkTools.enable = true;
 
   # System Configuration
   system.stateVersion = "24.11";
@@ -247,9 +250,6 @@ in
         ../../../../modules/shared/programs/zsh.nix
       ];
       programs = {
-        zsh = {
-          enable = true;
-        };
         neovim = {
           enable = true;
         };
