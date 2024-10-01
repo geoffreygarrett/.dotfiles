@@ -1,8 +1,6 @@
 {
-  config,
   lib,
   pkgs,
-  self,
   user,
   inputs,
   keys,
@@ -48,60 +46,6 @@ in
     grub.enable = false;
     generic-extlinux-compatible.enable = lib.mkForce false;
   };
-
-  # fileSystems = {
-  #   "/" = {
-  #     device = "/dev/disk/by-label/ROOT";
-  #     fsType = "ext4";
-  #     options = [ "noatime" ];
-  #   };
-  #   "/boot" = {
-  #     device = "/dev/disk/by-label/BOOT";
-  #     fsType = "vfat";
-  #   };
-  # };
-  # swapDevices = [
-  #   { device = "/dev/disk/by-label/SWAP"; }
-  # ];
-
-  # fileSystems = {
-  #   "/" = {
-  #     device = "/dev/disk/by-label/ROOT";
-  #     fsType = "btrfs";
-  #     options = [
-  #       "subvol=root"
-  #       "compress=zstd"
-  #       "noatime"
-  #     ];
-  #   };
-  #   "/home" = {
-  #     device = "/dev/disk/by-label/ROOT";
-  #     fsType = "btrfs";
-  #     options = [
-  #       "subvol=home"
-  #       "compress=zstd"
-  #       "noatime"
-  #     ];
-  #   };
-  #   "/nix" = {
-  #     device = "/dev/disk/by-label/ROOT";
-  #     fsType = "btrfs";
-  #     options = [
-  #       "subvol=nix"
-  #       "compress=zstd"
-  #       "noatime"
-  #     ];
-  #   };
-  #   "/boot" = {
-  #     device = "/dev/disk/by-label/BOOT";
-  #     fsType = "vfat";
-  #   };
-  # };
-
-  swapDevices = [
-    # { device = "/dev/disk/by-uuid/8f549645-0e82-44ae-984b-6f17ca763b22"; }
-    # { device = "/dev/disk/by-label/SWAP"; }
-  ];
 
   # Kernel Modules and Power Management
   boot.initrd.availableKernelModules = [

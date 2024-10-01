@@ -10,4 +10,9 @@
       "--cluster-init"
     ];
   };
+
+  # open required ports for k3s
+  networking.firewall.allowedTCPPorts = [
+    8001
+  ];
 }

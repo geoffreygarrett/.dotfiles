@@ -26,6 +26,7 @@
     "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
   ] ++ extraModules;
 
+  # System configuration
   system.stateVersion = "24.11";
   sdImage.compressImage = false;
 

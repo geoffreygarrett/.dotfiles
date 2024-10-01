@@ -450,108 +450,110 @@
       ##############################
       # Deploy Nodes :deploy
       ##############################
-      deploy.nodes =
-        let
-          commonSshOpts = [
-            # "-o"
-            # "StrictHostKeyChecking=no"
-            # "-o"
-            # "UserKnownHostsFile=/dev/null"
-          ];
-          activateNixOnDroid =
-            configuration:
-            inputs.deploy-rs.lib.aarch64-linux.activate.custom configuration.activationPackage "${configuration.activationPackage}/activate";
-        in
-        {
+      deploy = {
+        nodes =
+          let
+            commonSshOpts = [
+              # "-o"
+              # "StrictHostKeyChecking=no"
+              # "-o"
+              # "UserKnownHostsFile=/dev/null"
+            ];
+            activateNixOnDroid =
+              configuration:
+              inputs.deploy-rs.lib.aarch64-linux.activate.custom configuration.activationPackage "${configuration.activationPackage}/activate";
+          in
+          {
 
-          "cassini" = {
-            hostname = "cassini.nixus.net";
-            profiles.system = {
-              # Build the derivation on the target system.
-              # Will also fetch all external dependencies from the target system's substituters.
-              # This default to `false`. If the target system does not have the trusted keys, set this to `true`.
-              remoteBuild = false;
-              sshUser = "${user}";
-              user = "root";
-              magicRollback = true;
-              interactiveSudo = true;
-              sshOpts = commonSshOpts;
-              # sshOpts = commonSshOpts ++ [
-              #   # # NOTE: This is a workaround for "too many root sets":
-              #   # # https://github.com/NixOS/nix/issues/7359
-              #   "-o"
-              #   "ProxyCommand=none"
-              #   "-t" # pseudo-terminal allocation for password prompt
-              # ];
-              path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.cassini;
+            "cassini" = {
+              hostname = "cassini.nixus.net";
+              profiles.system = {
+                # Build the derivation on the target system.
+                # Will also fetch all external dependencies from the target system's substituters.
+                # This default to `false`. If the target system does not have the trusted keys, set this to `true`.
+                remoteBuild = false;
+                sshUser = "${user}";
+                user = "root";
+                magicRollback = true;
+                interactiveSudo = true;
+                sshOpts = commonSshOpts;
+                # sshOpts = commonSshOpts ++ [
+                #   # # NOTE: This is a workaround for "too many root sets":
+                #   # # https://github.com/NixOS/nix/issues/7359
+                #   "-o"
+                #   "ProxyCommand=none"
+                #   "-t" # pseudo-terminal allocation for password prompt
+                # ];
+                path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.cassini;
+              };
+            };
+
+            "mariner-1" = {
+              hostname = "mariner-1.nixus.net";
+              profiles.system = {
+                sshUser = "${user}";
+                user = "root";
+                magicRollback = true;
+                sshOpts = commonSshOpts;
+                path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
+              };
+            };
+
+            "mariner-3" = {
+              hostname = "mariner-3.nixus.net";
+              profiles.system = {
+                sshUser = "${user}";
+                user = "root";
+                magicRollback = true;
+                sshOpts = commonSshOpts;
+                path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-3;
+              };
+            };
+
+            "mariner-4" = {
+              # Raspberry Pi 3B+
+              hostname = "mariner-4.nixus.net";
+              profiles.system = {
+                sshUser = "${user}";
+                user = "root";
+                magicRollback = true;
+                sshOpts = commonSshOpts;
+                path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-4;
+              };
+            };
+
+            "pioneer" = {
+              # Samsung S20 Ultra
+              hostname = "pioneer.nixus.net";
+              profiles.system = {
+                confirmTimeout = 60;
+                sshUser = "nix-on-droid";
+                user = "nix-on-droid";
+                magicRollback = true;
+                sshOpts = commonSshOpts ++ [
+                  "-p"
+                  "8022"
+                ];
+                path = activateNixOnDroid self.nixOnDroidConfigurations.pioneer;
+              };
+            };
+
+            "voyager" = {
+              # Samsung Galaxy Tab S7
+              hostname = "voyager.nixus.net";
+              profiles.system = {
+                sshUser = "nix-on-droid";
+                user = "nix-on-droid";
+                magicRollback = true;
+                sshOpts = commonSshOpts ++ [
+                  "-p"
+                  "8022"
+                ];
+                path = activateNixOnDroid self.nixOnDroidConfigurations.voyager;
+              };
             };
           };
-
-          "mariner-1" = {
-            hostname = "mariner-1.nixus.net";
-            profiles.system = {
-              sshUser = "${user}";
-              user = "root";
-              magicRollback = true;
-              sshOpts = commonSshOpts;
-              path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
-            };
-          };
-
-          "mariner-3" = {
-            hostname = "mariner-3.nixus.net";
-            profiles.system = {
-              sshUser = "${user}";
-              user = "root";
-              magicRollback = true;
-              sshOpts = commonSshOpts;
-              path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-3;
-            };
-          };
-
-          "mariner-4" = {
-            # Raspberry Pi 3B+
-            hostname = "mariner-4.nixus.net";
-            profiles.system = {
-              sshUser = "${user}";
-              user = "root";
-              magicRollback = true;
-              sshOpts = commonSshOpts;
-              path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-4;
-            };
-          };
-
-          "pioneer" = {
-            # Samsung S20 Ultra
-            hostname = "pioneer.nixus.net";
-            profiles.system = {
-              confirmTimeout = 60;
-              sshUser = "nix-on-droid";
-              user = "nix-on-droid";
-              magicRollback = true;
-              sshOpts = commonSshOpts ++ [
-                "-p"
-                "8022"
-              ];
-              path = activateNixOnDroid self.nixOnDroidConfigurations.pioneer;
-            };
-          };
-
-          "voyager" = {
-            # Samsung Galaxy Tab S7
-            hostname = "voyager.nixus.net";
-            profiles.system = {
-              sshUser = "nix-on-droid";
-              user = "nix-on-droid";
-              magicRollback = true;
-              sshOpts = commonSshOpts ++ [
-                "-p"
-                "8022"
-              ];
-              path = activateNixOnDroid self.nixOnDroidConfigurations.voyager;
-            };
-          };
-        };
+      };
 
       ##############################
       # NixOS Configuration :nixos

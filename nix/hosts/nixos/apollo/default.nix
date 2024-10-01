@@ -103,6 +103,7 @@ in
     ../../../modules/nixos/openssh.nix
     ../../../modules/nixos/tailscale.nix
     ../../../modules/nixos/samba.nix
+    ../../../modules/nixos/key-repeat.nix
     ../mariner/k3/agent.nix
     ./k3s.nix
     ../shared.nix
