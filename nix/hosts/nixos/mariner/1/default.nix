@@ -29,6 +29,7 @@ in
     ../../../../modules/nixos/openssh.nix
     ../../../../modules/nixos/samba.nix
     ../../../../scripts/network-tools.nix
+    ../k3/server.nix
     ./disko-ext4.nix
     inputs.disko.nixosModules.disko
   ];
