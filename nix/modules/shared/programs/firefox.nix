@@ -155,6 +155,8 @@
             }
             {
               url = "https://haseebmajid.dev/series/setup-raspberry-pi-cluster-with-k3s-and-nixos/";
+              # url = "https://haseebmajid.dev/posts/2023-11-30-til-how-to-use-sops-nix-with-colmena/";
+
             }
             {
               name = "NixOS Config (RPi4+UEFI+SSD boot)";

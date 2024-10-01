@@ -213,7 +213,7 @@
         system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
       );
       sharedDnsmasqConfig = {
-        enable = false;
+        enable = true;
         # debugMode = true;
         hosts = {
           "pioneer.nixus.net" = {
@@ -243,7 +243,7 @@
           "mariner-1.nixus.net" = {
             addresses = [
               {
-                ip = "192.168.68.114";
+                ip = "192.168.68.109";
                 type = "local";
               }
             ];
@@ -490,20 +490,17 @@
           };
 
           "mariner-1" = {
-            # Raspberry Pi 4B
             hostname = "mariner-1.nixus.net";
             profiles.system = {
-              sshUser = "root";
+              sshUser = "${user}";
               user = "root";
-              # interactiveSudo = true;
-              magicRollback = false;
+              magicRollback = true;
               sshOpts = commonSshOpts;
               path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.mariner-1;
             };
           };
 
           "mariner-3" = {
-            # Raspberry Pi 3B+
             hostname = "mariner-3.nixus.net";
             profiles.system = {
               sshUser = "${user}";

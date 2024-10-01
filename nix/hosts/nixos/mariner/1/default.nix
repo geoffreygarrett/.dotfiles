@@ -15,20 +15,23 @@ in
 {
   imports = [
     # inputs.impermanence.nixosModules.impermanence
-    # inputs.argon40-nix.nixosModules.default
+    inputs.argon40-nix.nixosModules.default
     inputs.nixos-hardware.nixosModules.raspberry-pi-4
-    # inputs.sops-nix.nixosModules.default
-    # inputs.home-manager.nixosModules.home-manager
+    inputs.sops-nix.nixosModules.default
+    inputs.home-manager.nixosModules.home-manager
+    {
+      home-manager.useGlobalPkgs = true;
+      home-manager.useUserPackages = true;
+    }
     # ./kubernetes.nix
-    # ../../../../modules/shared/secrets.nix
-    # ../../../../modules/nixos/tailscale.nix
-    # ../../../../modules/nixos/openssh.nix
-    # ../../../../modules/nixos/samba.nix
+    ../../../../modules/shared/secrets.nix
+    ../../../../modules/nixos/tailscale.nix
+    ../../../../modules/nixos/openssh.nix
+    ../../../../modules/nixos/samba.nix
+    ./disko-ext4.nix
     inputs.disko.nixosModules.disko
-
   ];
 
-  disko.devices = import ./disko-ext4.nix { inherit lib; };
   # System Configuration
   system.stateVersion = "24.11";
   time.timeZone = "Africa/Johannesburg";
@@ -41,9 +44,6 @@ in
     grub.enable = false;
     generic-extlinux-compatible.enable = lib.mkForce false;
   };
-
-  #   boot.loader.efi.canTouchEfiVariables = false;
-  # boot.supportedFilesystems = [ "zfs" ];
 
   # fileSystems = {
   #   "/" = {
@@ -93,11 +93,11 @@ in
   #     fsType = "vfat";
   #   };
   # };
-  #
-  # swapDevices = [
-  #   { device = "/dev/disk/by-label/SWAP"; }
-  # ];
-  #
+
+  swapDevices = [
+    { device = "/dev/disk/by-label/SWAP"; }
+  ];
+
   # Kernel Modules and Power Management
   boot.initrd.availableKernelModules = [
     # Raspberry Pi-specific modules
@@ -106,17 +106,16 @@ in
     "i2c_bcm2835"
 
     # SSD boot support
-    "usb_storage"
-    "xhci_pci"
-    "usbhid"
+    # "usb_storage"
+    # "xhci_pci"
+    # "usbhid"
     "uas"
   ];
 
-  boot.kernelModules = [ "8021q" ];
-  boot.blacklistedKernelModules = [
-    "brcmfmac"
-    "brcmutil"
-  ];
+  # boot.blacklistedKernelModules = [
+  #   "brcmfmac"
+  #   "brcmutil"
+  # ];
 
   # boot.kernelParams = [
   #   "console=ttyS0,115200n8"
@@ -131,58 +130,88 @@ in
   #   "kexec-load-disabled=0"
   # ];
 
-  boot.kernelParams = [
-    "console=ttyS0,115200n8"
-    "console=tty0"
-    "noirqbalance"
-    "kexec_core.loaded_kexec_image=1"
-    "kexec_core.kexec_loaded=1"
-    "kexec-syscall=on"
-    "maxcpus=1"
-    "loglevel=7"
-  ];
-
-  boot.consoleLogLevel = 7;
+  # boot.kernelParams = [
+  #   "console=ttyS0,115200n8"
+  #   "console=tty0"
+  # ];
 
   # Filesystem and kernel options
-  systemd.services."getty@".enable = false;
-  boot.supportedFilesystems = [
-    "ext4"
-    "btrfs"
-    "vfat"
+  # boot.supportedFilesystems = [
+  #   "ext4"
+  #   "btrfs"
+  #   "vfat"
+  # ];
+
+  environment.systemPackages = with pkgs; [
+    neovim
+    wget
+    git
   ];
+
   boot.kernelPackages = pkgs.linuxPackages_latest;
   powerManagement.cpuFreqGovernor = "ondemand";
 
   # Networking and Services
-  systemd.services.dbus.serviceConfig.TimeoutStartSec = "120s";
-  services.udev.extraRules = ''
-    # Rename the interface with the MAC address to eth0
-    SUBSYSTEM=="net", ACTION=="add", ATTR{address}=="e4:5f:01:26:7e:ad", NAME="eth0"
-  '';
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
   ];
 
-  # Disable Predictable Network Interface Names
-  networking.usePredictableInterfaceNames = false;
-  networking = {
-    hostName = hostname;
-    useDHCP = false;
-    interfaces.enabcm6e4ei0 = {
-      useDHCP = true;
-    };
-    interfaces.eth0 = {
-      useDHCP = true;
-    };
-  };
+  # Network and firewall configurationa
+  networking.networkmanager.enable = true;
+  # networking = {
+  #   hostName = hostname;
+  #   useDHCP = false;
+  #   dhcpcd.wait = "background";
+  #   interfaces.wlan0.useDHCP = true;
+  #   interfaces.enabcm6e4ei0.useDHCP = true;
+  #   wireless = {
+  #     enable = true;
+  #     userControlled.enable = true;
+  #     secretsFile = config.sops.secrets.wireless_secrets.path;
+  #     networks = {
+  #       "Haemanthus" = {
+  #         priority = 90;
+  #         pskRaw = "ext:haemanthus_psk";
+  #       };
+  #     };
+  #   };
+  #
+  #   firewall = {
+  #     enable = true;
+  #     allowedTCPPorts = [
+  #       22 # SSH
+  #       80 # HTTP
+  #       443 # HTTPS
+  #       6443 # k3s: Kubernetes API server
+  #       10250 # Kubelet API
+  #     ];
+  #     allowedUDPPorts = [
+  #       # 8472  # Required if using Flannel in multi-node setup
+  #     ];
+  #   };
+  # };
+
+  # networking.usePredictableInterfaceNames = false;
+  # networking = {
+  #   hostName = hostname;
+  #   useDHCP = false;
+  #   interfaces.enabcm6e4ei0 = {
+  #     useDHCP = true;
+  #   };
+  #   interfaces.eth0 = {
+  #     useDHCP = true;
+  #   };
+  # };
 
   # User configuration
   users.users.${user} = {
     isNormalUser = true;
     shell = pkgs.zsh;
-    extraGroups = [ "wheel" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     initialPassword = "changeme";
     openssh.authorizedKeys.keys = keys;
   };
@@ -200,5 +229,43 @@ in
   nix.settings.trusted-public-keys = [
     "builder-name:4w+NIGfO2WFJ6xKs4JaPoiUcxjm4YDG8ycLt3M67uBA=%"
   ];
+
+  # Home Manager configuration
+  home-manager.users = lib.genAttrs [ "${user}" ] (
+    username:
+    { lib, ... }:
+    {
+      home.stateVersion = "24.11";
+      programs.ssh = {
+        enable = true;
+
+        matchBlocks = {
+          "*" = {
+            identityFile = "~/.ssh/id_ed25519";
+            extraOptions = {
+              AddKeysToAgent = "yes";
+            };
+          };
+        };
+
+        extraConfig = ''
+          Host github.com
+            IdentitiesOnly yes
+            IdentityFile ~/.ssh/github_ed25519
+        '';
+      };
+
+      home.activation = {
+        generateSshKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+          if [ ! -f $HOME/.ssh/id_ed25519 ]; then
+            ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $HOME/.ssh/id_ed25519 -N "" -C "${username}@${hostname}"
+          fi
+          if [ ! -f $HOME/.ssh/github_ed25519 ]; then
+            ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $HOME/.ssh/github_ed25519 -N "" -C "${username}@github"
+          fi
+        '';
+      };
+    }
+  );
 
 }

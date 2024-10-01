@@ -2,24 +2,25 @@
   # SSH Server
   services.openssh = {
     enable = true;
-
-    # Use the new options for PermitRootLogin and PasswordAuthentication
     settings = {
-      PermitRootLogin = "prohibit-password"; # Options: "yes", "without-password", "prohibit-password", "forced-commands-only", "no"
+      PermitRootLogin = "prohibit-password";
       PasswordAuthentication = false;
       UseDns = true;
     };
-
     allowSFTP = true;
 
-    # These commands must be properly defined if used, otherwise, comment them out
-    # authorizedKeysCommand = "/path/to/command"; # Define the command to retrieve authorized keys
-    # authorizedKeysCommandUser = "nobody"; # Define the user under which the command runs
-
-    # Example template for setting authorized keys files (can be null if not needed)
-    # authorizedKeysFiles = [ "/path/to/authorized_keys" ]; 
-
-    # authorizedKeysInHomedir = false; # Set to true if keys are located in the user's home directory
+    # Generate host keys if they don't exist
+    hostKeys = [
+      {
+        path = "/etc/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+      {
+        path = "/etc/ssh/ssh_host_rsa_key";
+        type = "rsa";
+        bits = 4096;
+      }
+    ];
 
     # Optionally set a banner
     # banner = "/path/to/banner";
@@ -28,13 +29,13 @@
     # extraConfig = ''
     #   # Additional options can be placed here
     # '';
-    #
-    # Define the host keys
-    # hostKeys = [
-    #   # "/path/to/host_key"
-    # ];
 
     # Example template for known hosts (optional)
-    # knownHosts = [ "host.example.com ssh-rsa AAAAB3Nza..." ];
+    # knownHosts = [ 
+    #   {
+    #     hostNames = [ "host.example.com" ];
+    #     publicKey = "ssh-rsa AAAAB3Nza...";
+    #   }
+    # ];
   };
 }

@@ -1,7 +1,8 @@
 #!/bin/sh
 set -e
 
-IMAGE_PATH=$(echo result/sd-image/nixos-sd-image-*-aarch64-linux.img)
+# IMAGE_PATH=$(echo result/sd-image/nixos-sd-image-*-aarch64-linux.img)
+IMAGE_PATH=/home/geoffrey/Downloads/nixos-gnome-24.05.5366.fbca5e745367-aarch64-linux.iso
 # IMAGE_PATH=/home/geoffrey/Downloads/nixos-sd-image-24.11pre685764.1925c603f17f-aarch64-linux.img.zst
 SD_CARD="/dev/sdb"  # Make sure this is the correct device for your SD card
 
