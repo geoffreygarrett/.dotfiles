@@ -104,7 +104,7 @@ in
     ../../../modules/nixos/tailscale.nix
     ../../../modules/nixos/samba.nix
     ../mariner/k3/agent.nix
-    ./k3.nix
+    ./k3s.nix
     ../shared.nix
     ./config/desktop.nix
     ../../../scripts/network-tools.nix

@@ -2,8 +2,9 @@
 {
   virtualisation.docker = {
     enable = true;
-    enableNvidia = true;
+    # enableNvidia = true;
   };
+  hardware.nvidia-container-toolkit.enable = true;
   environment.systemPackages = with pkgs; [
     docker
     runc
