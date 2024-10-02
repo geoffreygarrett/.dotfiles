@@ -220,11 +220,6 @@
                   name = "Unmoved Centre - Secrets Management Guide";
                   tags = [
                     "nixos"
-                    "secrets"
-                    "sops"
-                    "security"
-                  ];
-                  keywords = [
                     "nixos"
                     "secrets management"
                     "sops"
@@ -243,12 +238,6 @@
                         "yubikey"
                         "gpg"
                       ];
-                      keywords = [
-                        "nixos"
-                        "yubikey"
-                        "sops"
-                        "security"
-                      ];
                       url = "https://www.reddit.com/r/NixOS/comments/1dbalru/yubikey_gpg_key_sopsnix/";
                     }
                     {
@@ -258,12 +247,6 @@
                         "secrets"
                         "sops"
                         "yubikey"
-                      ];
-                      keywords = [
-                        "nixos"
-                        "yubikey"
-                        "sops"
-                        "security"
                       ];
                       url = "https://www.reddit.com/r/NixOS/comments/1bqwbsj/sopsnix_and_yubikey/";
                     }
@@ -287,11 +270,6 @@
                     "raspberry-pi"
                     "setup"
                   ];
-                  keywords = [
-                    "nixos"
-                    "raspberry pi"
-                    "installation"
-                  ];
                   url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
                 }
                 {
@@ -303,12 +281,6 @@
                     "luks"
                     "encryption"
                   ];
-                  keywords = [
-                    "nixos"
-                    "raspberry pi 4"
-                    "luks"
-                    "encrypted filesystem"
-                  ];
                 }
                 {
                   name = "NixOS on Raspberry Pi 4 with SSD Boot";
@@ -318,11 +290,6 @@
                     "raspberry-pi"
                     "ssd"
                     "boot"
-                  ];
-                  keywords = [
-                    "nixos"
-                    "raspberry pi 4"
-                    "ssd boot"
                   ];
                 }
                 {
@@ -334,12 +301,6 @@
                     "uefi"
                     "boot"
                   ];
-                  keywords = [
-                    "nixos"
-                    "raspberry pi 4"
-                    "uefi"
-                    "ssd boot"
-                  ];
                   url = "https://codeberg.org/kotatsuyaki/rpi4-usb-uefi-nixos-config";
                 }
               ];
@@ -350,12 +311,6 @@
                 "nixos"
                 "flakes"
                 "installation"
-              ];
-              keywords = [
-                "nixos"
-                "flakes"
-                "git"
-                "configuration"
               ];
               url = "https://nixos.asia/en/nixos-install-flake";
             }
