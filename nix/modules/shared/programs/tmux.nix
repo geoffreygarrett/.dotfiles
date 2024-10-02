@@ -97,14 +97,23 @@ in
       bind-key -r f run-shell "tmux neww ${pkgs.tmux-sessionizer}/bin/tms"
 
       # tmux-sessionizer [tms]
-      bind-key s display-popup -E "tms switch"  # Switch sessions
-      bind-key w display-popup -E "tms windows"  # Show windows in current session
+      bind C-t display-popup -E "tms" # tms fuzzy find repos
+      bind C-j display-popup -E "tms switch" # tms switch between active sessions
+      bind C-w display-popup -E "tms windows" # tms show active windows in current session
+      # tms rename active session
+      # Note: This conflicts with the 'tms windows' binding
+      # Uncomment if you prefer this over the 'tms windows' binding
+      # bind C-w command-prompt -p "Rename active session to: " "run-shell 'tms rename %1'"
+      # bind C-r "run-shell 'tms refresh'" # tms refresh (generate missing worktree windows)
+
+      #bind-key s display-popup -E "tms switch"  # Switch sessions
+      #bind-key w display-popup -E "tms windows"  # Show windows in current session
       bind-key R command-prompt -p "Rename session to: " "run-shell 'tms rename %1'"  # Rename session
       bind-key F run-shell 'tms refresh'  # Refresh session (create missing worktree windows)
       bind-key K run-shell 'tms kill'  # Kill session and switch to another
-      set -ag status-right "#(tms sessions)"  # Show sessions in status bar
       bind-key ( switch-client -p\; refresh-client -S  # Switch to previous session and refresh
       bind-key ) switch-client -n\; refresh-client -S  # Switch to next session and refresh
+      set -ag status-right "#(tms sessions)"  # Show sessions in status bar
 
       # TODO.md, complements of ThePrimeagen
       # https://github.com/ThePrimeagen/.dotfiles/blob/602019e902634188ab06ea31251c01c1a43d1621/tmux/.tmux.conf#L24
