@@ -59,7 +59,6 @@ with pkgs;
   ############################
   # Developer productivity
   ############################
-  tmux-sessionizer
   # Developer productivity
   iperf2
 ]

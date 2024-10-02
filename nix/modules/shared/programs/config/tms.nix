@@ -46,7 +46,7 @@ in
 
     switchFilterUnknown = mkOption {
       type = types.bool;
-      default = true;
+      default = false;
       description = "Whether to filter unknown sessions when switching.";
     };
 
@@ -65,8 +65,7 @@ in
       default = [
         ".git"
         "node_modules"
-        "target"
-        "build"
+        "dist"
       ];
       description = "Directories to exclude from search.";
     };
@@ -90,23 +89,7 @@ in
       default = [
         {
           path = config.home.homeDirectory;
-          depth = 1;
-        }
-        {
-          path = "${config.home.homeDirectory}/Projects";
-          depth = 1;
-        }
-        {
-          path = "${config.home.homeDirectory}/PyCharmProjects";
-          depth = 1;
-        }
-        {
-          path = "${config.home.homeDirectory}/CLionProjects";
-          depth = 1;
-        }
-        {
-          path = "${config.home.homeDirectory}/RustRoverProjects";
-          depth = 1;
+          depth = 2;
         }
       ];
       description = "Directories to search, with their respective depths.";
@@ -117,7 +100,7 @@ in
         options = {
           highlightColor = mkOption {
             type = types.str;
-            default = "#1F2233";
+            default = "#2E3440";
             description = "The highlight color.";
           };
           highlightTextColor = mkOption {
@@ -158,19 +141,14 @@ in
       recursive_submodules = ${boolToString cfg.recursiveSubmodules}
       switch_filter_unknown = ${boolToString cfg.switchFilterUnknown}
       session_sort_order = "${cfg.sessionSortOrder}"
-
       # Excluded directories
       excluded_dirs = [
-        ${concatMapStringsSep ",\n        " (dir: "\"${dir}\"") cfg.excludedDirs}
+        ${concatMapStringsSep ",\n  " (dir: "\"${dir}\"") cfg.excludedDirs}
       ]
-
       # Search directories
       search_dirs = [
-        ${
-          concatMapStringsSep ",\n        " (dir: "[\"${dir.path}\", ${toString dir.depth}]") cfg.searchDirs
-        }
+        ${concatMapStringsSep ",\n  " (dir: "[\"${dir.path}\", ${toString dir.depth}]") cfg.searchDirs}
       ]
-
       # Picker colors
       [picker_colors]
       highlight_color = "${cfg.pickerColors.highlightColor}"

@@ -97,8 +97,7 @@ in
       bind-key -r f run-shell "tmux neww ${pkgs.tmux-sessionizer}/bin/tms"
 
       # tmux-sessionizer [tms]
-      # FIXME: The current sessions don't show in switch and windows, but tms sessions shows them correctly.
-      # bind-key s display-popup -E "tms switch"  # Switch sessions
+      bind-key s display-popup -E "tms switch"  # Switch sessions
       bind-key w display-popup -E "tms windows"  # Show windows in current session
       bind-key R command-prompt -p "Rename session to: " "run-shell 'tms rename %1'"  # Rename session
       bind-key F run-shell 'tms refresh'  # Refresh session (create missing worktree windows)

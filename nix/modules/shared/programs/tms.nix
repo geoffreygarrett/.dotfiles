@@ -9,7 +9,26 @@
   imports = [
     ./config/tms.nix
   ];
-  programs.tmux-sessionizer.enable = true;
+  programs.tmux-sessionizer = {
+    enable = true;
+    defaultSession = "work";
+    excludedDirs = [
+      ".git"
+      "node_modules"
+      "dist"
+    ];
+    # searchDirs = [
+    #   {
+    #     path = "/home/user/projects";
+    #     depth = 2;
+    #   }
+    #   {
+    #     path = "/home/user/documents";
+    #     depth = 1;
+    #   }
+    # ];
+    pickerColors.highlightColor = "#2E3440";
+  };
   # # Install Tailscale for the user
   # home.packages = with pkgs; [ tmux-sessionizer ];
   #

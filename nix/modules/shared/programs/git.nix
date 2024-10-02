@@ -14,8 +14,8 @@
       co = "checkout";
       br = "branch";
       ci = "commit";
-      use-ssh = "remote set-url origin $(git remote get-url origin | sed -E 's#^https?://([^/]+)/(.+)$#git@\1:\2#')";
-      use-https = "remote set-url origin $(git remote get-url origin | sed -E 's#^git@([^:]+):(.+)$#https://\1/\2#')";
+      use-ssh = "!f() { git remote set-url origin $(git remote get-url origin | sed -E 's#^https?://([^/]+)/(.+)$#git@\\1:\\2#'); }; f";
+      use-https = "!f() { git remote set-url origin $(git remote get-url origin | sed -E 's#^git@([^:]+):(.+)$#https://\\1/\\2#'); }; f";
     };
     extraConfig = {
       init.defaultBranch = "main";
