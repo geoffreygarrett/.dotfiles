@@ -151,7 +151,22 @@
           ];
         }
         {
+          name = "Academic Interests";
+          bookmarks = [
+            {
+              name = "Fundamentals of Systems Engineering";
+              tags = [
+                "systems"
+                "engineering"
+              ];
+              keyword = "systems";
+              urls = "https://ocw.mit.edu/courses/16-842-fundamentals-of-systems-engineering-fall-2015/";
+            }
+          ];
+        }
+        {
           name = "NixOS Learning";
+          toolbar = true;
           bookmarks = [
             {
               name = "[myme.no] NixOS: On Raspberry Pi 3B";
@@ -168,7 +183,6 @@
             {
               url = "https://haseebmajid.dev/series/setup-raspberry-pi-cluster-with-k3s-and-nixos/";
               # url = "https://haseebmajid.dev/posts/2023-11-30-til-how-to-use-sops-nix-with-colmena/";
-
             }
             {
               name = "NixOS Config (RPi4+UEFI+SSD boot)";

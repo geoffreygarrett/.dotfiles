@@ -56,18 +56,4 @@ in
       };
     };
   };
-  #  # Service to login once sops-nix is ready.
-  #  systemd.user.services.gh-auth = {
-  #    Unit = {
-  #      Description = "Authenticate GitHub CLI with token";
-  #      After = [ "sops-nix.service" ];
-  #    };
-  #    Service = {
-  #      Type = "oneshot";
-  #      ExecStart = "${gh-wrapped}/bin/gh auth login --with-token < ${config.sops.secrets.github-token.path}";
-  #    };
-  #    Install = {
-  #      WantedBy = [ "default.target" ];
-  #    };
-  #  };
 }

@@ -84,7 +84,7 @@
         ];
       };
       mouse = {
-        hide_when_typing = false;
+        hide_when_typing = true;
       };
       keyboard.bindings = [
         {
