@@ -18,4 +18,7 @@ shared-packages
 
   # Deploy
   deploy-rs
+
+  # Networking
+  iperf2
 ]

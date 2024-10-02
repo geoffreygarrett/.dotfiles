@@ -12,6 +12,56 @@
       search = {
         force = true;
         engines = {
+          "Rust Docs" = {
+            urls = [
+              {
+                template = "https://doc.rust-lang.org/std/?search={searchTerms}";
+              }
+            ];
+            iconUpdateURL = "https://www.rust-lang.org/favicon.ico";
+            updateInterval = 24 * 60 * 60 * 1000;
+            definedAliases = [ "@rust" ];
+          };
+          "GitHub Code" = {
+            urls = [
+              {
+                template = "https://github.com/search?q={searchTerms}&type=code";
+              }
+            ];
+            iconUpdateURL = "https://github.com/favicon.ico";
+            updateInterval = 24 * 60 * 60 * 1000;
+            definedAliases = [ "@ghc" ];
+          };
+          "Stack Overflow" = {
+            urls = [
+              {
+                template = "https://stackoverflow.com/search?q={searchTerms}";
+              }
+            ];
+            iconUpdateURL = "https://cdn.sstatic.net/Sites/stackoverflow/Img/favicon.ico";
+            updateInterval = 24 * 60 * 60 * 1000;
+            definedAliases = [ "@so" ];
+          };
+          "arXiv" = {
+            urls = [
+              {
+                template = "https://arxiv.org/search/?query={searchTerms}&searchtype=all";
+              }
+            ];
+            iconUpdateURL = "https://static.arxiv.org/static/browse/0.3.2.8/images/icons/favicon.ico";
+            updateInterval = 24 * 60 * 60 * 1000;
+            definedAliases = [ "@arx" ];
+          };
+          "Google Scholar" = {
+            urls = [
+              {
+                template = "https://scholar.google.com/scholar?q={searchTerms}";
+              }
+            ];
+            iconUpdateURL = "https://scholar.google.com/favicon.ico";
+            updateInterval = 24 * 60 * 60 * 1000;
+            definedAliases = [ "@gs" ];
+          };
           "Anaconda Packages" = {
             iconUpdateURL = "https://www.google.com/s2/favicons?domain=anaconda.org";
             updateInterval = 24 * 60 * 60 * 1000; # every day
@@ -59,87 +109,49 @@
           };
         };
       };
-
-      # Bookmarks
       bookmarks = [
         {
-          name = "Plan To Listen";
+          name = "NixOS Resources";
           bookmarks = [
             {
-              name = "[Podcast] FTN interview with Jonathan Ringer";
+              name = "Awesome Nix - Curated List of Nix Resources";
               tags = [
-                "podcast"
+                "nix"
                 "nixos"
+                "package-manager"
+                "linux"
+                "open-source"
+                "devops"
+                "system-administration"
               ];
-              url = "https://fulltimenix.com/episodes/jonathan-ringer";
-            }
-          ];
-        }
-        {
-          name = "NixOS Secrets Management";
-          bookmarks = [
-            {
-              name = "Unmoved Centre - Secrets Management";
-              tags = [
+              keywords = [
+                "nix"
                 "nixos"
-                "secrets"
-                "sops"
+                "package manager"
+                "reproducible builds"
+                "functional programming"
+                "system configuration"
               ];
-              url = "https://unmovedcentre.com/posts/secrets-management/";
-            }
-            {
-              name = "The Negation - NixOS on Raspberry Pi 4 with Encrypted Filesystem";
-              url = "https://thenegation.hashnode.dev/nixos-rpi4-luks";
-              tags = [
-                "nixos"
-                "rpi4"
-                "luks"
-              ];
+              url = "https://github.com/nix-community/awesome-nix";
             }
             {
-              name = "Yubikey with SOPS";
-              bookmarks = [
-                {
-                  name = "Reddit - Yubikey + gpg key + sops-nix";
-                  tags = [
-                    "nixos"
-                    "secrets"
-                    "sops"
-                    "yubikey"
-                  ];
-                  url = "https://www.reddit.com/r/NixOS/comments/1dbalru/yubikey_gpg_key_sopsnix/";
-                }
-                {
-                  name = "Reddit - Sops-nix and Yubikey";
-                  tags = [
-                    "nixos"
-                    "secrets"
-                    "sops"
-                    "yubikey"
-                  ];
-                  url = "https://www.reddit.com/r/NixOS/comments/1bqwbsj/sopsnix_and_yubikey/";
-                }
-              ];
-            }
-          ];
-        }
-        {
-          name = "NixOS Configuration";
-          bookmarks = [
-            {
-              name = "Home Manager";
+              name = "Home Manager Options";
               tags = [
                 "nixos"
-                "firefox"
+                "home-manager"
+                "configuration"
               ];
-              keyword = "nixos";
+              keywords = [
+                "nixos"
+                "home-manager"
+                "user environment"
+              ];
               url = "https://nix-community.github.io/home-manager/options.xhtml";
             }
           ];
         }
         {
-          name = "NixOS Setup";
-          toolbar = true;
+          name = "NixOS Learning";
           bookmarks = [
             {
               name = "[myme.no] NixOS: On Raspberry Pi 3B";
@@ -181,20 +193,176 @@
             }
           ];
         }
-        # {
-        #   name = "NixOS Configuration";
-        #   folder = true;
-        #   bookmarks = [
-        #     {
-        #       name = "[myme.no] NixOS: On Raspberry Pi 3B";
-        #       url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
-        #     }
-        #     {
-        #       name = "Stack Overflow";
-        #       url = "https://stackoverflow.com";
-        #     }
-        #   ];
-        # }
+        {
+          name = "Podcasts & Interviews";
+          bookmarks = [
+            {
+              name = "Full Time Nix - Interview with Jonathan Ringer";
+              tags = [
+                "podcast"
+                "nixos"
+                "interview"
+              ];
+              keywords = [
+                "nix"
+                "nixos"
+                "development"
+              ];
+              url = "https://fulltimenix.com/episodes/jonathan-ringer";
+            }
+          ];
+        }
+        {
+          name = "NixOS Security & Configuration";
+          bookmarks = [
+            {
+              name = "Secrets Management";
+              bookmarks = [
+                {
+                  name = "Unmoved Centre - Secrets Management Guide";
+                  tags = [
+                    "nixos"
+                    "secrets"
+                    "sops"
+                    "security"
+                  ];
+                  keywords = [
+                    "nixos"
+                    "secrets management"
+                    "sops"
+                  ];
+                  url = "https://unmovedcentre.com/posts/secrets-management/";
+                }
+                {
+                  name = "Yubikey Integration";
+                  bookmarks = [
+                    {
+                      name = "Reddit - Yubikey + GPG Key + sops-nix Setup";
+                      tags = [
+                        "nixos"
+                        "secrets"
+                        "sops"
+                        "yubikey"
+                        "gpg"
+                      ];
+                      keywords = [
+                        "nixos"
+                        "yubikey"
+                        "sops"
+                        "security"
+                      ];
+                      url = "https://www.reddit.com/r/NixOS/comments/1dbalru/yubikey_gpg_key_sopsnix/";
+                    }
+                    {
+                      name = "Reddit - Sops-nix and Yubikey Integration";
+                      tags = [
+                        "nixos"
+                        "secrets"
+                        "sops"
+                        "yubikey"
+                      ];
+                      keywords = [
+                        "nixos"
+                        "yubikey"
+                        "sops"
+                        "security"
+                      ];
+                      url = "https://www.reddit.com/r/NixOS/comments/1bqwbsj/sopsnix_and_yubikey/";
+                    }
+                  ];
+                }
+              ];
+            }
+          ];
+        }
+        {
+          name = "NixOS Setup Guides";
+          toolbar = true;
+          bookmarks = [
+            {
+              name = "Raspberry Pi Setups";
+              bookmarks = [
+                {
+                  name = "NixOS on Raspberry Pi 3B - myme.no Guide";
+                  tags = [
+                    "nixos"
+                    "raspberry-pi"
+                    "setup"
+                  ];
+                  keywords = [
+                    "nixos"
+                    "raspberry pi"
+                    "installation"
+                  ];
+                  url = "https://myme.no/posts/2022-12-01-nixos-on-raspberrypi.html";
+                }
+                {
+                  name = "NixOS on Raspberry Pi 4 with Encrypted Filesystem";
+                  url = "https://thenegation.hashnode.dev/nixos-rpi4-luks";
+                  tags = [
+                    "nixos"
+                    "raspberry-pi"
+                    "luks"
+                    "encryption"
+                  ];
+                  keywords = [
+                    "nixos"
+                    "raspberry pi 4"
+                    "luks"
+                    "encrypted filesystem"
+                  ];
+                }
+                {
+                  name = "NixOS on Raspberry Pi 4 with SSD Boot";
+                  url = "https://discourse.nixos.org/t/install-nixos-on-raspberry-pi-4-ssd/22788/8";
+                  tags = [
+                    "nixos"
+                    "raspberry-pi"
+                    "ssd"
+                    "boot"
+                  ];
+                  keywords = [
+                    "nixos"
+                    "raspberry pi 4"
+                    "ssd boot"
+                  ];
+                }
+                {
+                  name = "NixOS on Raspberry Pi 4 with UEFI and SSD Boot";
+                  tags = [
+                    "nixos"
+                    "raspberry-pi"
+                    "ssd"
+                    "uefi"
+                    "boot"
+                  ];
+                  keywords = [
+                    "nixos"
+                    "raspberry pi 4"
+                    "uefi"
+                    "ssd boot"
+                  ];
+                  url = "https://codeberg.org/kotatsuyaki/rpi4-usb-uefi-nixos-config";
+                }
+              ];
+            }
+            {
+              name = "NixOS with Flakes";
+              tags = [
+                "nixos"
+                "flakes"
+                "installation"
+              ];
+              keywords = [
+                "nixos"
+                "flakes"
+                "git"
+                "configuration"
+              ];
+              url = "https://nixos.asia/en/nixos-install-flake";
+            }
+          ];
+        }
       ];
 
       # Browser settings
