@@ -160,7 +160,7 @@
                 "engineering"
               ];
               keyword = "systems";
-              urls = "https://ocw.mit.edu/courses/16-842-fundamentals-of-systems-engineering-fall-2015/";
+              url = "https://ocw.mit.edu/courses/16-842-fundamentals-of-systems-engineering-fall-2015/";
             }
           ];
         }
@@ -213,11 +213,6 @@
             {
               name = "Full Time Nix - Interview with Jonathan Ringer";
               tags = [
-                "podcast"
-                "nixos"
-                "interview"
-              ];
-              keywords = [
                 "nix"
                 "nixos"
                 "development"
