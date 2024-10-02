@@ -53,28 +53,28 @@ in
     useNerdFonts = mkOption {
       type = types.bool;
       default = false;
-      description = mdDoc "Use Nerd Fonts icons instead of emojis for formatting output.";
+      description = "Use Nerd Fonts icons instead of emojis for formatting output.";
     };
     firewall = {
       enableLocalDiscovery = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Open firewall for local device discovery (mDNS). Opens UDP port 5353.";
+        description = "Open firewall for local device discovery (mDNS). Opens UDP port 5353.";
       };
       enableLocalSync = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Open firewall for syncing local files with mobile devices. Opens TCP port 57621.";
+        description = "Open firewall for syncing local files with mobile devices. Opens TCP port 57621.";
       };
       enableSpotifyConnect = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Open firewall for Spotify Connect features. Opens TCP port 4070.";
+        description = "Open firewall for Spotify Connect features. Opens TCP port 4070.";
       };
       acknowledgeFirewallRisks = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Acknowledge understanding of the firewall risks and silence warnings.";
+        description = "Acknowledge understanding of the firewall risks and silence warnings.";
       };
     };
   };

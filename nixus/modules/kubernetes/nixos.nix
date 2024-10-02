@@ -56,28 +56,28 @@ in
     useNerdFonts = mkOption {
       type = types.bool;
       default = false;
-      description = mdDoc "Use Nerd Fonts icons instead of emojis for formatting output.";
+      description = "Use Nerd Fonts icons instead of emojis for formatting output.";
     };
     firewall = {
       enableAPIServer = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Open firewall for Kubernetes API server. Opens TCP port 6443.";
+        description = "Open firewall for Kubernetes API server. Opens TCP port 6443.";
       };
       enableKubelet = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Open firewall for Kubelet. Opens TCP port 10250.";
+        description = "Open firewall for Kubelet. Opens TCP port 10250.";
       };
       enableNodePorts = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Open firewall for NodePort services. Opens TCP ports 30000-32767.";
+        description = "Open firewall for NodePort services. Opens TCP ports 30000-32767.";
       };
       acknowledgeFirewallRisks = mkOption {
         type = types.bool;
         default = false;
-        description = mdDoc "Acknowledge understanding of the firewall risks and silence warnings.";
+        description = "Acknowledge understanding of the firewall risks and silence warnings.";
       };
     };
   };
