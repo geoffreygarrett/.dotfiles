@@ -28,6 +28,7 @@
     ./plugins/rustaceanvim.nix
     ./plugins/code-runner.nix
     ./plugins/diffview.nix
+    ./plugins/harpoon.nix
 
     #  Custom plugin configs
     ./plugins/custom/relative-open.nix
