@@ -124,14 +124,7 @@
                 "devops"
                 "system-administration"
               ];
-              keywords = [
-                "nix"
-                "nixos"
-                "package manager"
-                "reproducible builds"
-                "functional programming"
-                "system configuration"
-              ];
+              keyword = "nix";
               url = "https://github.com/nix-community/awesome-nix";
             }
             {
@@ -141,11 +134,7 @@
                 "home-manager"
                 "configuration"
               ];
-              keywords = [
-                "nixos"
-                "home-manager"
-                "user environment"
-              ];
+              keyword = "home-manager";
               url = "https://nix-community.github.io/home-manager/options.xhtml";
             }
           ];
