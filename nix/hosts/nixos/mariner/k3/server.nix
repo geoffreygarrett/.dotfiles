@@ -6,8 +6,9 @@
   services.k3s = {
     enable = true;
     role = "server";
+    clusterInit = true;
     extraFlags = [
-      "--cluster-init"
+      # "--cluster-init"
       # "--kube-controller-manager-arg=node-monitor-period=5s"
       # "--kube-controller-manager-arg=node-monitor-grace-period=20s"
       # "--kube-controller-manager-arg=pod-eviction-timeout=30s"

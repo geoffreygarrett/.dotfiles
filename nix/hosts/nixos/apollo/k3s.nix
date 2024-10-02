@@ -12,11 +12,14 @@
 
   # K3s services configuration
   services.k3s = {
+    # TODO: Figure out how to set this, and furthermore if it's needed.
+    # extraArgs = [
+    #   "--register-with-taints=power.management=wol:NoSchedule"
+    # ];
     extraFlags = [
       # Wake-on-LAN related labels
       "--node-label=wol.mac-address=b4-2e-99-a6-54-36"
       "--node-label=power.management=wol"
-      "--register-with-taints=power.management=wol:NoSchedule"
 
       # GPU-related labels
       "--node-label=nvidia.com/gpu=true"
