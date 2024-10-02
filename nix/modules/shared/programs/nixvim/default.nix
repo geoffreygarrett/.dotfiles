@@ -27,6 +27,7 @@
     ./plugins/duck.nix
     ./plugins/rustaceanvim.nix
     ./plugins/code-runner.nix
+    ./plugins/diffview.nix
 
     #  Custom plugin configs
     ./plugins/custom/relative-open.nix
