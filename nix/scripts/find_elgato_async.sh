@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Default subnet if none is specified
 DEFAULT_SUBNET="192.168.68"

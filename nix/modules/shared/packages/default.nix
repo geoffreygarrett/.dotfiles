@@ -1,4 +1,7 @@
 { pkgs, ... }:
+let
+  elgato-light-control = import ../../../scripts/elgato-light-control.nix { inherit pkgs; };
+in
 with pkgs;
 [
   (nerdfonts.override { fonts = [ "JetBrainsMono" ]; })
@@ -61,4 +64,5 @@ with pkgs;
   ############################
   # Developer productivity
   iperf2
+  elgato-light-control
 ]

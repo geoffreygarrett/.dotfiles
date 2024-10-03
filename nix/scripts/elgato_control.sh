@@ -1,4 +1,3 @@
-#!/bin/bas
 #!/bin/bash
 
 # Elgato lamp IP and port

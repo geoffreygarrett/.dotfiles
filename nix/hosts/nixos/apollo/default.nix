@@ -269,6 +269,7 @@ in
         22 # SSH (Secure Shell) for remote access and management
         80 # HTTP for web services
         443 # HTTPS for secure web services
+        9123 # Elgato light
         # 4070 # Spotify: General communication port
         # 57621 # Spotify: Sync local tracks with mobile devices on the same network
       ];
