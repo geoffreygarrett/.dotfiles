@@ -11,7 +11,7 @@
   ];
   programs.tmux-sessionizer = {
     enable = true;
-    defaultSession = "work";
+    defaultSession = "main";
     excludedDirs = [
       ".git"
       "node_modules"

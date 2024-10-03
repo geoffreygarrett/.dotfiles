@@ -88,8 +88,12 @@ in
       );
       default = [
         {
-          path = config.home.homeDirectory;
-          depth = 2;
+          path = "${config.home.homeDirectory}/.dotfiles";
+          depth = 1;
+        }
+        {
+          path = "${config.home.homeDirectory}/Projects";
+          depth = 1;
         }
       ];
       description = "Directories to search, with their respective depths.";
