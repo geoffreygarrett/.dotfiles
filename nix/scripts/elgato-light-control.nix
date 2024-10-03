@@ -2,6 +2,10 @@
   pkgs ? import <nixpkgs> { },
 }:
 
+let
+  ipCommand =
+    if pkgs.stdenv.isDarwin then "${pkgs.darwin.iproute2mac}/bin/ip" else "${pkgs.iproute2}/bin/ip";
+in
 pkgs.writeShellScriptBin "elgato-light-control" ''
   # Configuration
   ELGATO_PORT="9123"
@@ -12,21 +16,13 @@ pkgs.writeShellScriptBin "elgato-light-control" ''
   # Ensure the directory for known lights exists
   mkdir -p "$KNOWN_LIGHTS_DIR"
 
-  # Function to get all possible subnets (Darwin and Linux compatible)
+  # Function to get all possible subnets
   get_subnets() {
-    if [[ "$(uname)" == "Darwin" ]]; then
-      ${pkgs.iproute2mac}/bin/ip -4 addr show | ${pkgs.gawk}/bin/awk '/inet / && !/127.0.0.1/ {
-        split($2, a, "/")
-        split(a[1], b, ".")
-        print b[1] "." b[2] "." b[3]
-      }'
-    else
-      ${pkgs.iproute2}/bin/ip -4 addr show | ${pkgs.gawk}/bin/awk '/inet / && !/127.0.0.1/ {
-        split($2, a, "/")
-        split(a[1], b, ".")
-        print b[1] "." b[2] "." b[3]
-      }'
-    fi
+    ${ipCommand} -4 addr show | ${pkgs.gawk}/bin/awk '/inet / && !/127.0.0.1/ {
+      split($2, a, "/")
+      split(a[1], b, ".")
+      print b[1] "." b[2] "." b[3]
+    }'
   }
 
   # Check if an Elgato light exists at the given IP

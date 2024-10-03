@@ -35,7 +35,7 @@ in
     (importModule ./starship.nix)
     #(importModule ./mdt.nix)
     (importModule ./firefox.nix)
-    #    (importModule ./htop.nix)
+    (importModule ./htop.nix)
     (importModule ./vscode.nix)
   ];
 
