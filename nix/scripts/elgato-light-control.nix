@@ -12,13 +12,21 @@ pkgs.writeShellScriptBin "elgato-light-control" ''
   # Ensure the directory for known lights exists
   mkdir -p "$KNOWN_LIGHTS_DIR"
 
-  # Function to get all possible subnets
+  # Function to get all possible subnets (Darwin and Linux compatible)
   get_subnets() {
-    ${pkgs.iproute2}/bin/ip -4 addr show | ${pkgs.gawk}/bin/awk '/inet / && !/127.0.0.1/ {
-      split($2, a, "/")
-      split(a[1], b, ".")
-      print b[1] "." b[2] "." b[3]
-    }'
+    if [[ "$(uname)" == "Darwin" ]]; then
+      ${pkgs.iproute2mac}/bin/ip -4 addr show | ${pkgs.gawk}/bin/awk '/inet / && !/127.0.0.1/ {
+        split($2, a, "/")
+        split(a[1], b, ".")
+        print b[1] "." b[2] "." b[3]
+      }'
+    else
+      ${pkgs.iproute2}/bin/ip -4 addr show | ${pkgs.gawk}/bin/awk '/inet / && !/127.0.0.1/ {
+        split($2, a, "/")
+        split(a[1], b, ".")
+        print b[1] "." b[2] "." b[3]
+      }'
+    fi
   }
 
   # Check if an Elgato light exists at the given IP
@@ -111,6 +119,24 @@ pkgs.writeShellScriptBin "elgato-light-control" ''
     [[ $new_value -lt $min ]] && new_value=$min
     [[ $new_value -gt $max ]] && new_value=$max
     echo "$new_value"
+  }
+
+  # Select light interactively
+  select_light() {
+    local -n lights=$1
+    if [[ ''${#lights[@]} -eq 1 ]]; then
+      echo "''${lights[0]}"
+    else
+      echo "Multiple lights found. Please select one:" >&2
+      select light in "''${lights[@]}"; do
+        if [[ -n $light ]]; then
+          echo "$light"
+          return 0
+        else
+          echo "Invalid selection. Please try again." >&2
+        fi
+      done
+    fi
   }
 
   # Main logic
