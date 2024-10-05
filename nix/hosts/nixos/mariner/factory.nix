@@ -44,6 +44,7 @@
     useDHCP = false;
     dhcpcd.wait = "background";
     interfaces.wlan0.useDHCP = true;
+    interfaces.enu1u1u1.useDHCP = true;
     wireless = {
       enable = true;
       userControlled.enable = true;
