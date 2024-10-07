@@ -39,14 +39,17 @@ in
   # the user will get a permission error when mounting.
   sops.secrets."smb-secrets".owner = "${user}";
 
+  # Also needs dnsmasq.service to resolve the domain name
+
   # Merge the default mounts with the additional mounts
   # https://nixos.wiki/wiki/Samba
   fileSystems =
     let
       common = [
         "nofail" # Do not fail if the mount fails
+        "noauto" # Do not mount on boot
         "x-gvfs-show" # Show in file manager
-        "x-systemd.automount" # Mount on access
+        # "x-systemd.automount" # Mount on access
         "x-systemd.idle-timeout=60"
         "x-systemd.device-timeout=5s"
         "x-systemd.mount-timeout=5s"

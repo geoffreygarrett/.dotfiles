@@ -214,6 +214,18 @@
         enable = true;
         # debugMode = true;
         hosts = {
+          "apollo.nixus.net" = {
+            addresses = [
+              {
+                ip = "100.125.219.65";
+                type = "tailscale";
+              }
+              {
+                ip = "192.168.68.129";
+                type = "local";
+              }
+            ];
+          };
           "pioneer.nixus.net" = {
             addresses = [
               {
@@ -270,7 +282,7 @@
               }
             ];
           };
-          "nimbus.nixust.net" = {
+          "nimbus.nixus.net" = {
             addresses = [
               {
                 ip = "100.98.196.120";
@@ -308,10 +320,10 @@
           ];
           cache-size = 1000;
           no-resolv = true;
-          # dnssec = true;
           dnssec-check-unsigned = true;
           domain-needed = true;
           bogus-priv = true;
+          listen-address = "127.0.0.1";
         };
       };
       formatHosts =

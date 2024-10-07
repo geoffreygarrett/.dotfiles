@@ -12,6 +12,7 @@
 
     # Keyboard remapping
     #inputs.xremap-flake.nixosModules.default
+    # ../../modules/shared/cachix/default.nix
 
     # Dependencies across my nixos modules
     ../../modules/shared/secrets.nix

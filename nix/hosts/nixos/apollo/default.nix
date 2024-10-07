@@ -103,12 +103,12 @@ in
     ../../../modules/nixos/openrgb.nix
     ../../../modules/nixos/openssh.nix
     ../../../modules/nixos/tailscale.nix
-    ../../../modules/nixos/samba.nix
+    # ../../../modules/nixos/samba.nix
     ../mariner/k3/agent.nix
     ./k3s.nix
     ../shared.nix
     ./config/desktop.nix
-    ../../../users/geoffrey/nixos/default.nix
+    ../../../users/geoffrey/nixos/desktop.nix
     ../../../scripts/network-tools.nix
   ];
 

@@ -11,6 +11,7 @@
     ./hardware-configuration.nix
     ../shared.nix
     ../../../modules/nixos/openrgb.nix
+    ../../../users/geoffrey/nixos/desktop.nix
   ];
 
   # Bootloader.

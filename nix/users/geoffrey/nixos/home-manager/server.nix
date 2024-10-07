@@ -7,5 +7,5 @@
     ./shared.nix
 
     # Add after this comment
-  ] ++ (import ../../home-manager/default.nix args).imports;
+  ] ++ (import ../../home-manager/server.nix args).imports;
 }

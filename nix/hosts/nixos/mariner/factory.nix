@@ -21,7 +21,7 @@
     ../../../modules/shared/secrets.nix
     ../../../modules/nixos/tailscale.nix
     ../../../modules/nixos/openssh.nix
-    ../../../modules/nixos/samba.nix
+    # ../../../modules/nixos/samba.nix
     ./k3/agent.nix
     "${inputs.nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
   ] ++ extraModules;

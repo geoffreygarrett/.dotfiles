@@ -15,6 +15,10 @@ in
 {
   imports = [ sharedModule ];
   config = mkIf cfg.enable {
+    # systemd.services.dnsmasq = {
+    #   after = [ "network-online.target" ];
+    #   wants = [ "network-online.target" ];
+    # };
     services.dnsmasq = {
       enable = true;
       settings = mkMerge [

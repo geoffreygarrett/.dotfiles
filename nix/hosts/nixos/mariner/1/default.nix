@@ -15,7 +15,7 @@ in
     # inputs.impermanence.nixosModules.impermanence
     inputs.argon40-nix.nixosModules.default
     inputs.nixos-hardware.nixosModules.raspberry-pi-4
-    inputs.sops-nix.nixosModules.default
+    # inputs.sops-nix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
     {
       home-manager.useGlobalPkgs = true;
@@ -25,11 +25,13 @@ in
     ../../../../modules/shared/secrets.nix
     ../../../../modules/nixos/tailscale.nix
     ../../../../modules/nixos/openssh.nix
-    ../../../../modules/nixos/samba.nix
+    # ../../../../modules/nixos/samba.nix
     ../../../../scripts/network-tools.nix
     ../k3/server.nix
     ./disko-ext4.nix
     inputs.disko.nixosModules.disko
+    ../../../../users/geoffrey/nixos/server.nix
+    ../../shared.nix
   ];
 
   services.networkTools.enable = true;
@@ -45,6 +47,36 @@ in
     systemd-boot.enable = lib.mkForce true;
     grub.enable = false;
     generic-extlinux-compatible.enable = lib.mkForce false;
+  };
+
+  # Argon one case
+  programs.argon.one = {
+    enable = true;
+
+    settings = {
+      # Is 'celsius' by default, can also be set to 'fahrenheit'
+      displayUnits = "celsius";
+
+      # This is the same config as the original Argon40 config.
+      # This is also the default config for this flake.
+      fanspeed = [
+        {
+          # This the temperature threshold at which this fan speed will activate.
+          # The temperature is in the above specified unit.
+          temperature = 55;
+          # This is speed percentage at which the fan will spin.
+          speed = 30;
+        }
+        {
+          temperature = 60;
+          speed = 55;
+        }
+        {
+          temperature = 65;
+          speed = 100;
+        }
+      ];
+    };
   };
 
   # Kernel Modules and Power Management
@@ -154,17 +186,17 @@ in
   #   };
   # };
 
-  # User configuration
-  users.users.${user} = {
-    isNormalUser = true;
-    shell = pkgs.zsh;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    initialPassword = "changeme";
-    openssh.authorizedKeys.keys = keys;
-  };
+  # # User configuration
+  # users.users.${user} = {
+  #   isNormalUser = true;
+  #   shell = pkgs.zsh;
+  #   extraGroups = [
+  #     "wheel"
+  #     "networkmanager"
+  #   ];
+  #   initialPassword = "changeme";
+  #   openssh.authorizedKeys.keys = keys;
+  # };
 
   # Root user SSH authorized keys
   users.users.root.openssh.authorizedKeys.keys = keys;
@@ -182,55 +214,45 @@ in
   home-manager.extraSpecialArgs = {
     inherit inputs user;
   };
-  # Home Manager configuration
-  home-manager.users = lib.genAttrs [ "${user}" ] (
-    username:
-    { lib, config, ... }:
-    {
-      home.stateVersion = "24.11";
-      imports = [
-        ../../../../modules/shared/programs/gh.nix
-        ../../../../modules/shared/programs/git.nix
-        ../../../../modules/shared/programs/tms.nix
-        ../../../../modules/shared/programs/starship.nix
-        ../../../../modules/shared/programs/nushell.nix
-        ../../../../modules/shared/programs/zsh.nix
-      ];
-      programs = {
-        neovim = {
-          enable = true;
-        };
-        ssh = {
-          enable = true;
+  # # Home Manager configuration
+  # home-manager.users = lib.genAttrs [ "${user}" ] (
+  #   username:
+  #   { lib, config, ... }:
+  #   {
+  #     home.stateVersion = "24.11";
+  #     imports = [
+  #       ../../../../modules/shared/programs/gh.nix
+  #       ../../../../modules/shared/programs/git.nix
+  #       ../../../../modules/shared/programs/tms.nix
+  #       ../../../../modules/shared/programs/starship.nix
+  #       ../../../../modules/shared/programs/nushell.nix
+  #       ../../../../modules/shared/programs/zsh.nix
+  #     ];
+  #     programs = {
+  #       neovim = {
+  #         enable = true;
+  #       };
+  #       ssh = {
+  #         enable = true;
+  #
+  #         matchBlocks = {
+  #           "*" = {
+  #             identityFile = "~/.ssh/id_ed25519";
+  #             extraOptions = {
+  #               AddKeysToAgent = "yes";
+  #             };
+  #           };
+  #         };
+  #
+  #         extraConfig = ''
+  #           Host github.com
+  #             IdentitiesOnly yes
+  #             IdentityFile ~/.ssh/github_ed25519
+  #         '';
+  #       };
+  #     };
+  #
 
-          matchBlocks = {
-            "*" = {
-              identityFile = "~/.ssh/id_ed25519";
-              extraOptions = {
-                AddKeysToAgent = "yes";
-              };
-            };
-          };
-
-          extraConfig = ''
-            Host github.com
-              IdentitiesOnly yes
-              IdentityFile ~/.ssh/github_ed25519
-          '';
-        };
-      };
-
-      home.activation = {
-        generateSshKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          if [ ! -f $HOME/.ssh/id_ed25519 ]; then
-            ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $HOME/.ssh/id_ed25519 -N "" -C "${username}@${hostname}"
-          fi
-          if [ ! -f $HOME/.ssh/github_ed25519 ]; then
-            ${pkgs.openssh}/bin/ssh-keygen -t ed25519 -f $HOME/.ssh/github_ed25519 -N "" -C "${username}@github"
-          fi
-        '';
-      };
-    }
-  );
+  # );
 
 }

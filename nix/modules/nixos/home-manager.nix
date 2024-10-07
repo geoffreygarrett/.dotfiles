@@ -10,7 +10,7 @@ in
 {
   imports = [
     ../shared/aliases.nix
-    ../shared/programs
+    # ../shared/programs
   ];
 
   xdg.mimeApps = {
@@ -57,7 +57,7 @@ in
     #   # (import ./files.nix { inherit user pkgs; })
     # ];
     #
-    stateVersion = "24.05";
+    # stateVersion = "24.05";
   };
 
 }
