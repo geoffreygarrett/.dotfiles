@@ -270,6 +270,18 @@
               }
             ];
           };
+          "nimbus.nixust.net" = {
+            addresses = [
+              {
+                ip = "100.98.196.120";
+                type = "tailscale";
+              }
+              {
+                ip = "192.168.68.115";
+                type = "local";
+              }
+            ];
+          };
           "cassini.nixus.net" = {
             addresses = [
               {

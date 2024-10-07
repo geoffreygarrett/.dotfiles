@@ -16,8 +16,8 @@
       unstage = "reset HEAD --";
       last = "log -1 HEAD";
       lg = "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit";
-      use-ssh = "remote set-url origin $(git remote get-url origin | sed -E 's#^https?://([^/]+)/(.+)$#git@\\1:\\2#')";
-      use-https = "remote set-url origin $(git remote get-url origin | sed -E 's#^git@([^:]+):(.+)$#https://\\1/\\2#')";
+      use-ssh = "!f() { git remote set-url origin $(git remote get-url origin | sed -E 's#^https?://([^/]+)/(.+)$#git@\\1:\\2#'); }; f";
+      use-https = "!f() { git remote set-url origin $(git remote get-url origin | sed -E 's#^git@([^:]+):(.+)$#https://\\1/\\2#'); }; f";
     };
     extraConfig = {
       init.defaultBranch = "main";

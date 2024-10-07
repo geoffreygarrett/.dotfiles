@@ -1,8 +1,6 @@
 {
   config,
   pkgs,
-  lib,
-  inputs,
   ...
 }:
 {
@@ -84,7 +82,7 @@
         ];
       };
       mouse = {
-        hide_when_typing = true;
+        hide_when_typing = false;
       };
       keyboard.bindings = [
         {
@@ -131,28 +129,36 @@
       };
       colors = {
         primary = {
-          background = "#0F111A";
-          foreground = "#8F93A2";
+          background = "#${config.colorScheme.palette.base00}";
+          foreground = "#${config.colorScheme.palette.base04}";
         };
         normal = {
-          black = "#090B10";
-          red = "#F07178";
-          green = "#C3E88D";
-          yellow = "#FFCB6B";
-          blue = "#82AAFF";
-          magenta = "#C792EA";
-          cyan = "#89DDFF";
-          white = "#EEFFFF";
+          black = "#${config.colorScheme.palette.base00}";
+          red = "#${config.colorScheme.palette.base08}";
+          green = "#${config.colorScheme.palette.base0B}";
+          yellow = "#${config.colorScheme.palette.base0A}";
+          blue = "#${config.colorScheme.palette.base0D}";
+          magenta = "#${config.colorScheme.palette.base0E}";
+          cyan = "#${config.colorScheme.palette.base0C}";
+          white = "#${config.colorScheme.palette.base04}";
         };
         bright = {
-          black = "#464B5D";
-          red = "#FF5370";
-          green = "#C3E88D";
-          yellow = "#FFCB6B";
-          blue = "#82AAFF";
-          magenta = "#C792EA";
-          cyan = "#89DDFF";
-          white = "#FFFFFF";
+          black = "#${config.colorScheme.palette.base03}";
+          red = "#${config.colorScheme.palette.base0F}";
+          green = "#${config.colorScheme.palette.base0B}";
+          yellow = "#${config.colorScheme.palette.base0A}";
+          blue = "#${config.colorScheme.palette.base0D}";
+          magenta = "#${config.colorScheme.palette.base0E}";
+          cyan = "#${config.colorScheme.palette.base0C}";
+          white = "#${config.colorScheme.palette.base05}";
+        };
+        cursor = {
+          text = "#${config.colorScheme.palette.base00}";
+          cursor = "#${config.colorScheme.palette.base04}";
+        };
+        selection = {
+          text = "#${config.colorScheme.palette.base00}";
+          background = "#${config.colorScheme.palette.base04}";
         };
       };
     };

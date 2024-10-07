@@ -1,12 +1,7 @@
 {
   config,
-  self,
   pkgs,
-  lib,
-  home-manager,
-  inputs,
   user,
-  keys,
   ...
 }:
 let

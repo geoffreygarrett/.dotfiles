@@ -1,27 +1,38 @@
 {
   config,
-  lib,
   pkgs,
+  lib,
   ...
 }:
 {
+  home-manager = {
+    users.geoffrey = import ./home-manager/default.nix;
+  };
+  sops.secrets."users/geoffrey/password" = { };
+  users.mutableUsers = false;
   users.users.geoffrey = {
+    name = "geoffrey";
     isNormalUser = true;
     home = "/home/geoffrey";
     description = "Geoffrey Garrett";
     extraGroups = [
       "wheel"
       "networkmanager"
+      # "docker"
+      # "video"
+      # "audio"
+      # "input"
+      # "disk"
     ];
+    hashedPasswordFile = config.sops.secrets."users/geoffrey/password".path;
     shell = pkgs.zsh;
-    openssh.authorizedKeys.keys = [
-      "ssh-dss AAAAB3Nza... alice@foobar"
+    openssh.authorizedKeys.keys = import ../authorized-keys.nix;
+    packages = with pkgs; [
+      nautilus
+      baobab
+      git
     ];
   };
-
-  # Enable zsh system-wide
   programs.zsh.enable = true;
-
-  # Allow sudo without password for wheel group
   security.sudo.wheelNeedsPassword = false;
 }

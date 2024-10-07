@@ -25,19 +25,71 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/94519d79-9552-4b12-b073-46883c7d420c";
-    fsType = "ext4";
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-uuid/94519d79-9552-4b12-b073-46883c7d420c";
+      fsType = "ext4";
+    };
+
+    "/boot/efi" = {
+      device = "/dev/disk/by-uuid/44FF-B40D";
+      fsType = "vfat";
+      options = [
+        "fmask=0022"
+        "dmask=0022"
+      ];
+    };
+
+    # 930.9G NTFS partition (likely a secondary Windows drive)
+    "/mnt/windows_data" = {
+      device = "/dev/disk/by-uuid/A2B48E20B48DF6D7";
+      fsType = "ntfs";
+      options = [
+        "rw"
+        "uid=1000"
+        "gid=100"
+        "umask=0022"
+        "nofail"
+      ];
+    };
+
+    # 1.6T NTFS partition labeled "Space Drive"
+    "/mnt/space_drive" = {
+      device = "/dev/disk/by-uuid/1002807402806118";
+      fsType = "ntfs";
+      options = [
+        "rw"
+        "uid=1000"
+        "gid=100"
+        "umask=0022"
+        "nofail"
+      ];
+    };
+
+    # 184.8G ext4 partition (likely for backups or extra storage)
+    "/mnt/extra_storage" = {
+      device = "/dev/disk/by-uuid/dee28288-5bc4-4df0-a122-e16d904eda29";
+      fsType = "ext4";
+      options = [ "nofail" ];
+    };
   };
 
-  fileSystems."/boot/efi" = {
-    device = "/dev/disk/by-uuid/44FF-B40D";
-    fsType = "vfat";
-    options = [
-      "fmask=0022"
-      "dmask=0022"
-    ];
+  # Create symbolic links for easy access
+  system.activationScripts = {
+    createDriveSymlinks = ''
+      ln -sfn /mnt/windows_data /home/geoffrey/WindowsData
+      ln -sfn /mnt/space_drive /home/geoffrey/SpaceDrive
+      ln -sfn /mnt/extra_storage /home/geoffrey/ExtraStorage
+    '';
   };
+
+  # Enable NTFS support
+  boot.supportedFilesystems = [ "ntfs" ];
+
+  # Enable GVFS and related services
+  services.gvfs.enable = true;
+  services.udisks2.enable = true;
+  services.devmon.enable = true;
 
   swapDevices = [
     { device = "/dev/disk/by-uuid/9dc1d93d-d337-4f61-8644-441feb7fd44c"; }

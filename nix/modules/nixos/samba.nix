@@ -7,7 +7,7 @@
 }:
 let
   # The IP address of the NAS on the VPN (I'm using Tailscale)
-  nas-vpn-ip = "100.98.196.120";
+  nas-vpn-ip = "nimbus.nixus.net";
 
   # Function to capitalize the first letter of a string
   capitalize =
@@ -71,4 +71,20 @@ in
         options = common;
       };
     };
+
+  # Firewall ports for CIFS/Samba
+  networking = {
+    firewall = {
+      # Allow incoming connections for Samba and mDNS
+      allowedTCPPorts = [
+        139 # NetBIOS Session Service
+        445 # Microsoft-DS (SMB)
+      ];
+      allowedUDPPorts = [
+        137 # NetBIOS Name Service
+        138 # NetBIOS Datagram Service
+        # 5353 # mDNS (Multicast DNS)
+      ];
+    };
+  };
 }

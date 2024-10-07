@@ -77,7 +77,8 @@ in
     # enableNvidia = true; # Deprecated for below.
   };
   hardware.nvidia-container-toolkit.enable = true;
-
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
   # systemd.services.autorandr = {
   #   wantedBy = [ "graphical-session.target" ];
   #   partOf = [ "graphical-session.target" ];
@@ -107,6 +108,7 @@ in
     ./k3s.nix
     ../shared.nix
     ./config/desktop.nix
+    ../../../users/geoffrey/nixos/default.nix
     ../../../scripts/network-tools.nix
   ];
 
@@ -139,16 +141,16 @@ in
 
   # It's me, it's you, it's everyone
   users.users = {
-    ${user} = {
-      isNormalUser = true;
-      extraGroups = [
-        "wheel" # Enable ‘sudo’ for the user.
-        "docker"
-      ];
-      shell = pkgs.zsh;
-      openssh.authorizedKeys.keys = keys;
-    };
-
+    # ${user} = {
+    #   isNormalUser = true;
+    #   extraGroups = [
+    #     "wheel" # Enable ‘sudo’ for the user.
+    #     "docker"
+    #   ];
+    #   shell = pkgs.zsh;
+    #   openssh.authorizedKeys.keys = keys;
+    # };
+    #
     root = {
       openssh.authorizedKeys.keys = keys;
     };

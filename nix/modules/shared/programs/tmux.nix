@@ -142,9 +142,12 @@ in
         extraConfig = ''
           resurrect_dir="$HOME/.tmux/resurrect"
           set -g @resurrect-dir $resurrect_dir
-          set -g @resurrect-hook-post-save-all "sed -i 's/--cmd lua.*--cmd set packpath/--cmd \"lua/g; s/--cmd set rtp.*\$/\"/' $resurrect_dir/last"
+          set -g @resurrect-hook-post-save-all '
+            sed -i -E "s|(pane.[^:]+:)[^;]+;.*\s([^ ]+)$|\1nvim \2|" $resurrect_dir/last
+          '
           set -g @resurrect-capture-pane-contents 'on'
-          set -g @resurrect-processes '"~nvim"'
+          set -g @resurrect-processes 'nvim'
+          set -g @resurrect-strategy-nvim 'session'
         '';
       }
       {
@@ -152,7 +155,7 @@ in
         extraConfig = ''
           set -g @continuum-restore 'on'
           set -g @continuum-boot 'on'
-          set -g @continuum-save-interval '10'
+          set -g @continuum-save-interval '5'
         '';
       }
       # {
