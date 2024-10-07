@@ -78,7 +78,7 @@ in
   };
   hardware.nvidia-container-toolkit.enable = true;
   home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
+  # home-manager.useUserPackages = true;
   # systemd.services.autorandr = {
   #   wantedBy = [ "graphical-session.target" ];
   #   partOf = [ "graphical-session.target" ];
@@ -186,60 +186,32 @@ in
     sopss
   ];
 
-  home-manager.users.${user} = {
-    # home.activation.generateSopsAgeKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    #   $DRY_RUN_CMD mkdir -p $VERBOSE_ARG ~/.config/sops/age
-    #   if [[ ! -f ~/.config/sops/age/keys.txt ]]; then
-    #     $DRY_RUN_CMD ${pkgs.ssh-to-age}/bin/ssh-to-age -private-key -i ~/.ssh/id_ed25519 > ~/.config/sops/age/keys.txt
-    #     $DRY_RUN_CMD chmod 600 ~/.config/sops/age/keys.txt
-    #   fi
-    # '';
-    home.packages = with pkgs; [
-      # Applications
-      # "firefox"
-      # "spotify"
-      # "vlc"
-      # "code"
-      # "steam"
-      # "discord"
-      # "signal-desktop"
-      # "slack"
-      # "zoom"
-      # "obs-studio"
-      # "kdenlive"
-      # "gimp"
-      # "inkscape"
-      # "krita"
-      # "blender"
-      # "darktable"
-      # "rawtherapee
-      # minecraft
-      prismlauncher
-    ];
-  };
   nix.settings.trusted-users = [
     "root"
     "geoffrey"
   ];
 
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.loader.timeout = 5;
   boot.loader = {
-    systemd-boot.enable = false;
+    systemd-boot.enable = true;
+    systemd-boot.configurationLimit = 10;
     efi = {
-      canTouchEfiVariables = false;
+      canTouchEfiVariables = true;
       efiSysMountPoint = "/boot/efi";
     };
     grub = {
-      enable = true;
-      device = "nodev";
-      efiSupport = true;
-      efiInstallAsRemovable = true;
-      useOSProber = true;
-      gfxmodeEfi = "2560x1440";
-      theme = "${hyperfluent-theme}/nixos";
-      extraConfig = ''
-        GRUB_DEFAULT=saved
-        GRUB_SAVEDEFAULT=true
-      '';
+      enable = false;
+      # device = "nodev";
+      # efiSupport = true;
+      # efiInstallAsRemovable = true;
+      # useOSProber = true;
+      # gfxmodeEfi = "2560x1440";
+      # theme = "${hyperfluent-theme}/nixos";
+      # extraConfig = ''
+      #   GRUB_DEFAULT=saved
+      #   GRUB_SAVEDEFAULT=true
+      # '';
     };
   };
 
