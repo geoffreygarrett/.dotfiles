@@ -39,7 +39,7 @@ in
   hardware.opengl.enable = true;
   hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
   boot.kernelParams = [
-    "video=HDMI-1:3840x2160@59.94"
+    # "video=HDMI-1:3840x2160@59.94"
     "video=DP-4:2560x1440@143.97"
     "nvidia-drm.modeset=1"
   ];
@@ -169,24 +169,7 @@ in
   i18n.defaultLocale = "en_GB.UTF-8";
 
   programs.zsh.enable = true;
-
-  # It's me, it's you, it's everyone
-  users.users = {
-    # ${user} = {
-    #   isNormalUser = true;
-    #   extraGroups = [
-    #     "wheel" # Enable ‘sudo’ for the user.
-    #     "docker"
-    #   ];
-    #   shell = pkgs.zsh;
-    #   openssh.authorizedKeys.keys = keys;
-    # };
-    #
-    root = {
-      openssh.authorizedKeys.keys = keys;
-    };
-  };
-
+  users.users.root.openssh.authorizedKeys.keys = keys;
   hardware.nvidia.open = false; # Disable open source
 
   # All custom options originate from the shared options
@@ -214,7 +197,6 @@ in
   environment.systemPackages = with pkgs; [
     jdk17
     sops
-    sopss
   ];
 
   nix.settings.trusted-users = [
@@ -223,7 +205,7 @@ in
   ];
 
   # Enable better console fonts for high-res displays
-  console.font = "latarcyrheb-sun32";
+  # console.font = "latarcyrheb-sun32";
   console.earlySetup = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;

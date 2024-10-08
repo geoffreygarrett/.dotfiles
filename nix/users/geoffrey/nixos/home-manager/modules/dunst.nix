@@ -39,22 +39,26 @@ in
         startup_notification = false;
         frame_width = 2;
         frame_color = "#${base16.base0D}";
+        corner_radius = 12;
       };
       urgency_low = {
         background = "#${base16.base00}";
         foreground = "#${base16.base05}";
         timeout = 10;
+        corner_radius = 12;
       };
       urgency_normal = {
         background = "#${base16.base00}";
         foreground = "#${base16.base05}";
         timeout = 10;
+        corner_radius = 12;
       };
       urgency_critical = {
         background = "#${base16.base00}";
         foreground = "#${base16.base08}";
         frame_color = "#${base16.base08}";
         timeout = 0;
+        corner_radius = 12;
       };
     };
   };

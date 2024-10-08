@@ -5,6 +5,7 @@
 {
   imports = [
     ./shared.nix
+    ./modules/sway.nix
   ];
   home-manager = {
     users."geoffrey" = import ./home-manager/desktop.nix;

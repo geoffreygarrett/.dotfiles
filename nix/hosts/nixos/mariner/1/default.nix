@@ -32,8 +32,18 @@ in
     inputs.disko.nixosModules.disko
     ../../../../users/geoffrey/nixos/server.nix
     ../../shared.nix
+    # ./argon-ir.nix
+
   ];
 
+  # Enable the Argon IR service
+  # services.argonIR = {
+  #   enable = true;
+  #   # Optionally, you can customize these:
+  #   gpioPin = 23; # Default is 23
+  #   user = "geoffrey"; # Default is "1000"
+  # };
+  #
   services.networkTools.enable = true;
 
   # System Configuration

@@ -15,5 +15,6 @@
     ./modules/skhd.nix
     ./modules/files.nix
     ./modules/picom.nix
+    ./modules/sway.nix
   ] ++ (import ../../home-manager/desktop.nix args).imports;
 }

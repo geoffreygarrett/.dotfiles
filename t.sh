@@ -19,15 +19,15 @@ flash_image() {
   # Check if the file starts with the zstd magic number
   if [ "$(od -An -N4 -tx1 "$IMAGE_PATH" | tr -d ' ')" = "28b52ffd" ]; then
     echo "Flashing zstd compressed image..."
-    zstd -dcf "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M status=progress conv=fsync
+    zstd -dcf "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M oflag=sync status=progress conv=fsync
     # Check if the file starts with the gzip magic number
   elif [ "$(od -An -N2 -tx1 "$IMAGE_PATH" | tr -d ' ')" = "1f8b" ]; then
     echo "Flashing gzip compressed image..."
-    zcat "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M status=progress conv=fsync
+    zcat "$IMAGE_PATH" | dd of="$SD_CARD" bs=4M oflag=sync status=progress conv=fsync
     # Assume it's an uncompressed image if it doesn't match the above
   else
     echo "Flashing uncompressed image..."
-    dd if="$IMAGE_PATH" of="$SD_CARD" bs=4M status=progress conv=fsync
+    dd if="$IMAGE_PATH" of="$SD_CARD" bs=4M oflag=sync status=progress conv=fsync
   fi
 }
 

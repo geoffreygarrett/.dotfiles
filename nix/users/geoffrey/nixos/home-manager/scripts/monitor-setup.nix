@@ -1,10 +1,5 @@
 { pkgs, ... }:
 pkgs.writeShellScriptBin "monitor-setup" ''
-  # Set wallpaper
-  ${pkgs.feh}/bin/feh --bg-fill ${../../../../../modules/shared/assets/wallpaper/nix-wallpaper-binary-black.png}
-  # ${pkgs.feh}/bin/feh --bg-fill ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
-
-
   # Restart Polybar
   ${pkgs.procps}/bin/pkill polybar
   ${pkgs.polybar}/bin/polybar main-left &
@@ -39,4 +34,6 @@ pkgs.writeShellScriptBin "monitor-setup" ''
 
   # Ensure the first desktop is focused at the end
   ${pkgs.bspwm}/bin/bspc desktop '^1' --focus
+
+
 ''

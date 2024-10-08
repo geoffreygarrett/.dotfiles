@@ -857,6 +857,22 @@
         "type": "github"
       }
     },
+    "jetpack-nixos": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1727719305,
+        "narHash": "sha256-bchTP7chEx8+b8R9KQJtHJeEz6gnBfAArQ4zjGSxUjU=",
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "rev": "26c6ed1275923a0dcc75da0dfe2bf70ee336c955",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anduril",
+        "repo": "jetpack-nixos",
+        "type": "github"
+      }
+    },
     "nikitabobko-aerospace": {
       "flake": false,
       "locked": {
@@ -1511,6 +1527,7 @@
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
         "impermanence": "impermanence",
+        "jetpack-nixos": "jetpack-nixos",
         "nikitabobko-aerospace": "nikitabobko-aerospace",
         "nix-colors": "nix-colors",
         "nix-homebrew": "nix-homebrew",

@@ -32,6 +32,8 @@ in
     openssh.authorizedKeys.keys = import ../authorized-keys.nix;
     packages = with pkgs; [
       git
+      usbutils
+      pciutils
     ];
   };
   services.gvfs.enable = true;

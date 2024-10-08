@@ -40,19 +40,6 @@
       ];
     };
 
-    # 930.9G NTFS partition (likely a secondary Windows drive)
-    "/mnt/windows_data" = {
-      device = "/dev/disk/by-uuid/A2B48E20B48DF6D7";
-      fsType = "ntfs";
-      options = [
-        "rw"
-        "uid=1000"
-        "gid=100"
-        "umask=0022"
-        "nofail"
-      ];
-    };
-
     # 1.6T NTFS partition labeled "Space Drive"
     "/mnt/space_drive" = {
       device = "/dev/disk/by-uuid/1002807402806118";
@@ -66,20 +53,12 @@
       ];
     };
 
-    # 184.8G ext4 partition (likely for backups or extra storage)
-    "/mnt/extra_storage" = {
-      device = "/dev/disk/by-uuid/dee28288-5bc4-4df0-a122-e16d904eda29";
-      fsType = "ext4";
-      options = [ "nofail" ];
-    };
   };
 
   # Create symbolic links for easy access
   system.activationScripts = {
     createDriveSymlinks = ''
-      ln -sfn /mnt/windows_data /home/geoffrey/WindowsData
       ln -sfn /mnt/space_drive /home/geoffrey/SpaceDrive
-      ln -sfn /mnt/extra_storage /home/geoffrey/ExtraStorage
     '';
   };
 

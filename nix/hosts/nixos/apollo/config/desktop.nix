@@ -102,18 +102,17 @@
     autoRepeatDelay = 200; # Delay before key repeat starts (in milliseconds)
     autoRepeatInterval = 45; # Interval between key repeats (in milliseconds)
     displayManager = {
-      gdm.enable = true;
+      # gdm.enable = true;
+      lightdm = {
+        enable = true;
+        greeters.slick.enable = true;
+        # defaultSession = "none+bspwm";
+        background = ../../../../modules/shared/assets/wallpaper/login-wallpaper.png;
+        # background = ../../../modules/shared/assets/wallpaper/login-wall
+      };
     };
     windowManager.bspwm.enable = true;
 
-    # displayManager.lightdm = {
-    #   enable = true;
-    #   greeters.slick.enable = true;
-    #
-    #   defaultSession = "none+bspwm";
-    #   background = ../../../modules/shared/assets/wallpaper/login-wallpaper.png;
-    # };
-    #
     videoDrivers = [ "nvidia" ];
 
     # This helps fix tearing of windows for Nvidia cards

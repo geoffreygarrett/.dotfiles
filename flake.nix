@@ -78,6 +78,12 @@
       url = "github:xremap/nix-flake";
     };
 
+    # Nvidia
+    jetpack-nixos = {
+      url = "github:anduril/jetpack-nixos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # NixOS
     nixos-hardware = {
       url = "github:NixOS/nixos-hardware/master";
@@ -681,6 +687,17 @@
                 hostname = "mariner-4";
               })
               inputs.nixos-hardware.nixosModules.raspberry-pi-3
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
+            ];
+          };
+
+          "curiosity" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [
+              ./nix/hosts/nixos/curiosity/default.nix
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];

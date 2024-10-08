@@ -11,17 +11,17 @@
     enable = true;
     settings = {
       # Disable animations
-      animations = true;
-      animation-stiffness = 300.0;
-      animation-dampening = 35.0;
-      animation-clamping = false;
-      animation-mass = 1;
-      animation-for-workspace-switch-in = "none";
-      animation-for-workspace-switch-out = "none";
-      animation-for-open-window = "none";
-      animation-for-menu-window = "none";
-      animation-for-transient-window = "none";
-
+      # animations = true;
+      # animation-stiffness = 300.0;
+      # animation-dampening = 35.0;
+      # animation-clamping = false;
+      # animation-mass = 1;
+      # animation-for-workspace-switch-in = "none";
+      # animation-for-workspace-switch-out = "none";
+      # animation-for-open-window = "none";
+      # animation-for-menu-window = "none";
+      # animation-for-transient-window = "none";
+      #
       # Keep corner radius
       corner-radius = 12;
 
@@ -66,11 +66,11 @@
       };
 
       blur-background-exclude = [ ];
+      # NOTE: I could not get this working with glx. Windows did not refresh and GPU seemed to be receiving reset commands. `xrender` worked, but no round borders.
 
-      # Use xrender backend for better compatibility and performance
       backend = "egl";
 
-      # Disable vsync to avoid synchronization issues
+      # NOTE: Couldn't run vsync at all, but not necessary.
       vsync = false;
 
       # Keep these settings for window focus behavior
@@ -82,7 +82,7 @@
       detect-client-leader = true;
       use-damage = false; # Keep this for performance optimization
       log-level = "warn"; # Reduce log verbosity
-      experimental-backends = true;
+      experimental-backends = false;
       wintypes = {
         normal = {
           fade = false;

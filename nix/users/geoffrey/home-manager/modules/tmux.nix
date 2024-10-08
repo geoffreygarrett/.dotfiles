@@ -168,5 +168,6 @@ in
   };
   home.packages = with pkgs; [
     tmux
+    tmux-sessionizer
   ];
 }
