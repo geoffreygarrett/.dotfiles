@@ -65,7 +65,8 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    package = config.boot.kernelPackages.nvidiaPackages.latest; # Use latest instead of stable
+    forceFullCompositionPipeline = true; # This can help with tearing issues
   };
   # services.redshift = {
   #   enable = true; # Or set to false to disable Redshift
@@ -84,6 +85,11 @@
   #     "-m randr"
   #   ];
   # };
+
+  hardware.opengl = {
+    enable = true;
+    driSupport32Bit = true;
+  };
 
   # Better support for general peripherals
   services.libinput.enable = true;

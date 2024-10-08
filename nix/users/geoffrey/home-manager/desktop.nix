@@ -3,6 +3,8 @@
   imports = [
     ./shared.nix
     ./modules/nixvim
+    ./modules/alacritty.nix
+    ./modules/firefox.nix
   ];
   # home-manager = {
   #   users."geoffrey" = import ./home-manager/server.nix;

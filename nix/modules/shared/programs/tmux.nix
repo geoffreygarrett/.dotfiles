@@ -142,9 +142,7 @@ in
         extraConfig = ''
           resurrect_dir="$HOME/.tmux/resurrect"
           set -g @resurrect-dir $resurrect_dir
-          set -g @resurrect-hook-post-save-all '
-            sed -i -E "s|(pane.[^:]+:)[^;]+;.*\s([^ ]+)$|\1nvim \2|" $resurrect_dir/last
-          '
+          set -g @resurrect-hook-post-save-all 'sed -i -E "s|(pane.[^:]+:)[^;]+;.*[[:space:]]([^[:space:]]+)$|\1nvim \2|" "$resurrect_dir/last"'
           set -g @resurrect-capture-pane-contents 'on'
           set -g @resurrect-processes '"~nvim"'
           set -g @resurrect-strategy-nvim 'session'

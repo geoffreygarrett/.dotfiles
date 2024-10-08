@@ -1,7 +1,9 @@
 { pkgs, ... }:
 pkgs.writeShellScriptBin "monitor-setup" ''
   # Set wallpaper
-  ${pkgs.feh}/bin/feh --bg-fill ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
+  ${pkgs.feh}/bin/feh --bg-fill ${../../../../../modules/shared/assets/wallpaper/nix-wallpaper-binary-black.png}
+  # ${pkgs.feh}/bin/feh --bg-fill ${pkgs.nixos-artwork.wallpapers.nineish-dark-gray.gnomeFilePath}
+
 
   # Restart Polybar
   ${pkgs.procps}/bin/pkill polybar

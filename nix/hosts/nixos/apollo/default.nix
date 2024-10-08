@@ -3,20 +3,51 @@
   pkgs,
   inputs,
   keys,
+  config,
   lib,
   ...
 }:
 let
   hostname = "apollo";
   mainInterface = "eno2";
-  hyperfluent-theme = pkgs.fetchFromGitHub {
-    owner = "Coopydood";
-    repo = "HyperFluent-GRUB-Theme";
-    rev = "v1.0.1";
-    sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f";
-  };
 in
+# hyperfluent-theme = pkgs.fetchFromGitHub {
+#   owner = "Coopydood";
+#   repo = "HyperFluent-GRUB-Theme";
+#   rev = "v1.0.1";
+#   sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f";
+# };
 {
+
+  # Don't require password for users in `wheel` group for these commands
+  security.sudo = {
+    enable = true;
+    extraRules = [
+      {
+        commands = [
+          {
+            command = "${pkgs.systemd}/bin/reboot";
+            options = [ "NOPASSWD" ];
+          }
+        ];
+        groups = [ "wheel" ];
+      }
+    ];
+  };
+  # nix.pkgs.allowUnfree = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  hardware.opengl.enable = true;
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  boot.kernelParams = [
+    "video=HDMI-1:3840x2160@59.94"
+    "video=DP-4:2560x1440@143.97"
+    "nvidia-drm.modeset=1"
+  ];
+
+  services.xserver.displayManager.setupCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary
+  '';
+
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   services.autorandr = {
     enable = true;
@@ -95,10 +126,10 @@ in
     ./hardware-configuration.nix
     inputs.nixos-hardware.nixosModules.common-pc
     inputs.nixos-hardware.nixosModules.common-pc-ssd
-    inputs.nixos-hardware.nixosModules.common-cpu-intel
-    inputs.nixos-hardware.nixosModules.common-gpu-intel
-    inputs.nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
-    inputs.nixos-hardware.nixosModules.common-hidpi
+    # inputs.nixos-hardware.nixosModules.common-cpu-intel
+    # inputs.nixos-hardware.nixosModules.common-gpu-intel
+    # inputs.nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
+    # inputs.nixos-hardware.nixosModules.common-hidpi
     inputs.nixus.nixosModules.spotify
     ../../../modules/nixos/openrgb.nix
     ../../../modules/nixos/openssh.nix
@@ -191,10 +222,15 @@ in
     "geoffrey"
   ];
 
+  # Enable better console fonts for high-res displays
+  console.font = "latarcyrheb-sun32";
+  console.earlySetup = true;
+
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.loader.timeout = 5;
   boot.loader = {
     systemd-boot.enable = true;
+    systemd-boot.consoleMode = "max";
     systemd-boot.configurationLimit = 10;
     efi = {
       canTouchEfiVariables = true;

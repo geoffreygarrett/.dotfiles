@@ -550,7 +550,7 @@
     };
 
     windows = {
-      command = "systemctl reboot --boot-loader-entry=\"Windows Boot Manager (on /dev/nvme0n1p1)\"";
+      command = "systemctl reboot --boot-loader-entry=auto-windows";
       description = "Reboot into Windows in dual-boot";
       tags = [
         "system"

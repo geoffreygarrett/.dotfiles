@@ -594,7 +594,6 @@
           };
           homeManagerModule = {
             home-manager = {
-              backupFileExtension = "bak";
               sharedModules = [
                 inputs.nixvim.homeManagerModules.nixvim
                 ./nix/packages/shared/shell-aliases

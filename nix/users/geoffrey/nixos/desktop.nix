@@ -13,4 +13,16 @@
     nautilus
     baobab
   ];
+  services = {
+    tumbler.enable = true;
+  };
+  fonts.packages = with pkgs; [
+    dejavu_fonts
+    emacs-all-the-icons-fonts
+    feather-font # from overlay
+    jetbrains-mono
+    font-awesome
+    noto-fonts
+    noto-fonts-emoji
+  ];
 }

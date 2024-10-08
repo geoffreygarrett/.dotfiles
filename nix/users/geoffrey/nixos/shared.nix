@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  inputs,
   ...
 }:
 let
@@ -12,6 +11,7 @@ in
   sops.secrets."users/${username}/password" = {
     neededForUsers = true;
   };
+  home-manager.backupFileExtension = ".bak";
   users.mutableUsers = false;
   users.users.geoffrey = {
     inherit description;
@@ -34,6 +34,11 @@ in
       git
     ];
   };
+  services.gvfs.enable = true;
   programs.zsh.enable = true;
   security.sudo.wheelNeedsPassword = false;
+  environment.systemPackages = with pkgs; [
+    gitAndTools.gitFull
+    inetutils
+  ];
 }

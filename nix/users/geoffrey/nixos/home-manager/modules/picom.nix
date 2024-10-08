@@ -10,8 +10,17 @@
   services.picom = {
     enable = true;
     settings = {
-      # Disable animations to improve performance
-      animations = false;
+      # Disable animations
+      animations = true;
+      animation-stiffness = 300.0;
+      animation-dampening = 35.0;
+      animation-clamping = false;
+      animation-mass = 1;
+      animation-for-workspace-switch-in = "none";
+      animation-for-workspace-switch-out = "none";
+      animation-for-open-window = "none";
+      animation-for-menu-window = "none";
+      animation-for-transient-window = "none";
 
       # Keep corner radius
       corner-radius = 12;
@@ -37,6 +46,7 @@
       active-opacity = 1.0;
 
       focus-exclude = [ ];
+      xrender-sync-fence = false;
 
       # Opacity rules for Alacritty
       opacity-rule = [
@@ -58,7 +68,7 @@
       blur-background-exclude = [ ];
 
       # Use xrender backend for better compatibility and performance
-      backend = "xrender";
+      backend = "egl";
 
       # Disable vsync to avoid synchronization issues
       vsync = false;
@@ -66,13 +76,13 @@
       # Keep these settings for window focus behavior
       mark-wmwin-focused = true;
       mark-ovredir-focused = true;
-      detect-rounded-corners = false;
+      detect-rounded-corners = true;
       detect-client-opacity = false;
       detect-transient = true;
       detect-client-leader = true;
-      use-damage = true; # Keep this for performance optimization
+      use-damage = false; # Keep this for performance optimization
       log-level = "warn"; # Reduce log verbosity
-
+      experimental-backends = true;
       wintypes = {
         normal = {
           fade = false;

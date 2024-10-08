@@ -15,6 +15,8 @@ in
     ./modules/starship.nix
     ./modules/nushell.nix
     ./modules/zsh.nix
+    ./modules/tmux.nix
+    ./modules/htop.nix
   ];
 
   home = {
