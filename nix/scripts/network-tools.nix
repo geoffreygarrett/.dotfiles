@@ -9,22 +9,19 @@ with lib;
 
 let
   cfg = config.services.networkTools;
-
   wakePcScript = pkgs.writeShellScriptBin "wake-pc" ''
     PC_MAC=""
     PC_IP=""
     TIMEOUT=60
     INTERVAL=2
-
     usage() {
-      echo "Usage: $0 -m MAC_ADDRESS -i IP_ADDRESS [-t TIMEOUT] [-n INTERVAL]"
+      echo "Usage: $0 -m MAC_ADDRESS [-i IP_ADDRESS] [-t TIMEOUT] [-n INTERVAL]"
       echo "  -m MAC_ADDRESS: MAC address of the target PC (required)"
-      echo "  -i IP_ADDRESS: IP address of the target PC (required)"
+      echo "  -i IP_ADDRESS: IP address of the target PC (optional)"
       echo "  -t TIMEOUT: Maximum time to wait for PC to wake up in seconds (default: 60)"
       echo "  -n INTERVAL: Interval between ping attempts in seconds (default: 2)"
       exit 1
     }
-
     while getopts "m:i:t:n:" opt; do
       case $opt in
         m) PC_MAC=$OPTARG ;;
@@ -34,37 +31,40 @@ let
         *) usage ;;
       esac
     done
-
-    if [ -z "$PC_MAC" ] || [ -z "$PC_IP" ]; then
+    if [ -z "$PC_MAC" ]; then
+      echo "Error: MAC address is required."
       usage
     fi
-
     wake_pc() {
       ${pkgs.wakeonlan}/bin/wakeonlan $PC_MAC
       echo "Wake-on-LAN packet sent to $PC_MAC"
     }
-
     is_pc_awake() {
-      ${pkgs.iputils}/bin/ping -c 1 $PC_IP > /dev/null 2>&1
-      return $?
-    }
-
-    wake_pc
-
-    echo "Waiting for PC to wake up..."
-    end_time=$((SECONDS + TIMEOUT))
-    while [ $SECONDS -lt $end_time ]; do
-      if is_pc_awake; then
-        echo "PC is awake!"
-        exit 0
+      if [ -n "$PC_IP" ]; then
+        ${pkgs.iputils}/bin/ping -c 1 $PC_IP > /dev/null 2>&1
+        return $?
+      else
+        return 1
       fi
-      sleep $INTERVAL
-    done
-
-    echo "PC did not wake up within the timeout period."
-    exit 1
+    }
+    wake_pc
+    if [ -n "$PC_IP" ]; then
+      echo "Waiting for PC to wake up..."
+      end_time=$((SECONDS + TIMEOUT))
+      while [ $SECONDS -lt $end_time ]; do
+        if is_pc_awake; then
+          echo "PC is awake!"
+          exit 0
+        fi
+        sleep $INTERVAL
+      done
+      echo "PC did not wake up within the timeout period."
+      exit 1
+    else
+      echo "IP address not provided. Unable to check if PC is awake."
+      exit 0
+    fi
   '';
-
   discoverNetworkScript = pkgs.writeShellScriptBin "discover-network" ''
     SUBNET="192.168.1"
     START_IP=1
