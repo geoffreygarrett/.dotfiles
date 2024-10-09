@@ -23,6 +23,7 @@
         startup_mode = "Windowed";
         title = "Alacritty";
         dynamic_title = true;
+        # https://github.com/alacritty/alacritty/issues/7637
         option_as_alt = "Both";
       };
       scrolling = {

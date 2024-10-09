@@ -6,6 +6,6 @@
     ./shared.nix
   ];
   home-manager = {
-    users."geoffrey" = import ./home-manager/default.nix;
+    users."geoffrey" = import ./home-manager/desktop.nix;
   };
 }

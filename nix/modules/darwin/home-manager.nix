@@ -74,7 +74,7 @@
         imports = [
           ../shared/aliases.nix
           ../shared/secrets.nix
-          ../shared/programs
+          # ../shared/programs
         ];
 
         home = {

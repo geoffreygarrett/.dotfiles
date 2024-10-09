@@ -1,6 +1,7 @@
 {
   inputs,
   pkgs,
+  lib,
   ...
 }:
 
@@ -9,6 +10,10 @@ let
 in
 {
   imports = [
+    # Don't change
+    inputs.nix-colors.homeManagerModules.default
+
+    # Add after this comment
     ./modules/gh.nix
     ./modules/git.nix
     ./modules/tms.nix
@@ -19,10 +24,14 @@ in
     ./modules/htop.nix
   ];
 
+  colorScheme = import ../shared/nix-colors.nix;
+
   home = {
-    username = username;
-    homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
-    stateVersion = "24.11";
+    username = lib.mkDefault username;
+    homeDirectory = lib.mkDefault (
+      if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}"
+    );
+    stateVersion = lib.mkDefault "24.11";
   };
 
   # Let Home Manager install and manage itself.

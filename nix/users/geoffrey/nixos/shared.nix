@@ -1,46 +1,30 @@
 {
   config,
-  pkgs,
   ...
 }:
 let
-  username = "geoffrey";
-  description = "Geoffrey Garrett";
+  name = "geoffrey";
 in
 {
-  sops.secrets."users/${username}/password" = {
+  imports = [
+    ../shared/unix.nix
+  ];
+  sops.secrets."users/${name}/password" = {
     neededForUsers = true;
   };
-  home-manager.backupFileExtension = ".bak";
-  users.mutableUsers = false;
-  users.users.geoffrey = {
-    inherit description;
-    name = "${username}";
-    isNormalUser = true;
-    home = "/home/${username}";
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-      # "docker"
-      # "video"
-      # "audio"
-      # "input"
-      # "disk"
-    ];
-    hashedPasswordFile = config.sops.secrets."users/${username}/password".path;
-    shell = pkgs.zsh;
-    openssh.authorizedKeys.keys = import ../authorized-keys.nix;
-    packages = with pkgs; [
-      git
-      usbutils
-      pciutils
-    ];
-  };
-  services.gvfs.enable = true;
-  programs.zsh.enable = true;
-  security.sudo.wheelNeedsPassword = false;
-  environment.systemPackages = with pkgs; [
-    gitAndTools.gitFull
-    inetutils
+  users.users.${name}.home = "/home/${name}";
+  users.users.${name}.hashedPasswordFile = config.sops.secrets."users/${name}/password".path;
+  users.users.${name}.extraGroups = [
+    "wheel"
+    "networkmanager"
+    "docker"
+    "video"
+    # "audio"
+    # "input"
+    # "disk"
   ];
+  users.users.${name}.isNormalUser = true;
+  users.mutableUsers = false;
+  services.gvfs.enable = true;
+  security.sudo.wheelNeedsPassword = false;
 }

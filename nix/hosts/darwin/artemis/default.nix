@@ -13,6 +13,7 @@
     ../../../modules/shared/cachix
     ../../../modules/shared
     ../../../modules/darwin
+    ../../../users/geoffrey/darwin/desktop.nix
   ];
 
   services.nix-daemon.enable = true;

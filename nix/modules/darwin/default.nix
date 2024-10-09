@@ -34,6 +34,18 @@
             };
           };
         };
+        # Night Shift settings
+        "com.apple.CoreBrightness" = {
+          CBBlueLightReductionEnabled = true;
+          CBBlueLightReductionSchedule = {
+            CBBlueLightReductionScheduleType = 1; # 1 for custom schedule, 2 for sunset to sunrise
+            CBBlueLightReductionStartHour = 22; # 10 PM
+            CBBlueLightReductionStartMinute = 0;
+            CBBlueLightReductionEndHour = 7; # 7 AM
+            CBBlueLightReductionEndMinute = 0;
+          };
+          CBBlueLightReductionStrength = 0.9; # 50% strength, adjust as needed (0.0 to 1.0)
+        };
       };
 
       LaunchServices.LSQuarantine = false;
