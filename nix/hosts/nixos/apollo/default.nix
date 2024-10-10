@@ -4,7 +4,6 @@
   inputs,
   keys,
   config,
-  lib,
   ...
 }:
 let
