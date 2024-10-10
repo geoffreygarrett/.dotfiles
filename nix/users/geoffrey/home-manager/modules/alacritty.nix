@@ -1,12 +1,14 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }:
 {
   programs.alacritty = {
     enable = true;
     package = pkgs.alacritty;
+
     settings = {
       window = {
         dimensions = {

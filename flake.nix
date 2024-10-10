@@ -11,10 +11,7 @@
     };
 
     # System Management
-    darwin = {
-      url = "github:LnL7/nix-darwin/master";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -50,6 +47,10 @@
     };
 
     # macOS-specific
+    darwin = {
+      url = "github:LnL7/nix-darwin/master";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-homebrew = {
       url = "github:zhaofengli-wip/nix-homebrew";
     };
@@ -198,7 +199,8 @@
                   attrNames (readDir path)
                 );
             in
-            map (n: import (path + ("/" + n))) overlayFiles
+            lib.optional (lib.isLinux system) nixgl.overlay
+            ++ map (n: import (path + ("/" + n))) overlayFiles
             ++ [
               (final: prev: {
                 nixus = self.packages.${system}.nixus;
@@ -210,8 +212,7 @@
               }
             )
             ++ lib.optional (lib.isAndroid system) nix-on-droid.overlays.default
-            ++ lib.optional (lib.isAndroid system) inputs.sops-nix.overlays.default
-            ++ lib.optional (lib.isLinux system) nixgl.overlay;
+            ++ lib.optional (lib.isAndroid system) inputs.sops-nix.overlays.default;
         };
       treefmtEval = lib.forAllSystems (
         system: treefmt-nix.lib.evalModule (pkgsFor system) ./nix/formatter/default.nix
@@ -241,6 +242,14 @@
               {
                 ip = "100.78.156.17";
                 type = "tailscale";
+              }
+            ];
+          };
+          "curiosity.nixus.net" = {
+            addresses = [
+              {
+                ip = "192.168.68.106";
+                type = "local";
               }
             ];
           };
@@ -582,6 +591,25 @@
                 path = activateNixOnDroid self.nixOnDroidConfigurations.voyager;
               };
             };
+
+            "curiosity" = {
+              # Jetson Orin Nano 8GB
+              hostname = "curiosity.nixus.net";
+              profiles.system = {
+                sshUser = "${user}";
+                user = "root";
+                remoteBuild = true;
+                magicRollback = true;
+                sshOpts = commonSshOpts;
+                # Timeout for profile activation confirmation.
+                # This defaults to 30 seconds.
+                confirmTimeout = 300;
+                # Timeout for profile activation.
+                # This defaults to 240 seconds.
+                activationTimeout = 600;
+                path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.curiosity;
+              };
+            };
           };
       };
 
@@ -692,12 +720,22 @@
             ];
           };
 
+          "installation-cd-minimal" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [
+              ./nix/hosts/nixos/installation-cd-minimal.nix
+            ];
+          };
+
           "curiosity" = nixpkgs.lib.nixosSystem {
             inherit specialArgs;
             system = "aarch64-linux";
             pkgs = pkgsFor "aarch64-linux";
             modules = [
               ./nix/hosts/nixos/curiosity/default.nix
+              ./nix/users/geoffrey/nixos/desktop.nix
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];

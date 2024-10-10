@@ -14,7 +14,7 @@
       rofi
       polybar
       feh
-      alacritty
+      # alacritty
       dunst
       libnotify
       maim
@@ -36,10 +36,21 @@
   services.displayManager.defaultSession = "none+bspwm";
   services.redshift.enable = false;
 
+  # Enable graphics driver in NixOS unstable/NixOS 24.11
+  hardware.graphics.enable = true;
+  # The same as above but for NixOS 23.11
+  #hardware.opengl = {
+  #  enable = true;
+  #  driSupport = true;
+  #};
+
+  # Load "nvidia" driver for Xorg and Wayland
+  services.xserver.videoDrivers = [ "nvidia" ];
+
   hardware.nvidia = {
 
     # Modesetting is required.
-    modesetting.enable = true;
+    modesetting.enable = false;
 
     # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
     # Enable this if you have graphical corruption issues or application crashes after waking
@@ -65,30 +76,7 @@
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
-    package = config.boot.kernelPackages.nvidiaPackages.latest; # Use latest instead of stable
-    forceFullCompositionPipeline = true; # This can help with tearing issues
-  };
-  # services.redshift = {
-  #   enable = true; # Or set to false to disable Redshift
-  #   temperature = {
-  #     day = 5500;
-  #     night = 3700;
-  #   };
-
-  #   brightness = {
-  #     day = "1";
-  #     night = "0.8";
-
-  #   };
-  #   extraOptions = [
-  #     "-v"
-  #     "-m randr"
-  #   ];
-  # };
-
-  hardware.opengl = {
-    enable = true;
-    driSupport32Bit = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
   # Better support for general peripherals
@@ -113,14 +101,12 @@
     };
     windowManager.bspwm.enable = true;
 
-    videoDrivers = [ "nvidia" ];
-
     # This helps fix tearing of windows for Nvidia cards
-    screenSection = ''
-      Option       "metamodes" "nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
-      Option       "AllowIndirectGLXProtocol" "off"
-      Option       "TripleBuffer" "on"
-    '';
+    # screenSection = ''
+    #   Option       "metamodes" "nvidia-auto-select +0+0 {ForceFullCompositionPipeline=On}"
+    #   Option       "AllowIndirectGLXProtocol" "off"
+    #   Option       "TripleBuffer" "on"
+    # '';
   };
   services.acpid.enable = true;
   home-manager.users.${user} =

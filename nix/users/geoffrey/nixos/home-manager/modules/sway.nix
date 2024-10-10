@@ -2,8 +2,6 @@
 # File: /etc/nixos/configuration.nix
 
 { config, pkgs, ... }:
-let
-in
 
 {
 
@@ -48,14 +46,13 @@ in
 
   programs.waybar = {
     enable = true;
-    # Add your Waybar configuration here
   };
 
-  programs.alacritty = {
-    enable = true;
-    # Add your Alacritty configuration here
-  };
-
+  # programs.alacritty = {
+  #   enable = true;
+  #   # Add your Alacritty configuration here
+  # };
+  #
   # Install additional user packages
   home.packages = with pkgs; [
     # firefox

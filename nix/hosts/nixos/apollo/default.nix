@@ -10,12 +10,6 @@ let
   hostname = "apollo";
   mainInterface = "eno2";
 in
-# hyperfluent-theme = pkgs.fetchFromGitHub {
-#   owner = "Coopydood";
-#   repo = "HyperFluent-GRUB-Theme";
-#   rev = "v1.0.1";
-#   sha256 = "0gyvms5s10j24j9gj480cp2cqw5ahqp56ddgay385ycyzfr91g6f";
-# };
 {
 
   # Don't require password for users in `wheel` group for these commands
@@ -33,20 +27,21 @@ in
       }
     ];
   };
-  # nix.pkgs.allowUnfree = true;
-  services.xserver.videoDrivers = [ "nvidia" ];
-  hardware.opengl.enable = true;
-  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.stable;
+  # nixpkgs.config.allowUnfree = lib.mkForce true;
   boot.kernelParams = [
     # "video=HDMI-1:3840x2160@59.94"
     "video=DP-4:2560x1440@143.97"
-    "nvidia-drm.modeset=1"
+    # "nvidia-drm.modeset=1"
   ];
-
-  services.xserver.displayManager.setupCommands = ''
-    ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary
-  '';
-
+  environment.sessionVariables = {
+    #   LD_LIBRARY_PATH = [ "/ruopengl-driver/lib" ];
+    #   "LIBGL_ALWAYS_SOFTWARE" = "0";
+    "LIBGL_DEBUG" = "verbose";
+  };
+  # services.xserver.displayManager.setupCommands = ''
+  #   ${pkgs.xorg.xrandr}/bin/xrandr --output DP-4 --primary
+  # '';
+  #
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   services.autorandr = {
     enable = true;
@@ -101,7 +96,6 @@ in
     };
   };
 
-  hardware.graphics.enable32Bit = true; # Needed for enableNvidia
   virtualisation.docker = {
     enable = true;
     # enableNvidia = true; # Deprecated for below.
@@ -123,8 +117,8 @@ in
     # Intel(R) Core(TM) i9-9900KS (16) @ 5.00 GHz
     # NVIDIA GeForce GTX 1080 Ti [Discrete]
     ./hardware-configuration.nix
-    inputs.nixos-hardware.nixosModules.common-pc
-    inputs.nixos-hardware.nixosModules.common-pc-ssd
+    # inputs.nixos-hardware.nixosModules.common-pc
+    # inputs.nixos-hardware.nixosModules.common-pc-ssd
     # inputs.nixos-hardware.nixosModules.common-cpu-intel
     # inputs.nixos-hardware.nixosModules.common-gpu-intel
     # inputs.nixos-hardware.nixosModules.common-gpu-nvidia-nonprime
@@ -169,7 +163,6 @@ in
 
   programs.zsh.enable = true;
   users.users.root.openssh.authorizedKeys.keys = keys;
-  hardware.nvidia.open = false; # Disable open source
 
   # All custom options originate from the shared options
   #custom.openrgb.enable = true;
