@@ -599,7 +599,7 @@
                 sshUser = "${user}";
                 user = "root";
                 remoteBuild = true;
-                magicRollback = true;
+                magicRollback = false;
                 sshOpts = commonSshOpts;
                 # Timeout for profile activation confirmation.
                 # This defaults to 30 seconds.
@@ -653,6 +653,19 @@
             pkgs = pkgsFor "x86_64-linux";
             modules = [
               ./nix/hosts/nixos/apollo
+              homeManagerModule
+              inputs.nixus.nixosModules.dnsmasq
+              { nixus.dnsmasq = sharedDnsmasqConfig; }
+            ];
+          };
+
+          "curiosity" = nixpkgs.lib.nixosSystem {
+            inherit specialArgs;
+            system = "aarch64-linux";
+            pkgs = pkgsFor "aarch64-linux";
+            modules = [
+              ./nix/hosts/nixos/curiosity/default.nix
+              ./nix/users/geoffrey/nixos/desktop.nix
               homeManagerModule
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }
@@ -726,18 +739,6 @@
             pkgs = pkgsFor "aarch64-linux";
             modules = [
               ./nix/hosts/nixos/installation-cd-minimal.nix
-            ];
-          };
-
-          "curiosity" = nixpkgs.lib.nixosSystem {
-            inherit specialArgs;
-            system = "aarch64-linux";
-            pkgs = pkgsFor "aarch64-linux";
-            modules = [
-              ./nix/hosts/nixos/curiosity/default.nix
-              ./nix/users/geoffrey/nixos/desktop.nix
-              inputs.nixus.nixosModules.dnsmasq
-              { nixus.dnsmasq = sharedDnsmasqConfig; }
             ];
           };
 

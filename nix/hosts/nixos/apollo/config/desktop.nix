@@ -28,11 +28,6 @@
     ];
   };
 
-  qt = {
-    enable = true;
-    platformTheme = "gnome";
-    style = "adwaita-dark";
-  };
   services.displayManager.defaultSession = "none+bspwm";
   services.redshift.enable = false;
 

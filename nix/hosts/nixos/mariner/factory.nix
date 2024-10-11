@@ -16,7 +16,6 @@
   imports = [
     inputs.sops-nix.nixosModules.default
     inputs.home-manager.nixosModules.home-manager
-    # ./kubernetes.nix
     # impermanence.nixosModules.impermanence
     ../../../modules/shared/secrets.nix
     ../../../modules/nixos/tailscale.nix

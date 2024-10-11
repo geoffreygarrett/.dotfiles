@@ -1,5 +1,9 @@
-{ inputs, ... }:
-with inputs.firefox-addons.packages."x86_64-linux";
+{
+  inputs,
+  pkgs,
+  ...
+}:
+with inputs.firefox-addons.packages.${pkgs.system};
 [
   bitwarden
   ublock-origin

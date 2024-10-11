@@ -1,11 +1,14 @@
 {
   pkgs,
+  lib,
+  config,
   ...
 }@args:
 {
   imports = [
     # Don't change
     ./shared.nix
+    ../../home-manager/desktop.nix
 
     # Add after this comment
     ./modules/polybar
@@ -16,5 +19,6 @@
     ./modules/files.nix
     ./modules/picom.nix
     ./modules/sway.nix
-  ] ++ (import ../../home-manager/desktop.nix args).imports;
+    ./modules/theming.nix
+  ];
 }

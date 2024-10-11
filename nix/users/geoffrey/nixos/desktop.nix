@@ -1,15 +1,19 @@
 {
   pkgs,
+  lib,
   ...
 }:
+
 {
   imports = [
     ./shared.nix
-    ./modules/sway.nix
+    ./modules/theming.nix
+    # ./modules/sway.nix
   ];
   home-manager = {
     users."geoffrey" = import ./home-manager/desktop.nix;
   };
+
   users.users.geoffrey.packages = with pkgs; [
     nautilus
     baobab
@@ -34,6 +38,7 @@
   ];
 
   services.xserver.exportConfiguration = true;
-  services.xserver.xkbOptions = "ctrl:swapcaps";
+  services.xserver.xkb.options = "ctrl:swapcaps";
   console.useXkbConfig = true;
+
 }

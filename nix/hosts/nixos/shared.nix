@@ -4,9 +4,6 @@
     # Disk management
     inputs.disko.nixosModules.disko
 
-    # Secret management
-    inputs.sops-nix.nixosModules.default
-
     # User management
     inputs.home-manager.nixosModules.home-manager
 

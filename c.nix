@@ -1,29 +1,37 @@
+# Edit this configuration file to define what should be installed on
+# your system. Help is available in the configuration.nix(5) man page, on
+# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
+
 {
+  config,
+  lib,
   pkgs,
-  inputs,
   ...
 }:
 let
-  mainInterface = "enP8p1s0";
-  hostname = "curiosity";
+  wallpaper = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/NixOS/nixos-artwork/master/wallpapers/nix-wallpaper-binary-black.png";
+    sha256 = "0v3111a1ihsh4ajijbjh6y7a8p5cb5g3rdxqjbzx37pn1k9s254s";
+  };
 in
 {
   imports = [
-    inputs.jetpack-nixos.nixosModules.default
+    # Include the results of the hardware scan.
     ./hardware-configuration.nix
-    ../../../modules/nixos/openssh.nix
-    ../../../modules/nixos/tailscale.nix
-    ../shared.nix
+    (
+      builtins.fetchTarball "https://github.com/anduril/jetpack-nixos/archive/master.tar.gz"
+      + "/modules/default.nix"
+    )
   ];
+
   services.xserver.enable = true;
   services.xserver.displayManager.lightdm.enable = true;
   services.xserver.displayManager.lightdm.greeters.slick.enable = true;
-  services.xserver.displayManager.defaultSession = "none+bspwm";
-  services.xserver.displayManager.lightdm.background = ../../../modules/shared/assets/wallpaper/login-wallpaper.png;
+  services.xserver.displayManager.defaultSession = "none+i3";
+  services.xserver.displayManager.lightdm.background = wallpaper;
   services.xserver.desktopManager = {
     xterm.enable = false;
   };
-  services.xserver.windowManager.bspwm.enable = true;
   services.xserver.windowManager.i3 = {
     enable = true;
     extraPackages = with pkgs; [
@@ -33,8 +41,6 @@ in
       i3blocks # if you are planning on using i3blocks over i3status
     ];
   };
-  # hardware.nvidia.open = false;
-  # hardware.nvidia.nvidiaSettings = true;
   hardware.nvidia-jetpack.enable = true;
   hardware.nvidia-jetpack.som = "orin-nano"; # Other options include orin-agx, xavier-nx, and xavier-nx-emmc
   hardware.nvidia-jetpack.carrierBoard = "devkit";
@@ -47,27 +53,14 @@ in
   # networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
   # Set your time zone.
-  time.timeZone = "Europe/Amsterdam";
+  # time.timeZone = "Europe/Amsterdam";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-  networking = {
-    hostName = hostname;
-    interfaces."${mainInterface}".wakeOnLan.enable = true;
-  };
-  systemd.services.wakeonlan = {
-    description = "Reenable wake on lan every boot";
-    after = [ "network.target" ];
-    serviceConfig = {
-      Type = "simple";
-      RemainAfterExit = "true";
-      ExecStart = "${pkgs.ethtool}/sbin/ethtool -s ${mainInterface} wol g";
-    };
-    wantedBy = [ "default.target" ];
-  };
+
   # Select internationalisation properties.
-  i18n.defaultLocale = "en_US.UTF-8";
+  # i18n.defaultLocale = "en_US.UTF-8";
   # console = {
   #   font = "Lat2-Terminus16";
   #   keyMap = "us";
@@ -84,10 +77,12 @@ in
   # services.printing.enable = true;
 
   # Enable sound.
-  services.pipewire = {
-    enable = true;
-    pulse.enable = true;
-  };
+  # hardware.pulseaudio.enable = true;
+  # OR
+  # services.pipewire = {
+  #   enable = true;
+  #   pulse.enable = true;
+  # };
 
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
@@ -103,7 +98,6 @@ in
     packages = with pkgs; [
       firefox
       tree
-      prismlauncher
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIITvBraRmM6IvQFt8VUHRx9hZ5DZVkPX3ORlfVqGa05z geoffrey@apollo"
@@ -160,4 +154,5 @@ in
   #
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "24.05"; # Did you read the comment?
+
 }
