@@ -93,3 +93,10 @@ official documentation of Ubuntu and NixOS.
 ## Forums
 
 - https://www.reddit.com/r/linux/comments/1aq8ice/is_nix_really_all_its_cracked_up_to_be/
+
+## Repositories
+
+
+
+- https://github.com/nix-community/srvos
+

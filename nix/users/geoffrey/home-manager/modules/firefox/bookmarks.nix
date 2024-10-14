@@ -81,6 +81,18 @@
         name = "Setup Guides";
         bookmarks = [
           {
+            name = "A GPU Passthrough Setup for NixOS (With VR passthrough too)";
+            tags = [
+              "nixos"
+              "gpu"
+              "passthrough"
+              "vfio"
+              "virtualization"
+            ];
+            keyword = "nixos-gpu-passthrough";
+            url = "https://astrid.tech/2022/09/22/0/nixos-gpu-vfio/";
+          }
+          {
             name = "NixOS on Raspberry Pi 4 with SSD Boot";
             tags = [
               "nixos"
@@ -187,6 +199,20 @@
                 url = "https://ocw.mit.edu/courses/16-842-fundamentals-of-systems-engineering-fall-2015/";
               }
             ];
+          }
+        ];
+      }
+      {
+        name = "Blogs";
+        bookmarks = [
+          {
+            name = "astrid dot tech";
+            tags = [
+              "nixos"
+              "newsletter"
+            ];
+            keyword = "astrid-dot-tech";
+            url = "https://astrid.tech/";
           }
         ];
       }

@@ -3,12 +3,14 @@
   lib,
   config,
   base16,
-}:
+  ...
+}@args:
 
 let
-  brightness-control = import ../../../../scripts/brightness-control.nix { inherit pkgs; };
+  brightness-control = import ./scripts/brightness-control.nix { inherit pkgs; };
 in
-{
+(import ./user-modules.nix args)
+// {
   "module/tray" = {
     type = "internal/tray";
     padding = 2;
@@ -70,8 +72,8 @@ in
   };
   "module/brightness" = {
     type = "custom/script";
-    exec = "${pkgs.coreutils}/bin/cat /tmp/polybar-brightness";
-    hook-0 = "${pkgs.coreutils}/bin/cat /tmp/polybar-brightness";
+    exec = "${pkgs.coreutils}/bin/cat $HOME/.polybar-brightness";
+    hook-0 = "${pkgs.coreutils}/bin/cat $HOME/.polybar-brightness";
     format = "<label>";
     label = "%output%";
     format-foreground = "#${base16.base05}";

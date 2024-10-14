@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   programs.nixvim = {
     plugins = {
@@ -9,14 +9,33 @@
     };
 
     extraPlugins = [
-      pkgs.vimPlugins.material-nvim
+      # pkgs.vimPlugins.material-nvim
     ];
 
-    colorscheme = "material-deep-ocean";
+    colorscheme = "material";
+    # colorscheme = "material-deep-ocean";
 
     extraConfigLua = ''
-            require('material').setup({
+      local palette = {
+        base00 = "#${config.colorScheme.palette.base00}",
+        base01 = "#${config.colorScheme.palette.base01}",
+        base02 = "#${config.colorScheme.palette.base02}",
+        base03 = "#${config.colorScheme.palette.base03}",
+        base04 = "#${config.colorScheme.palette.base04}",
+        base05 = "#${config.colorScheme.palette.base05}",
+        base06 = "#${config.colorScheme.palette.base06}",
+        base07 = "#${config.colorScheme.palette.base07}",
+        base08 = "#${config.colorScheme.palette.base08}",
+        base09 = "#${config.colorScheme.palette.base09}",
+        base0A = "#${config.colorScheme.palette.base0A}",
+        base0B = "#${config.colorScheme.palette.base0B}",
+        base0C = "#${config.colorScheme.palette.base0C}",
+        base0D = "#${config.colorScheme.palette.base0D}",
+        base0E = "#${config.colorScheme.palette.base0E}",
+        base0F = "#${config.colorScheme.palette.base0F}",
+      }
 
+      require('material').setup({
           contrast = {
               terminal = false, -- Enable contrast for the built-in terminal
               sidebars = false, -- Enable contrast for sidebar-like windows ( for example Nvim-Tree )
@@ -80,63 +99,48 @@
 
           high_visibility = {
               lighter = false, -- Enable higher contrast text for lighter style
-              darker = false -- Enable higher contrast text for darker style
+              darker = true -- Enable higher contrast text for darker style
           },
 
           lualine_style = "default", -- Lualine style ( can be 'stealth' or 'default' )
 
           async_loading = true, -- Load parts of the theme asynchronously for faster startup (turned on by default)
 
-          custom_colors = nil, -- If you want to override the default colors, set this to a function
+          custom_colors = function(colors)
+            colors.editor.bg = palette.base00
+            colors.editor.bg_alt = palette.base01
+            colors.editor.fg = palette.base05
+            colors.editor.fg_dark = palette.base04
+            colors.editor.selection = palette.base02
+            colors.editor.contrast = palette.base01
+            colors.editor.active = palette.base02
+            colors.editor.border = palette.base01
+            colors.editor.line_numbers = palette.base03
+            colors.editor.highlight = palette.base02
+            colors.editor.disabled = palette.base03
+            colors.editor.accent = palette.base0D
+
+            colors.main.red = palette.base08
+            colors.main.green = palette.base0B
+            colors.main.yellow = palette.base0A
+            colors.main.blue = palette.base0D
+            colors.main.paleblue = palette.base0C
+            colors.main.cyan = palette.base0C
+            colors.main.purple = palette.base0E
+            colors.main.orange = palette.base09
+            colors.main.gray = palette.base03
+
+            colors.syntax.comments = palette.base03
+            colors.syntax.variables = palette.base08
+            colors.syntax.functions = palette.base0D
+            colors.syntax.keywords = palette.base09
+            colors.syntax.types = palette.base0A
+          end,
 
           custom_highlights = {}, -- Overwrite highlights with your own
       })
 
-          vim.cmd 'colorscheme material-deep-ocean'
-          -- vim.g.material_style = "deep ocean"
-            --require('material').setup({
-            --  --contrast = {
-            --  --  terminal = false,
-            --  --  sidebars = false,
-            --  --  floating_windows = false,
-            --  --  cursor_line = false,
-            --  --  non_current_windows = false,
-            --  --  filetypes = {},
-            --  --},
-            --  --styles = {
-            --  --  comments = {},
-            --  --  functions = {},
-            --  --  keywords = {},
-            --  --  strings = {},
-            --  --  variables = {},
-            --  --},
-            ---- plugins = {
-            ----   "telescope",
-            ----   "nvim-cmp",
-            ----   "nvim-web-devicons",
-            ----   "indent-blankline",
-            ----   "nvim-tree",
-            ---- },
-            ---- high_visibility = {
-            ----   lighter = false,
-            ----   darker = true,
-            ---- },
-            ---- disable = {
-            ----   background = false,
-            ----   term_colors = true,
-            ----   eob_lines = false,
-            ---- },
-            --       --   custom_highlights = {}, -- Overwrite highlights with your own
-            ---- custom_colors = function(colors)
-            ----  colors.editor.bg = "#SOME_COLOR"
-            ----  colors.main.purple = "#SOME_COLOR"
-            ----  colors.lsp.error = "#SOME_COLOR"
-            ---- end
-            --  
-            --  -- lualine_style = "default",
-            --})
-        --
-        --     ---- vim.cmd.colorscheme("material")
+      -- vim.cmd 'colorscheme material-deep-ocean'
     '';
   };
 }

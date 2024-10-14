@@ -49,6 +49,8 @@ in
     --lwt-tab-line-color: var(--deep-accent) !important;
   }
 
+  #TabsToolbar { -moz-box-ordinal-group: 2; }
+
   /* Sidebar Styling */
   #sidebar-box {
     --sidebar-background-color: var(--deep-second-bg) !important;

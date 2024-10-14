@@ -6,7 +6,7 @@
 }:
 {
   "bar/main-left" = {
-    monitor = "DP-4";
+    monitor = "DP-0";
     width = "100%";
     height = 28;
     radius = 0;
@@ -26,7 +26,7 @@
     enable-ipc = true;
   };
   "bar/main-right" = {
-    monitor = "HDMI-1";
+    monitor = "DP-4";
     width = "100%";
     height = 28;
     radius = 0;

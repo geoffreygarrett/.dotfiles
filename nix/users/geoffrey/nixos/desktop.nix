@@ -8,6 +8,8 @@
   imports = [
     ./shared.nix
     ./modules/theming.nix
+    ./modules/ddcci.nix
+    ./modules/xdg-mime.nix
     # ./modules/sway.nix
   ];
   home-manager = {

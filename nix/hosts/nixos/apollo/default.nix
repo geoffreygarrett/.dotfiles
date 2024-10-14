@@ -29,9 +29,16 @@ in
   };
   # nixpkgs.config.allowUnfree = lib.mkForce true;
   boot.kernelParams = [
-    # "video=HDMI-1:3840x2160@59.94"
     "video=DP-4:2560x1440@143.97"
-    # "nvidia-drm.modeset=1"
+    "video=DP-0:d"
+    "nvidia-drm.modeset=1"
+    "nvidia.modeset=1"
+  ];
+  boot.initrd.kernelModules = [
+    "nvidia"
+    "nvidia_modeset"
+    "nvidia_uvm"
+    "nvidia_drm"
   ];
   environment.sessionVariables = {
     #   LD_LIBRARY_PATH = [ "/ruopengl-driver/lib" ];
@@ -43,59 +50,6 @@ in
   # '';
   #
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
-  services.autorandr = {
-    enable = true;
-    defaultTarget = "dual-monitor";
-    profiles = {
-      "dual-monitor" = {
-        fingerprint = builtins.fromJSON (builtins.readFile ./config/fingerprint.json);
-        config = {
-          "HDMI-1" = {
-            enable = true;
-            mode = "3840x2160";
-            rate = "59.94";
-            primary = false;
-            position = "0x0";
-            scale = {
-              x = 1.0;
-              y = 1.0;
-            };
-            rotate = "normal";
-          };
-          "DP-4" = {
-            enable = true;
-            mode = "2560x1440";
-            rate = "143.97";
-            primary = true;
-            position = "3840x720";
-            scale = {
-              x = 1.0;
-              y = 1.0;
-            };
-            rotate = "normal";
-          };
-        };
-      };
-    };
-    hooks = {
-      postswitch = {
-        "notify-polybar" = toString (
-          pkgs.writeShellScript "notify-polybar" ''
-            ${pkgs.systemd}/bin/systemctl --user restart polybar
-          ''
-        );
-        "notify-bspwm" = toString (
-          pkgs.writeShellScript "notify-bspwm" ''
-            sleep 2
-            ${pkgs.bspwm}/bin/bspc monitor HDMI-1 -d 4 5 6
-            ${pkgs.bspwm}/bin/bspc monitor DP-4 -d 1 2 3
-            #${pkgs.bspwm}/bin/bspc wm -r
-          ''
-        );
-      };
-    };
-  };
-
   virtualisation.docker = {
     enable = true;
     # enableNvidia = true; # Deprecated for below.
@@ -134,6 +88,7 @@ in
     ./config/desktop.nix
     ../../../users/geoffrey/nixos/desktop.nix
     ../../../scripts/network-tools.nix
+    ./modules/autorandr.nix
   ];
 
   services.networkTools.enable = true;
@@ -205,10 +160,10 @@ in
   boot.loader = {
     systemd-boot.enable = true;
     systemd-boot.consoleMode = "max";
-    systemd-boot.configurationLimit = 10;
+    systemd-boot.configurationLimit = 3;
     efi = {
       canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot/efi";
+      efiSysMountPoint = "/boot";
     };
     grub = {
       enable = false;

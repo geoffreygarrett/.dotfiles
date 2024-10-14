@@ -21,4 +21,15 @@
     ./modules/sway.nix
     ./modules/theming.nix
   ];
+
+  home.packages = with pkgs; [
+    qalculate-qt
+    # thunderbird
+    mailspring
+    gimp
+    slack
+    inkscape
+    vlc
+    # blender
+  ];
 }

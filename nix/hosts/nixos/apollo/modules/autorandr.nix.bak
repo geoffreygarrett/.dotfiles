@@ -1,0 +1,115 @@
+{ pkgs, lib, ... }:
+
+let
+  monitorConfig = {
+    "DP-4" = {
+      enable = true;
+      mode = "2560x1440";
+      rate = "143.97";
+      position = "640x2160";
+      primary = true;
+    };
+    "DP-0" = {
+      enable = true;
+      mode = "3840x2160";
+      rate = "59.94";
+      position = "0x0";
+    };
+  };
+
+  configureBspwm = pkgs.writeShellScript "configure-bspwm" ''
+    log_message() {
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> /tmp/bspwm_setup.log
+    }
+
+    log_message "Starting BSPWM configuration"
+
+    # Wait for X server to be fully started
+    sleep 2
+
+    # Get connected monitors
+    connected=$(${pkgs.xorg.xrandr}/bin/xrandr --query | ${pkgs.gnugrep}/bin/grep " connected" | ${pkgs.coreutils}/bin/cut -d ' ' -f1)
+    count=$(echo "$connected" | ${pkgs.coreutils}/bin/wc -l)
+    log_message "Connected monitors: $connected (Count: $count)"
+
+    # Remove all existing desktops
+    ${pkgs.bspwm}/bin/bspc query -M --names | while read -r monitor; do
+      ${pkgs.bspwm}/bin/bspc monitor "$monitor" -r
+    done
+    log_message "Removed existing desktops"
+
+    if [ "$count" -eq 1 ]; then
+      # Single monitor setup
+      monitor=$connected
+      ${pkgs.bspwm}/bin/bspc monitor "$monitor" -d 1 2 3 4 5 6
+      log_message "Single monitor setup: $monitor"
+    elif [ "$count" -eq 2 ]; then
+      # Dual monitor setup
+      primary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -m1 "DP-4" || echo "$connected" | ${pkgs.coreutils}/bin/head -n 1)
+      secondary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -v "$primary")
+      log_message "Dual monitor setup: Primary=$primary, Secondary=$secondary"
+
+      ${pkgs.bspwm}/bin/bspc monitor "$primary" -d 1 2 3
+      ${pkgs.bspwm}/bin/bspc monitor "$secondary" -d 4 5 6
+
+      # Ensure correct monitor order
+      ${pkgs.bspwm}/bin/bspc wm -O "$primary" "$secondary"
+    else
+      log_message "Unexpected number of monitors: $count"
+    fi
+
+    # Additional BSPWM configurations
+    ${pkgs.bspwm}/bin/bspc config remove_disabled_monitors true
+    ${pkgs.bspwm}/bin/bspc config remove_unplugged_monitors true
+    ${pkgs.bspwm}/bin/bspc config merge_overlapping_monitors true
+    log_message "Applied additional BSPWM configurations"
+
+    # Final check
+    final_monitors=$(${pkgs.bspwm}/bin/bspc query -M --names)
+    final_desktops=$(${pkgs.bspwm}/bin/bspc query -D --names)
+    log_message "Final setup - Monitors: $final_monitors, Desktops: $final_desktops"
+  '';
+
+in
+{
+  services.xserver = {
+    # ... other xserver configurations ...
+    displayManager.setupCommands = "${configureBspwm}";
+  };
+
+  services.autorandr = {
+    enable = true;
+    defaultTarget = "flexible-setup";
+    profiles = {
+      "flexible-setup" = {
+        fingerprint = builtins.fromJSON (builtins.readFile ./fingerprint.json);
+        config = monitorConfig;
+      };
+    };
+    hooks = {
+      postswitch = {
+        "restart-polybar" = "${pkgs.systemd}/bin/systemctl --user restart polybar";
+        "configure-bspwm" = "${configureBspwm}";
+      };
+    };
+  };
+
+  services.udev.extraRules = ''
+    ACTION=="change", SUBSYSTEM=="drm", RUN+="${pkgs.autorandr}/bin/autorandr --batch --change --default default"
+  '';
+
+  systemd.user.services.autorandr = {
+    description = "Autorandr execution hook";
+    wantedBy = [
+      "default.target"
+      "sleep.target"
+    ];
+    after = [ "sleep.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.autorandr}/bin/autorandr --change --default default";
+    };
+  };
+
+  systemd.user.services.autorandr.enable = true;
+}

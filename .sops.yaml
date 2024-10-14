@@ -27,6 +27,17 @@ creation_rules:
           - *geoffrey_artemis
           - *geoffrey_cassini
           - *geoffrey_curiosity
+
+  - path_regex: secrets/hosts/apollo.yaml
+    key_groups:
+      - age:
+          - *apollo
+
+  - path_regex: secrets/hosts/artemis.yaml
+    key_groups:
+      - age:
+          - *artemis
+
   - path_regex: secrets/network.yaml
     key_groups:
       - age:

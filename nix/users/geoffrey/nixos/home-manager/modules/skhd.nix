@@ -1,6 +1,8 @@
 { pkgs, ... }:
 let
-  brightness-control = import ../scripts/brightness-control.nix { inherit pkgs; };
+  brightness-control = import ./polybar/config/modules/scripts/brightness-control.nix {
+    inherit pkgs;
+  };
 in
 {
   services.sxhkd = {
@@ -35,10 +37,8 @@ in
       "super + {Left,Down,Up,Right}" = "bspc node -v {-20 0,0 20,0 -20,20 0}";
 
       # Desktop management
-      "super + {1-3}" = "bspc desktop -f 'DP-4:^{1-3}'";
-      "super + {4-6}" = "bspc desktop -f 'HDMI-1:^{1-3}'";
-      "super + shift + {1-3}" = "bspc node -d 'DP-4:^{1-3}'";
-      "super + shift + {4-6}" = "bspc node -d 'HDMI-1:^{1-3}'";
+      "super + {1-6}" = "bspc desktop -f '^{1-6}'";
+      "super + shift + {1-6}" = "bspc node -d '^{1-6}'";
 
       # Monitor focus
       "super + backslash" = "bspc monitor -f next";

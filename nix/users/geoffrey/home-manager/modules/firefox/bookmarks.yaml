@@ -76,3 +76,15 @@
     - name: Full Time Nix - Interview with Jonathan Ringer
       tags: [nix, nixos, development]
       url: https://fulltimenix.com/episodes/jonathan-ringerepisodes/jonathan-ringer
+- name: Trading & Investment
+  bookmarks:
+    - name: Day Trading Success Stories
+      bookmarks:
+        - name: $500,000 Profits in 1 Year of Full-Time Day Trading
+          tags: [day trading, profits, risk management]
+          url: https://medium.datadriveninvestor.com/i-just-crossed-500-000-in-profits-after-1-year-of-full-time-day-trading-2271abf92a24
+    - name: AI in Trading
+      bookmarks:
+        - name: OpenAI's o1 Model for Trading Strategy
+          tags: [AI, trading strategy, OpenAI]
+          url: https://medium.datadriveninvestor.com/i-used-openais-o1-model-to-develop-a-trading-strategy-it-is-destroying-the-market-576a6039e8fa
