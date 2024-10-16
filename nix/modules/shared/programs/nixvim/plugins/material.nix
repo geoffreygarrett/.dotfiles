@@ -106,36 +106,36 @@
 
           async_loading = true, -- Load parts of the theme asynchronously for faster startup (turned on by default)
 
-          custom_colors = function(colors)
-            colors.editor.bg = palette.base00
-            colors.editor.bg_alt = palette.base01
-            colors.editor.fg = palette.base05
-            colors.editor.fg_dark = palette.base04
-            colors.editor.selection = palette.base02
-            colors.editor.contrast = palette.base01
-            colors.editor.active = palette.base02
-            colors.editor.border = palette.base01
-            colors.editor.line_numbers = palette.base03
-            colors.editor.highlight = palette.base02
-            colors.editor.disabled = palette.base03
-            colors.editor.accent = palette.base0D
-
-            colors.main.red = palette.base08
-            colors.main.green = palette.base0B
-            colors.main.yellow = palette.base0A
-            colors.main.blue = palette.base0D
-            colors.main.paleblue = palette.base0C
-            colors.main.cyan = palette.base0C
-            colors.main.purple = palette.base0E
-            colors.main.orange = palette.base09
-            colors.main.gray = palette.base03
-
-            colors.syntax.comments = palette.base03
-            colors.syntax.variables = palette.base08
-            colors.syntax.functions = palette.base0D
-            colors.syntax.keywords = palette.base09
-            colors.syntax.types = palette.base0A
-          end,
+          -- custom_colors = function(colors)
+          --   colors.editor.bg = palette.base00
+          --   colors.editor.bg_alt = palette.base01
+          --   colors.editor.fg = palette.base05
+          --   colors.editor.fg_dark = palette.base04
+          --   colors.editor.selection = palette.base02
+          --   colors.editor.contrast = palette.base01
+          --   colors.editor.active = palette.base02
+          --   colors.editor.border = palette.base01
+          --   colors.editor.line_numbers = palette.base03
+          --   colors.editor.highlight = palette.base02
+          --   colors.editor.disabled = palette.base03
+          --   colors.editor.accent = palette.base0D
+          --
+          --   colors.main.red = palette.base08
+          --   colors.main.green = palette.base0B
+          --   colors.main.yellow = palette.base0A
+          --   colors.main.blue = palette.base0D
+          --   colors.main.paleblue = palette.base0C
+          --   colors.main.cyan = palette.base0C
+          --   colors.main.purple = palette.base0E
+          --   colors.main.orange = palette.base09
+          --   colors.main.gray = palette.base03
+          --
+          --   colors.syntax.comments = palette.base03
+          --   colors.syntax.variables = palette.base08
+          --   colors.syntax.functions = palette.base0D
+          --   colors.syntax.keywords = palette.base09
+          --   colors.syntax.types = palette.base0A
+          -- end,
 
           custom_highlights = {}, -- Overwrite highlights with your own
       })

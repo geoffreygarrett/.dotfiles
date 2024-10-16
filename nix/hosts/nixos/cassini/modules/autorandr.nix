@@ -1,28 +1,20 @@
 { pkgs, ... }:
 let
   monitorConfig = {
-    "DP-0" = {
+    "eDP-1" = {
+      enable = true;
+      mode = "3840x2160";
+      rate = "59.94";
+      primary = true;
+      position = "3840x0";
+    };
+    "DP-1" = {
       enable = true;
       mode = "3840x2160";
       rate = "59.94";
       position = "0x0";
-      dpi = 140;
-    };
-    "DP-4" = {
-      enable = true;
-      mode = "2560x1440";
-      rate = "143.97";
-      position = "640x2160";
-      primary = true;
-      dpi = 109;
     };
   };
-
-  # Calculate the minimum DPI from monitorConfig
-  minDpi = builtins.foldl' (
-    min: monitor: if monitor.enable && (monitor.dpi < min || min == 0) then monitor.dpi else min
-  ) 0 (builtins.attrValues monitorConfig);
-
   configureBspwm = pkgs.writeShellScript "configure-bspwm" ''
     log_file="/tmp/monitor_setup.log"
     echo "Monitor setup triggered at $(date)" > $log_file
@@ -38,8 +30,8 @@ let
       echo "Workspaces 1-6 assigned to $connected" >> $log_file
     elif [ "$count" -eq 2 ]; then
       echo "Dual monitor setup" >> $log_file
-      primary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -E "DP-4")
-      secondary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -vE "DP-4")
+      primary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -E "eDP-0")
+      secondary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -vE "eDP-0")
       ${pkgs.bspwm}/bin/bspc monitor $primary -d 1 2 3
       ${pkgs.bspwm}/bin/bspc monitor $secondary -d 4 5 6
       ${pkgs.bspwm}/bin/bspc wm -O $primary $secondary
@@ -57,7 +49,7 @@ in
     enable = true;
     defaultTarget = "flexible-setup";
     profiles.flexible-setup = {
-      fingerprint = builtins.fromJSON (builtins.readFile ./fingerprint.json);
+      # fingerprint = builtins.fromJSON (builtins.readFile ./fingerprint.json);
       config = monitorConfig;
     };
     hooks.postswitch = {
@@ -70,9 +62,4 @@ in
     bspwm
     autorandr
   ];
-  environment.etc."X11/Xresources" = {
-    text = ''
-      Xft.dpi: ${toString minDpi}
-    '';
-  };
 }

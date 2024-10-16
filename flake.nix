@@ -312,7 +312,7 @@
           "cassini.nixus.net" = {
             addresses = [
               {
-                ip = "192.168.68.131";
+                ip = "192.168.68.133";
                 type = "local";
               }
             ];
@@ -510,19 +510,18 @@
                 # Build the derivation on the target system.
                 # Will also fetch all external dependencies from the target system's substituters.
                 # This default to `false`. If the target system does not have the trusted keys, set this to `true`.
-                remoteBuild = false;
+                remoteBuild = true;
                 sshUser = "${user}";
                 user = "root";
                 magicRollback = true;
-                interactiveSudo = true;
-                sshOpts = commonSshOpts;
-                # sshOpts = commonSshOpts ++ [
-                #   # # NOTE: This is a workaround for "too many root sets":
-                #   # # https://github.com/NixOS/nix/issues/7359
-                #   "-o"
-                #   "ProxyCommand=none"
-                #   "-t" # pseudo-terminal allocation for password prompt
-                # ];
+                # sshOpts = commonSshOpts;
+                sshOpts = commonSshOpts ++ [
+                  #   # # NOTE: This is a workaround for "too many root sets":
+                  #   # # https://github.com/NixOS/nix/issues/7359
+                  "-o"
+                  "ProxyCommand=none"
+                  #   "-t" # pseudo-terminal allocation for password prompt
+                ];
                 path = inputs.deploy-rs.lib.x86_64-linux.activate.nixos self.nixosConfigurations.cassini;
               };
             };
@@ -678,6 +677,7 @@
             pkgs = pkgsFor "x86_64-linux";
             modules = [
               ./nix/hosts/nixos/cassini
+              ./nix/users/geoffrey/nixos/desktop.nix
               homeManagerModule
               inputs.nixus.nixosModules.dnsmasq
               { nixus.dnsmasq = sharedDnsmasqConfig; }

@@ -80,9 +80,9 @@
         html.enable = true; # Handles both HTML and CSS
         bashls.enable = true;
         clangd.enable = true; # Best for C/C++
-        java-language-server.enable = true; # Or jdt-language-server, both are good
+        java_language_server.enable = true; # Or jdt-language-server, both are good
         jsonls.enable = true;
-        nil-ls.enable = true; # Best for Nix
+        nil_ls.enable = true; # Best for Nix
 
         # Adding the best options for the languages you asked about:
         pyright.enable = true; # Best for Python, offers type checking
@@ -114,20 +114,20 @@
         svelte.enable = true; # Best for Svelte
         graphql.enable = true; # Best for GraphQL
         sqls.enable = true; # Good for SQL (including PostgreSQL)
-        docker-compose-language-service.enable = true; # Best for Docker Compose files
+        docker_compose_language_service.enable = true; # Best for Docker Compose files
         dockerls.enable = true; # For Dockerfile
         fortls.enable = true; # Best for Fortran
         nushell.enable = true; # Best for Nushell
         taplo.enable = true; # Best for TOML
         cmake.enable = true; # Best for CMake
         tailwindcss.enable = true; # Best for Tailwind CSS
-        nginx-language-server.enable = true; # Best for Nginx config files
+        nginx_language_server.enable = true; # Best for Nginx config files
         htmx.enable = true; # Best for HTMX
         bufls.enable = true; # Best for Protocol Buffers
         gdscript.enable = true; # Best for Godot/GDScript
-        helm-ls.enable = true; # Best for Helm charts
+        helm_ls.enable = true; # Best for Helm charts
         ltex.enable = true; # Best for LaTeX/text spell and grammar checking
-        ast-grep.enable = true; # Useful for AST-based code searching and rewriting
+        ast_grep.enable = true; # Useful for AST-based code searching and rewriting
 
         # ...etc. See `https://nix-community.github.io/nixvim/plugins/lsp` for a list of pre-configured LSPs
         #
@@ -137,7 +137,7 @@
         # But for many setups the LSP (`tsserver`) will work just fine
         # tsserver.enable = true;
 
-        lua-ls = {
+        lua_ls = {
           enable = true;
           settings = {
             Lua = {

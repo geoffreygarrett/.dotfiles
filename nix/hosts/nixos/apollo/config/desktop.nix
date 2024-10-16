@@ -85,6 +85,22 @@
     autoRepeatDelay = 200; # Delay before key repeat starts (in milliseconds)
     autoRepeatInterval = 45; # Interval between key repeats (in milliseconds)
     displayManager = {
+      # sessionCommands = ''
+      #   ${pkgs.xorg.xrdb}/bin/xrdb -merge <<EOF
+      #      ! X11 DPI setting
+      #      Xft.dpi: 96
+      #
+      #      ! Font rendering settings
+      #      Xft.antialias: 1
+      #      Xft.hinting: 1
+      #      Xft.rgba: rgb
+      #      Xft.hintstyle: hintslight
+      #      Xft.lcdfilter: lcddefault
+      #
+      #      ! Cursor size
+      #      Xcursor.size: 24
+      #    EOF
+      # '';
       # gdm.enable = true;
       lightdm = {
         enable = true;

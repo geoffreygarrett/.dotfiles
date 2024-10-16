@@ -23,7 +23,16 @@ let
 in
 {
   # For mount.cifs, required unless domain name resolution is not needed.
-  environment.systemPackages = [ pkgs.cifs-utils ];
+  environment.systemPackages = [
+    pkgs.cifs-utils
+    pkgs.nautilus
+    pkgs.gvfs
+    pkgs.gnome.gnome-keyring
+  ];
+  boot.supportedFilesystems = [ "fuse" ];
+
+  # https://nixos.wiki/wiki/Nautilus
+  services.gvfs.enable = true; # $GIO_EXTRA_MODULES confirmed to be set
 
   # Setuid wrapper for mount.cifs
   # https://discourse.nixos.org/t/cant-mount-samba-share-as-a-user/49171/2
@@ -40,14 +49,12 @@ in
   # the user will get a permission error when mounting.
   sops.secrets."smb-secrets".owner = "${user}";
 
-  # Also needs dnsmasq.service to resolve the domain name
-
   # Merge the default mounts with the additional mounts
   # https://nixos.wiki/wiki/Samba
   fileSystems =
     let
       common = [
-        "nofail" # Do not fail if the mount fails
+        # "nofail" # Do not fail if the mount fails
         "noauto" # Do not mount on boot
         "x-gvfs-show" # Show in file manager
         "x-systemd.automount" # Mount on access
@@ -56,12 +63,12 @@ in
         "x-systemd.mount-timeout=5s"
         "x-systemd.requires=network-online.target"
         "x-systemd.after=network-online.target"
-        # "username=${user}"
         "credentials=${config.sops.secrets.smb-secrets.path}"
-        "uid=${toString config.users.users."${user}".uid}"
+        "uid=1002"
+        # "uid=${toString config.users.users."${user}".uid}"
         "gid=${toString config.users.groups.users.gid}"
-        "user" # Allow users to mount
-        "users" # Allow multiple users to mount
+        "user"
+        "users"
       ];
     in
     {
@@ -80,7 +87,6 @@ in
   # Firewall ports for CIFS/Samba
   networking = {
     firewall = {
-      enable = lib.mkForce false;
       extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';
       # Allow incoming connections for Samba and mDNS
       allowedTCPPorts = [

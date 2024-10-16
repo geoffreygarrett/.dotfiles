@@ -8,7 +8,7 @@ keys:
     - &geoffrey_pioneer age1ahyztttw0jky84tzg5vzvhwvhy3c4ptw7zg4kv5jrn4ergjq2c3q4f76dv
     - &geoffrey_apollo age1z09vrs2ketcn244l43fjxgzuu22yp0q0tpkmh3s2grlqn8jgypeqgnnf9f
     - &geoffrey_artemis age18jgsuq5wf3jv426rhst5saxc3etz29te3dx3tugg7466tje3layqvtar5f
-    - &geoffrey_cassini age1mz6264gtrt32xj0hkzg620utf2eagx9p2k6yq63pxn4xnsv8jp8qn429m5
+    - &geoffrey_cassini age1x7t6fc2ccamga64a6lz7kxjv4txplng8272jnfx0le2vkcpyvuxq0jphnx
     - &geoffrey_curiosity age158unsxrql4w5huz4pjrr50gswj3tcnm3lxwd8ae54ye26pk454xsm5jwcr
   # Host keys
   - &hosts:
@@ -33,10 +33,10 @@ creation_rules:
       - age:
           - *apollo
 
-  - path_regex: secrets/hosts/artemis.yaml
-    key_groups:
-      - age:
-          - *artemis
+  # - path_regex: secrets/hosts/artemis.yaml
+  #   key_groups:
+  #     - age:
+  #         - *artemis
 
   - path_regex: secrets/network.yaml
     key_groups:

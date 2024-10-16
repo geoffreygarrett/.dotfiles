@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   ...
 }:
 
@@ -10,18 +9,24 @@
     ./modules/theming.nix
     ./modules/ddcci.nix
     ./modules/xdg-mime.nix
+    ./modules/samba.nix
+
     # ./modules/sway.nix
   ];
   home-manager = {
     users."geoffrey" = import ./home-manager/desktop.nix;
   };
 
-  users.users.geoffrey.packages = with pkgs; [
-    nautilus
+  # Move Nautilus and Baobab to system packages
+  environment.systemPackages = with pkgs; [
     baobab
+  ];
+
+  users.users.geoffrey.packages = with pkgs; [
     glxinfo
     minicom
 
+    #
     # robotics
     nvidia-omniverse-launcher
   ];

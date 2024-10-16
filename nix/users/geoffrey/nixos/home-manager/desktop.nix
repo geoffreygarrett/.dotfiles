@@ -20,6 +20,12 @@
     ./modules/picom.nix
     ./modules/sway.nix
     ./modules/theming.nix
+
+    # Development-related modules
+    ./modules/robotics.nix
+
+    # Hardware-related modules
+    ./modules/scarlett-focusrite.nix
   ];
 
   home.packages = with pkgs; [
@@ -27,7 +33,7 @@
     # thunderbird
     mailspring
     gimp
-    slack
+    # slack
     inkscape
     vlc
     # blender

@@ -6,6 +6,42 @@
 {
   aliases.enable = true;
   aliases.aliases = {
+    sshkey = {
+      command = ''
+        ID="$HOME/.ssh/id_ed25519"
+        if [ -f "$ID.pub" ]; then
+          cat "$ID.pub"
+        else
+          ssh-keygen -t ed25519 -f "$ID" -N "" && cat "$ID.pub"
+        fi
+      '';
+      description = "Generate (if needed) and display local SSH public key";
+      tags = [
+        "ssh"
+        "zsh"
+        "fish"
+        "bash"
+        "nu"
+      ];
+    };
+    remote-sshkey = {
+      command = ''
+        if [ $# -eq 0 ]; then
+          echo "Usage: remote-sshkey user@host"
+          return 1
+        fi
+        user_host="$1"
+        ssh -o BatchMode=yes "$user_host" 'ID="$HOME/.ssh/id_ed25519"; if [ -f "$ID.pub" ]; then cat "$ID.pub"; else ssh-keygen -t ed25519 -f "$ID" -N "" && cat "$ID.pub"; fi'
+      '';
+      description = "Generate (if needed) and display remote SSH public key";
+      tags = [
+        "ssh"
+        "zsh"
+        "fish"
+        "bash"
+        "nu"
+      ];
+    };
     fml = {
       command = "git log --since=\"yesterday\" --pretty=format:\"%h - %an: %s\" && echo \"\\nTODOs:\" && grep -rn \"TODO\" .";
       description = "Show recent commits and TODOs in the project";

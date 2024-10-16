@@ -13,6 +13,7 @@ in
     inputs.sops-nix.nixosModules.default # Secret management
     inputs.home-manager.nixosModules.home-manager # User management
   ];
+  sops.defaultSopsFile = lib.mkDefault ../../../../secrets/default.yaml;
   sops.secrets."users/${name}/password" = {
     neededForUsers = true;
   };
@@ -27,7 +28,7 @@ in
         "video"
         # "audio"
         # "input"
-        # "disk"
+        "disk" # NOTE: Possibly needed for Samba
       ];
       isNormalUser = true;
     }

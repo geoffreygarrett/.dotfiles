@@ -4,6 +4,9 @@
   pkgs,
   ...
 }:
+let
+  theme = config.colorScheme.palette;
+in
 
 {
 
@@ -20,6 +23,11 @@
       animation-for-open-window = "slide-down";
       animation-for-menu-window = "none";
       animation-for-transient-window = "slide-down";
+
+      # Window border settings
+      border-width = 2;
+      border-color = "#${theme.base0D}"; # Blue color for active window border
+      inactive-border-color = "#${theme.base02}"; # Darker shade for inactive window border
 
       # Keep corner radius
       corner-radius = 12;
@@ -71,12 +79,7 @@
       };
 
       blur-background-exclude = [ ];
-      # NOTE: I could not get this working with glx. Windows did not refresh and GPU seemed to be receiving reset commands. `xrender` worked, but no round borders. 
-      # Adendum: It now works? No clue.
-
       backend = "glx";
-
-      # NOTE: Couldn't run vsync at all, but not necessary.
       vsync = true;
 
       # Keep these settings for window focus behavior

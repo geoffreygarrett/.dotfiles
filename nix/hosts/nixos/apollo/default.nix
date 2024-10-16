@@ -11,7 +11,7 @@ let
   mainInterface = "eno2";
 in
 {
-
+  programs.steam.enable = true;
   # Don't require password for users in `wheel` group for these commands
   security.sudo = {
     enable = true;
@@ -27,6 +27,9 @@ in
       }
     ];
   };
+  services.xserver.displayManager.setupCommands = ''
+    ${pkgs.xorg.xrandr}/bin/xrandr --output DP-0 --primary
+  '';
   # nixpkgs.config.allowUnfree = lib.mkForce true;
   boot.kernelParams = [
     "video=DP-4:2560x1440@143.97"
@@ -81,7 +84,7 @@ in
     ../../../modules/nixos/openrgb.nix
     ../../../modules/nixos/openssh.nix
     ../../../modules/nixos/tailscale.nix
-    # ../../../modules/nixos/samba.nix
+    ../../../modules/nixos/samba.nix
     ../mariner/k3/agent.nix
     ./k3s.nix
     ../shared.nix
@@ -89,6 +92,7 @@ in
     ../../../users/geoffrey/nixos/desktop.nix
     ../../../scripts/network-tools.nix
     ./modules/autorandr.nix
+    ./modules/x11.nix
   ];
 
   services.networkTools.enable = true;
@@ -163,7 +167,7 @@ in
     systemd-boot.configurationLimit = 3;
     efi = {
       canTouchEfiVariables = true;
-      efiSysMountPoint = "/boot";
+      # efiSysMountPoint = "/boot";
     };
     grub = {
       enable = false;

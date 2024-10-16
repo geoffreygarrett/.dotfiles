@@ -34,7 +34,12 @@ in
     border-size = 1;
     border-color = "#44${base16.base0E}";
   };
-
+  "module/popup-calendar" = {
+    type = "custom/script";
+    exec = "${scripts.popup-calendar}/bin/polybar-popup-calendar";
+    interval = 5;
+    click-left = "${scripts.popup-calendar}/bin/polybar-popup-calendar --popup &";
+  };
   "module/sysmenu" = {
     type = "custom/text";
     format = "  ";

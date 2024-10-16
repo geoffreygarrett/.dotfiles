@@ -3,6 +3,8 @@
 let
   rofiConfig = ./rofi;
 
+  popup-calendar = import ./popup-calendar.nix { inherit pkgs; };
+
   updatesScript = pkgs.writeShellScriptBin "polybar-updates" ''
     NOTIFY_ICON="${pkgs.papirus-icon-theme}/share/icons/Papirus/32x32/apps/system-software-update.svg"
 
@@ -150,5 +152,6 @@ in
     launcherScript
     styleSwitchScript
     powermenuScript
+    popup-calendar
     ;
 }

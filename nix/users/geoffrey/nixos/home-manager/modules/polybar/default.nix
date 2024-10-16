@@ -57,7 +57,7 @@ in
         "bar/main-left" = bar // {
           monitor = "DP-4";
           modules-left = "launcher bspwm";
-          modules-center = "date";
+          modules-center = "date popup-calendar";
           modules-right = "tray pulseaudio brightness memory cpu battery spotify-volume spotify spotify-prev spotify-play-pause spotify-next sysmenu";
         };
 
