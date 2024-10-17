@@ -32,11 +32,6 @@ let
     enable-ipc = true;
   };
   brightness-control = import ./config/modules/scripts/brightness-control.nix { inherit pkgs; };
-
-  barFormat =
-    fill: indicator: empty:
-    "%{F#${base16.base05}}${fill}%{F-}%{F#${base16.base04}}${indicator}%{F-}%{F#${base16.base03}}${empty}%{F-}";
-
 in
 {
   home.packages = [
@@ -66,7 +61,6 @@ in
           modules-left = "bspwm";
           bottom = true;
         };
-
       }
     ];
     script = ''

@@ -35,3 +35,8 @@ Can only mount shares from Samba,
 ## NetworkManager wait online fails
 
 - [Relevant discussion](https://discourse.nixos.org/t/nixos-rebuild-switch-upgrade-networkmanager-wait-online-service-failure/30746)
+
+
+## Italic fonts with bg fills in Alacritty 
+
+- [This Fixes it](https://michenriksen.com/posts/italic-text-in-alacritty-tmux-neovim/)

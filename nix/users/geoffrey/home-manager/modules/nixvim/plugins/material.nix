@@ -1,4 +1,28 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
+
+let
+  theme = config.colorScheme.palette;
+  luaPalette = ''
+    local palette = {
+      base00 = "${theme.base00}",
+      base01 = "${theme.base01}",
+      base02 = "${theme.base02}",
+      base03 = "${theme.base03}",
+      base04 = "${theme.base04}",
+      base05 = "${theme.base05}",
+      base06 = "${theme.base06}",
+      base07 = "${theme.base07}",
+      base08 = "${theme.base08}",
+      base09 = "${theme.base09}",
+      base0A = "${theme.base0A}",
+      base0B = "${theme.base0B}",
+      base0C = "${theme.base0C}",
+      base0D = "${theme.base0D}",
+      base0E = "${theme.base0E}",
+      base0F = "${theme.base0F}",
+    }
+  '';
+in
 {
   programs.nixvim = {
     plugins = {
@@ -12,130 +36,243 @@
       pkgs.vimPlugins.material-nvim
     ];
 
-    colorscheme = "material-deep-ocean";
-
     extraConfigLua = ''
-        require('material').setup({
-          contrast = {
-              terminal = false, -- Enable contrast for the built-in terminal
-              sidebars = false, -- Enable contrast for sidebar-like windows ( for example Nvim-Tree )
-              floating_windows = false, -- Enable contrast for floating windows
-              cursor_line = false, -- Enable darker background for the cursor line
-              lsp_virtual_text = false, -- Enable contrasted background for lsp virtual text
-              non_current_windows = false, -- Enable contrasted background for non-current windows
-              filetypes = {}, -- Specify which filetypes get the contrasted (darker) background
-          },
+      ${luaPalette}
 
-          styles = { -- Give comments style such as bold, italic, underline etc.
-              comments = { --[[ italic = true ]] },
-              strings = { --[[ bold = true ]] },
-              keywords = { --[[ underline = true ]] },
-              functions = { --[[ bold = true, undercurl = true ]] },
-              variables = {},
-              operators = {},
-              types = {},
-          },
+      vim.opt.termguicolors = true
+      require('material').setup({
+        contrast = {
+          terminal = false,
+          sidebars = false,
+          floating_windows = false,
+          cursor_line = false,
+          non_current_windows = false,
+          filetypes = {},
+        },
 
-          plugins = { -- Uncomment the plugins that you use to highlight them
-              -- Available plugins:
-              -- "coc",
-              -- "colorful-winsep",
-              -- "dap",
-              -- "dashboard",
-              -- "eyeliner",
-              -- "fidget",
-              -- "flash",
-              "gitsigns",
-              -- "harpoon",
-              -- "hop",
-              -- "illuminate",
-              -- "indent-blankline",
-              -- "lspsaga",
-              -- "mini",
-              -- "neogit",
-              -- "neotest",
-              "neo-tree",
-              -- "neorg",
-              -- "noice",
-              "nvim-cmp",
-              -- "nvim-navic",
-              -- "nvim-tree",
-              -- "nvim-web-devicons",
-              -- "rainbow-delimiters",
-              -- "sneak",
-              -- "telescope",
-              -- "trouble",
-              "which-key",
-              -- "nvim-notify",
-          },
+        styles = {
+          comments = {},
+          strings = {},
+          keywords = {},
+          functions = {},
+          variables = {},
+          operators = {},
+          types = {},
+        },
 
-          disable = {
-              colored_cursor = false, -- Disable the colored cursor
-              borders = false, -- Disable borders between vertically split windows
-              background = false, -- Prevent the theme from setting the background (NeoVim then uses your terminal background)
-              term_colors = false, -- Prevent the theme from setting terminal colors
-              eob_lines = false -- Hide the end-of-buffer lines
-          },
+        plugins = {
+          "gitsigns",
+          "neo-tree",
+          "nvim-cmp",
+          "which-key",
+          "telescope",
+          "rainbow-delimiters",
+          "dashboard",
+        },
 
-          high_visibility = {
-              lighter = false, -- Enable higher contrast text for lighter style
-              darker = false -- Enable higher contrast text for darker style
-          },
+        disable = {
+          colored_cursor = true,
+          borders = true,
+          background = true,
+          term_colors = true,
+          eob_lines = false,
+        },
 
-          lualine_style = "default", -- Lualine style ( can be 'stealth' or 'default' )
+        high_visibility = {
+          lighter = false,
+          darker = true,
+        },
 
-          async_loading = true, -- Load parts of the theme asynchronously for faster startup (turned on by default)
+        lualine_style = "default",
+        async_loading = true,
+        custom_colors = function(colors)
+          -- Main colors
+          colors.main = {
+            white = "#" .. palette.base07,
+            gray = "#" .. palette.base04,
+            black = "#" .. palette.base00,
+            red = "#" .. palette.base08,
+            green = "#" .. palette.base0B,
+            yellow = "#" .. palette.base0A,
+            blue = "#" .. palette.base0D,
+            paleblue = "#" .. palette.base0C,
+            cyan = "#" .. palette.base0C,
+            purple = "#" .. palette.base0E,
+            orange = "#" .. palette.base09,
+            darkred = "#" .. palette.base08,
+            darkgreen = "#" .. palette.base0B,
+            darkyellow = "#" .. palette.base0A,
+            darkblue = "#" .. palette.base0D,
+            darkcyan = "#" .. palette.base0C,
+            darkpurple = "#" .. palette.base0E,
+            darkorange = "#" .. palette.base09,
+          }
 
-          custom_colors = nil, -- If you want to override the default colors, set this to a function
+          -- Editor colors
+          colors.editor = {
+            bg = "#" .. palette.base00,
+            bg_alt = "#" .. palette.base01,
+            fg = "#" .. palette.base05,
+            fg_dark = "#" .. palette.base04,
+            selection = "#" .. palette.base02,
+            contrast = "#" .. palette.base00,
+            active = "#" .. palette.base02,
+            border = "#" .. palette.base01,
+            line_numbers = "#" .. palette.base03,
+            highlight = "#" .. palette.base02,
+            disabled = "#" .. palette.base03,
+            accent = "#" .. palette.base0D,
+            cursor = "#" .. palette.base05,
+            title = "#" .. palette.base05,
+            link = "#" .. palette.base0C,
+          }
 
-          custom_highlights = {}, -- Overwrite highlights with your own
+          -- Syntax colors
+          colors.syntax = {
+            comments = "#" .. palette.base03,
+            variable = colors.editor.fg,
+            field = colors.editor.fg,
+            keyword = colors.main.purple,
+            value = colors.main.orange,
+            operator = colors.main.cyan,
+            fn = colors.main.blue,
+            string = colors.main.green,
+            type = colors.main.yellow,
+          }
+
+          -- LSP colors
+          colors.lsp = {
+            error = "#" .. palette.base08,
+            warning = colors.main.yellow,
+            info = colors.main.paleblue,
+            hint = colors.main.purple,
+          }
+
+          -- Git colors
+          colors.git = {
+            added = colors.main.green,
+            removed = colors.main.red,
+            modified = colors.main.blue,
+          }
+
+          -- Background colors
+          colors.backgrounds = {
+            sidebars = colors.editor.bg,
+            floating_windows = colors.editor.bg,
+            non_current_windows = colors.editor.bg,
+            cursor_line = colors.editor.active,
+          }
+        end,
+
+        custom_highlights = function(colors)
+          return {
+            -- General Identifiers
+            ["@variable"] = { fg = colors.syntax.variable },
+            ["@variable.builtin"] = { fg = colors.main.purple },
+            ["@variable.parameter"] = { fg = colors.main.orange },
+            ["@variable.member"] = { fg = colors.syntax.field },
+
+            -- Types
+            ["@type"] = { fg = colors.syntax.type },
+            ["@type.builtin"] = { fg = colors.syntax.keyword, italic = true },
+            ["@type.qualifier"] = { fg = colors.main.cyan },
+            ["@type.definition"] = { fg = colors.main.yellow },  -- Struct names
+            ["@storageclass"] = { fg = colors.main.cyan },
+            ["@storageclass.lifetime"] = { fg = colors.main.orange },
+            ["@attribute"] = { fg = colors.main.yellow },
+            ["@property"] = { fg = colors.syntax.field },
+            ["@derive"] = { fg = colors.main.purple },  -- For derive macros
+
+            -- Functions
+            ["@function"] = { fg = colors.syntax.fn },
+            ["@function.builtin"] = { fg = colors.syntax.fn },
+            ["@function.macro"] = { fg = colors.main.blue },
+            ["@method"] = { fg = colors.syntax.fn },
+            ["@constructor"] = { fg = colors.main.blue },
+
+            -- Keywords
+            ["@keyword"] = { fg = colors.syntax.keyword, italic = true },
+            ["@keyword.import"] = { fg = colors.syntax.keyword, italic = true },
+            ["@keyword.function"] = { fg = colors.syntax.keyword, italic = true },
+            ["@keyword.operator"] = { fg = colors.syntax.operator },
+            ["@keyword.return"] = { fg = colors.syntax.keyword,  italic = true },
+            ["@keyword.modifier"] = { fg = colors.syntax.keyword, italic = true },
+
+            ["@keyword.coroutine"] = { fg = colors.main.purple, bg = "NONE" },
+            ["@conditional"] = { fg = colors.syntax.keyword },
+            ["@repeat"] = { fg = colors.syntax.keyword },
+            ["@label"] = { fg = colors.main.yellow },
+            ["@include"] = { fg = colors.syntax.keyword },
+            ["@exception"] = { fg = colors.main.red },
+
+            -- Constants
+            ["@constant"] = { fg = colors.main.white },
+            ["@constant.builtin"] = { fg = colors.main.white, italic = true },  -- For Ok, Err, etc.
+            ["@constant.macro"] = { fg = colors.main.cyan },
+
+            -- Punctuation
+            ["@punctuation.delimiter"] = { fg = colors.main.cyan },
+            ["@punctuation.bracket"] = { fg = colors.main.cyan },
+            ["@punctuation.special"] = { fg = colors.main.cyan },
+
+            -- Comments
+            ["@comment"] = { fg = colors.syntax.comments, italic = true },
+            ["@comment.documentation"] = { fg = colors.syntax.comments, italic = true },
+
+            -- Strings
+            ["@string"] = { fg = colors.syntax.string },
+            ["@string.regex"] = { fg = colors.main.yellow },
+            ["@string.escape"] = { fg = colors.editor.fg_dark },
+            ["@string.special"] = { fg = colors.editor.fg_dark },
+            ["@string.special.path"] = { fg = colors.editor.accent },
+
+            -- Characters
+            ["@character"] = { fg = colors.main.green },
+            ["@character.special"] = { fg = colors.main.red },
+
+            -- Numbers
+            ["@number"] = { fg = colors.syntax.value },
+            ["@float"] = { fg = colors.syntax.value },
+
+            -- Booleans
+            ["@boolean"] = { fg = colors.syntax.value },
+
+            -- Modules
+            ["@module"] = { fg = colors.main.white },
+
+            -- Operators
+            ["@operator"] = { fg = colors.syntax.operator },
+
+            -- Markup
+            ["@markup.heading"] = { fg = colors.main.cyan, bold = true },
+            ["@markup.raw"] = { fg = colors.main.green },
+            ["@markup.link"] = { fg = colors.editor.link },
+            ["@markup.link.url"] = { fg = colors.editor.link, underline = true },
+            ["@markup.list"] = { fg = colors.main.red },
+            ["@markup.strong"] = { bold = true },
+            ["@markup.italic"] = { italic = true },
+            ["@markup.strikethrough"] = { strikethrough = true },
+
+            -- Rust-specific
+            ["@field"] = { fg = colors.syntax.field },
+            ["@type.qualifier"] = { fg = colors.main.cyan },
+            ["@variable.member"] = { fg = colors.syntax.field },
+            ["@namespace"] = { fg = colors.main.yellow },
+
+            -- SQL
+            ["@keyword.sql"] = { fg = colors.syntax.keyword, italic = true },
+            ["@string.sql"] = { fg = colors.syntax.string, italic = true },
+
+            -- LSP Semantic tokens
+            ["@lsp.type.parameter"] = { fg = colors.main.orange },
+            ["@lsp.type.variable"] = { fg = colors.main.orange },
+            ["@lsp.typemod.variable.local"] = { fg = colors.main.orange },
+            ["@lsp.typemod.variable.parameter"] = { fg = colors.main.orange },
+          }
+        end
       })
 
-          vim.cmd 'colorscheme material-deep-ocean'
-          -- vim.g.material_style = "deep ocean"
-            --require('material').setup({
-            --  --contrast = {
-            --  --  terminal = false,
-            --  --  sidebars = false,
-            --  --  floating_windows = false,
-            --  --  cursor_line = false,
-            --  --  non_current_windows = false,
-            --  --  filetypes = {},
-            --  --},
-            --  --styles = {
-            --  --  comments = {},
-            --  --  functions = {},
-            --  --  keywords = {},
-            --  --  strings = {},
-            --  --  variables = {},
-            --  --},
-            ---- plugins = {
-            ----   "telescope",
-            ----   "nvim-cmp",
-            ----   "nvim-web-devicons",
-            ----   "indent-blankline",
-            ----   "nvim-tree",
-            ---- },
-            ---- high_visibility = {
-            ----   lighter = false,
-            ----   darker = true,
-            ---- },
-            ---- disable = {
-            ----   background = false,
-            ----   term_colors = true,
-            ----   eob_lines = false,
-            ---- },
-            --       --   custom_highlights = {}, -- Overwrite highlights with your own
-            ---- custom_colors = function(colors)
-            ----  colors.editor.bg = "#SOME_COLOR"
-            ----  colors.main.purple = "#SOME_COLOR"
-            ----  colors.lsp.error = "#SOME_COLOR"
-            ---- end
-            --  
-            --  -- lualine_style = "default",
-            --})
-        --
-        --     ---- vim.cmd.colorscheme("material")
+      vim.cmd 'colorscheme material'
     '';
   };
 }

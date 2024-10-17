@@ -36,34 +36,36 @@
       font = {
         normal = {
           family = "JetBrainsMono Nerd Font";
-          style = "Medium";
+          style = "Regular";
         };
         bold = {
           family = "JetBrainsMono Nerd Font";
-          style = "Medium Bold";
+          style = "Bold";
         };
         italic = {
           family = "JetBrainsMono Nerd Font";
-          style = "Medium Italic";
+          style = "Italic";
         };
         bold_italic = {
           family = "JetBrainsMono Nerd Font";
-          style = "Medium Bold Italic";
+          style = "Bold Italic";
         };
         size = 11.0;
         offset = {
           x = 0;
-          y = 0;
+          y = 2;
         };
         glyph_offset = {
           x = 0;
-          y = 0;
+          y = 1;
         };
       };
       env = {
         # Fix for Alacritty + tmux colorscheme clashes.
         # https://www.reddit.com/r/neovim/comments/13thfol/help_same_colorscheme_of_neovim_showing_different/ 
-        TERM = "xterm-256color";
+        # TERM = "xterm-256color";
+        # TERM = "tmux-256color";
+        TERM = "alacritty";
       };
       bell = {
         animation = "EaseOutExpo";

@@ -9,7 +9,7 @@
     };
 
     extraPlugins = [
-      # pkgs.vimPlugins.material-nvim
+      pkgs.vimPlugins.material-nvim
     ];
 
     colorscheme = "material";

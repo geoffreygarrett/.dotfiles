@@ -45,8 +45,17 @@ in
     extraConfig = ''
       # Terminal settings
       # NOTE: Ensures no colour clash with Alacritty.
-      set -g default-terminal "screen-256color"
-      set -as terminal-overrides ",xterm-256color:RGB"
+      # set -g default-terminal "screen-256color"
+      # set -as terminal-overrides ",xterm-256color:RGB"
+      # set 256 color
+      # set -g default-terminal "tmux-256color"
+      # tell Tmux that outside terminal supports true color
+      # set -ga terminal-overrides ",xterm-256color*:Tc"
+      # set-option -ga terminal-overrides "alacritty:Tc"
+      set -g default-terminal "alacritty"
+      set -as terminal-overrides ',*:Setulc=\E[58::2::%p1%{65536}%/%d::%p1%{256}%/%{255}%&%d::%p1%{255}%&%d%;m'  # colored underscores
+      set -as terminal-overrides ',alacritty:RGB' # true-color support
+
 
       # Colors
       set -g status-style bg=default,fg=default

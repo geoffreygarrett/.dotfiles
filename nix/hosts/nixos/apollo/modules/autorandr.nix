@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 let
   monitorConfig = {
     "DP-0" = {
@@ -17,62 +17,68 @@ let
       dpi = 109;
     };
   };
-
-  # Calculate the minimum DPI from monitorConfig
   minDpi = builtins.foldl' (
     min: monitor: if monitor.enable && (monitor.dpi < min || min == 0) then monitor.dpi else min
   ) 0 (builtins.attrValues monitorConfig);
+  getPrimaryMonitor =
+    config: lib.head (lib.attrNames (lib.filterAttrs (name: value: value.primary or false) config));
 
-  configureBspwm = pkgs.writeShellScript "configure-bspwm" ''
-    log_file="/tmp/monitor_setup.log"
-    echo "Monitor setup triggered at $(date)" > $log_file
+  getSecondaryMonitor =
+    config:
+    lib.head (
+      lib.attrNames (lib.filterAttrs (name: value: !(value.primary or false) && value.enable) config)
+    );
 
-    connected=$(${pkgs.xorg.xrandr}/bin/xrandr | ${pkgs.gnugrep}/bin/grep " connected" | ${pkgs.coreutils}/bin/cut -d ' ' -f1)
-    count=$(echo "$connected" | ${pkgs.coreutils}/bin/wc -l)
-    echo "Connected monitors: $count" >> $log_file
-    echo "Connected outputs: $connected" >> $log_file
+  primaryMonitor = getPrimaryMonitor monitorConfig;
+  secondaryMonitor = getSecondaryMonitor monitorConfig;
+  configureBspwm = pkgs.writeShellScriptBin "configure-bspwm" ''
+    connected_monitors=$(${pkgs.xorg.xrandr}/bin/xrandr -q | ${pkgs.gnugrep}/bin/grep " connected" | ${pkgs.coreutils}/bin/cut -d ' ' -f1)
 
-    if [ "$count" -eq 1 ]; then
-      echo "Single monitor setup" >> $log_file
-      ${pkgs.bspwm}/bin/bspc monitor $connected -d 1 2 3 4 5 6
-      echo "Workspaces 1-6 assigned to $connected" >> $log_file
-    elif [ "$count" -eq 2 ]; then
-      echo "Dual monitor setup" >> $log_file
-      primary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -E "DP-4")
-      secondary=$(echo "$connected" | ${pkgs.gnugrep}/bin/grep -vE "DP-4")
-      ${pkgs.bspwm}/bin/bspc monitor $primary -d 1 2 3
-      ${pkgs.bspwm}/bin/bspc monitor $secondary -d 4 5 6
-      ${pkgs.bspwm}/bin/bspc wm -O $primary $secondary
-      echo "Primary: $primary" >> $log_file
-      echo "Secondary: $secondary" >> $log_file
-      echo "Workspaces 1-3 assigned to $primary" >> $log_file
-      echo "Workspaces 4-6 assigned to $secondary" >> $log_file
+    if echo "$connected_monitors" | ${pkgs.gnugrep}/bin/grep -q "${primaryMonitor}"; then
+      ${pkgs.xorg.xrandr}/bin/xrandr --output "${primaryMonitor}" \
+        --mode "${monitorConfig.${primaryMonitor}.mode}" \
+        --rate "${monitorConfig.${primaryMonitor}.rate}" \
+        --pos "${monitorConfig.${primaryMonitor}.position}" \
+        --primary
     fi
 
-    echo "Monitor setup completed at $(date)" >> $log_file
+    if echo "$connected_monitors" | ${pkgs.gnugrep}/bin/grep -q "${secondaryMonitor}"; then
+      ${pkgs.xorg.xrandr}/bin/xrandr --output "${secondaryMonitor}" \
+        --mode "${monitorConfig.${secondaryMonitor}.mode}" \
+        --rate "${monitorConfig.${secondaryMonitor}.rate}" \
+        --pos "${monitorConfig.${secondaryMonitor}.position}"
+      
+      ${pkgs.bspwm}/bin/bspc monitor ${primaryMonitor} -d 1 2 3
+      ${pkgs.bspwm}/bin/bspc monitor ${secondaryMonitor} -d 4 5 6
+    else
+      ${pkgs.bspwm}/bin/bspc monitor ${primaryMonitor} -d 1 2 3 4 5 6
+    fi
+
+    ${pkgs.bspwm}/bin/bspc wm -O ${primaryMonitor} ${secondaryMonitor}
   '';
 in
 {
   services.autorandr = {
     enable = true;
-    defaultTarget = "flexible-setup";
-    profiles.flexible-setup = {
+    defaultTarget = "default";
+    profiles.default = {
       fingerprint = builtins.fromJSON (builtins.readFile ./fingerprint.json);
       config = monitorConfig;
     };
-    hooks.postswitch = {
-      "restart-polybar" = "${pkgs.systemd}/bin/systemctl --user restart polybar";
-      "configure-bspwm" = "${configureBspwm}";
+    hooks = {
+      postswitch = {
+        "configure-bspwm" = "${configureBspwm}/bin/configure-bspwm";
+        "restart-polybar" = "${pkgs.systemd}/bin/systemctl --user restart polybar";
+      };
     };
   };
   environment.systemPackages = with pkgs; [
     xorg.xrandr
     bspwm
     autorandr
+    configureBspwm
   ];
-  environment.etc."X11/Xresources" = {
-    text = ''
-      Xft.dpi: ${toString minDpi}
-    '';
-  };
+  environment.etc."X11/Xresources".text = ''
+    Xft.dpi: ${toString minDpi}
+  '';
 }

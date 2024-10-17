@@ -92,7 +92,6 @@ in
     ../../../users/geoffrey/nixos/desktop.nix
     ../../../scripts/network-tools.nix
     ./modules/autorandr.nix
-    ./modules/x11.nix
   ];
 
   services.networkTools.enable = true;
