@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Consent Modal</title>
+    <style>
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        #accept_cookies_modal.fade-out {
+            animation: fadeOutAnimation 0.5s ease-out forwards;
+        }
+        @keyframes fadeOutAnimation {
+            to {
+                opacity: 0;
+                transform: translateX(50px);
+                visibility: hidden;
+                display: none;
+            }
+        }
+        #accept_cookies_modal {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            z-index: 1050;
+            width: auto;
+            max-width: 90%;
+            visibility: visible;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            padding: 10px;
+            font-family: roboto, sans-serif;
+            animation: fadeInRight 0.5s ease-out forwards;
+        }
+        @media (min-width: 768px) {
+            #accept_cookies_modal .modal-dialog {
+                max-width: 300px;
+            }
+        }
+        #accept_cookies_modal .modal-content {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.25),
+                0 3px 10px 5px rgba(0, 0, 0, 0.05) !important;
+            overflow: hidden;
+        }
+        #accept_cookies_modal .modal-body {
+            padding: 15px;
+            font-size: 14px;
+            color: #4f4f4f;
+        }
+        #accept_cookies_modal .modal-footer {
+            text-align: right;
+            padding: 10px 15px;
+            border-top: 2.5px solid hsla(0, 0%, 87%, 0.911);
+        }
+        #accept_cookies_modal .btn {
+            padding: 0.375rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            font-family: inherit;
+            line-height: 1.42857143;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background-color 0.2s ease;
+            text-transform: uppercase;
+        }
+        #accept_cookies_modal .btn-primary {
+            color: #fff;
+            background-color: #3b71ca;
+            box-shadow: rgb(56, 107, 192) 0px 4px 9px -4px;
+        }
+        #accept_cookies_modal .btn-tertiary {
+            color: #3b71ca;
+            background-color: #fff;
+            box-shadow: none;
+        }
+        #accept_cookies_modal .btn-primary:hover,
+        #accept_cookies_modal .btn-primary:focus {
+            background-color: #386bc0;
+        }
+        #accept_cookies_modal .btn-tertiary:hover,
+        #accept_cookies_modal .btn-tertiary:focus {
+            background-color: #f2f2f2;
+        }
+        #accept_cookies_modal .btn:focus,
+        #accept_cookies_modal .btn-primary:focus,
+        #accept_cookies_modal .btn-tertiary:focus {
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        #accept_cookies_modal a {
+            color: #4f4f4f;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-external" id="accept_cookies_modal" role="dialog" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    We use cookies to enhance your browsing experience, analyze traffic,
+                    serve ads, and personalize content in accordance with our
+                    <a href="/privacy-policy.html">Privacy Policy</a>. Click 'Accept' to
+                    consent to our use of cookies.
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-tertiary" name="reject_all_cookies" id="reject-all-cookies">
+                        Reject
+                    </button>
+                    <button class="btn btn-primary" name="accept_all_cookies" id="accept-all-cookies">
+                        Accept
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        // Safely push to dataLayer
+        function pushToDataLayer(data) {
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push(data);
+        }
+
+        // Function to update consent in dataLayer
+        function updateConsent(consent) {
+            pushToDataLayer({
+                event: consent ? 'accept_cookies' : 'reject_cookies',
+                consent_update: {
+                    ad_storage: consent ? 'granted' : 'denied',
+                    analytics_storage: consent ? 'granted' : 'denied',
+                    personalization_storage: consent ? 'granted' : 'denied',
+                    security_storage: consent ? 'granted' : 'denied',
+                    ad_user_data: consent ? 'granted' : 'denied',
+                    ad_personalization: consent ? 'granted' : 'denied'
+                }
+            });
+        }
+
+        // Function to set cookie
+        function setCookie(name, value, days) {
+            try {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/; Secure; SameSite=Lax";
+            } catch (error) {
+                console.error("Error setting cookie:", error);
+            }
+        }
+
+        // Function to get cookie value
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // Function to dismiss modal
+        function dismissModal() {
+            var modal = document.getElementById("accept_cookies_modal");
+            if (modal) {
+                modal.classList.add("fade-out");
+                setTimeout(function() {
+                    modal.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        // Function to handle cookie acceptance
+        function acceptCookies() {
+            updateConsent(true);
+            setCookie("cookie_consent", "granted", 365);
+            dismissModal();
+        }
+
+        // Function to handle cookie rejection
+        function rejectCookies() {
+            updateConsent(false);
+            setCookie("cookie_consent", "denied", 365);
+            dismissModal();
+        }
+
+        // Function to show modal
+        function showModal() {
+            var modal = document.getElementById("accept_cookies_modal");
+            if (modal) {
+                modal.style.display = 'block';
+            }
+        }
+
+        // Attach event listeners
+        function attachEventListeners() {
+            var acceptButton = document.getElementById("accept-all-cookies");
+            var rejectButton = document.getElementById("reject-all-cookies");
+
+            if (acceptButton) {
+                acceptButton.addEventListener("click", acceptCookies);
+            }
+            if (rejectButton) {
+                rejectButton.addEventListener("click", rejectCookies);
+            }
+        }
+
+        // Check if consent is needed on page load
+        function checkConsent() {
+            var consent = getCookie("cookie_consent");
+            if (consent === null) {
+                showModal();
+            } else {
+                updateConsent(consent === "granted");
+            }
+        }
+
+        // Initialize
+        function init() {
+            attachEventListeners();
+            checkConsent();
+        }
+
+        // Run initialization when DOM is fully loaded
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", init);
+        } else {
+            init();
+        }
+    })();
+    </script>
+</body>
+</html>

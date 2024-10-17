@@ -1,10 +1,5 @@
 {
-  self,
-  inputs,
-  config,
-  lib,
   pkgs,
-  user,
   ...
 }:
 {
@@ -17,8 +12,6 @@
   ];
 
   services.nix-daemon.enable = true;
-
-  # Environment packages
   environment.systemPackages =
     with pkgs;
     [ ] ++ (import ../../../modules/shared/packages { inherit pkgs; });

@@ -29,8 +29,9 @@
           "sql"
           "tsx"
           "tmux"
+          "nix"
         ];
-        autoInstall = false;
+        autoInstall = true;
 
         # Register SQL language
         languageRegister = {

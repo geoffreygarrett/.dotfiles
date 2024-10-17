@@ -6,7 +6,8 @@
 }:
 {
   programs.firefox = {
-    enable = lib.mkIf (!pkgs.stdenv.isDarwin) true;
+    enable = true;
+    # enable = lib.mkIf (!pkgs.stdenv.isDarwin) true;
     profiles.geoffrey = {
       # Search settings
       search = {

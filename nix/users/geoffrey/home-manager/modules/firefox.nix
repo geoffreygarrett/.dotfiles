@@ -65,7 +65,9 @@ let
 in
 {
   programs.firefox = {
-    enable = lib.mkIf (!pkgs.stdenv.isDarwin) true;
+    enable = true;
+    package = if (!pkgs.stdenv.isDarwin) then pkgs.firefox else pkgs.firefox-bin;
+    # enable = lib.mkIf (!pkgs.stdenv.isDarwin) true;
     profiles.geoffrey = {
       search = import ./firefox/search.nix {
         inherit

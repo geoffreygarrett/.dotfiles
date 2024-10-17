@@ -22,6 +22,10 @@ let
       base0F = "${theme.base0F}",
     }
   '';
+
+  materialSetup = ''
+
+  '';
 in
 {
   programs.nixvim = {
@@ -37,7 +41,7 @@ in
     ];
 
     extraConfigLua = ''
-      ${luaPalette}
+            ${luaPalette}
 
       vim.opt.termguicolors = true
       require('material').setup({
@@ -49,7 +53,6 @@ in
           non_current_windows = false,
           filetypes = {},
         },
-
         styles = {
           comments = {},
           strings = {},
@@ -59,7 +62,6 @@ in
           operators = {},
           types = {},
         },
-
         plugins = {
           "gitsigns",
           "neo-tree",
@@ -69,7 +71,6 @@ in
           "rainbow-delimiters",
           "dashboard",
         },
-
         disable = {
           colored_cursor = true,
           borders = true,
@@ -77,12 +78,10 @@ in
           term_colors = true,
           eob_lines = false,
         },
-
         high_visibility = {
           lighter = false,
           darker = true,
         },
-
         lualine_style = "default",
         async_loading = true,
         custom_colors = function(colors)
@@ -107,7 +106,6 @@ in
             darkpurple = "#" .. palette.base0E,
             darkorange = "#" .. palette.base09,
           }
-
           -- Editor colors
           colors.editor = {
             bg = "#" .. palette.base00,
@@ -126,7 +124,6 @@ in
             title = "#" .. palette.base05,
             link = "#" .. palette.base0C,
           }
-
           -- Syntax colors
           colors.syntax = {
             comments = "#" .. palette.base03,
@@ -139,7 +136,6 @@ in
             string = colors.main.green,
             type = colors.main.yellow,
           }
-
           -- LSP colors
           colors.lsp = {
             error = "#" .. palette.base08,
@@ -147,14 +143,12 @@ in
             info = colors.main.paleblue,
             hint = colors.main.purple,
           }
-
           -- Git colors
           colors.git = {
             added = colors.main.green,
             removed = colors.main.red,
             modified = colors.main.blue,
           }
-
           -- Background colors
           colors.backgrounds = {
             sidebars = colors.editor.bg,
@@ -163,7 +157,6 @@ in
             cursor_line = colors.editor.active,
           }
         end,
-
         custom_highlights = function(colors)
           return {
             -- General Identifiers
@@ -176,19 +169,19 @@ in
             ["@type"] = { fg = colors.syntax.type },
             ["@type.builtin"] = { fg = colors.syntax.keyword, italic = true },
             ["@type.qualifier"] = { fg = colors.main.cyan },
-            ["@type.definition"] = { fg = colors.main.yellow },  -- Struct names
+            ["@type.definition"] = { fg = colors.main.yellow },
             ["@storageclass"] = { fg = colors.main.cyan },
             ["@storageclass.lifetime"] = { fg = colors.main.orange },
-            ["@attribute"] = { fg = colors.main.yellow },
+            ["@attribute"] = { fg = colors.main.blue },
             ["@property"] = { fg = colors.syntax.field },
-            ["@derive"] = { fg = colors.main.purple },  -- For derive macros
+            ["@derive"] = { fg = colors.main.purple },
 
             -- Functions
             ["@function"] = { fg = colors.syntax.fn },
             ["@function.builtin"] = { fg = colors.syntax.fn },
-            ["@function.macro"] = { fg = colors.main.blue },
+            ["@function.macro"] = { fg = colors.syntax.fn },
             ["@method"] = { fg = colors.syntax.fn },
-            ["@constructor"] = { fg = colors.main.blue },
+            ["@constructor"] = { fg = colors.syntax.fn },
 
             -- Keywords
             ["@keyword"] = { fg = colors.syntax.keyword, italic = true },
@@ -197,7 +190,6 @@ in
             ["@keyword.operator"] = { fg = colors.syntax.operator },
             ["@keyword.return"] = { fg = colors.syntax.keyword,  italic = true },
             ["@keyword.modifier"] = { fg = colors.syntax.keyword, italic = true },
-
             ["@keyword.coroutine"] = { fg = colors.main.purple, bg = "NONE" },
             ["@conditional"] = { fg = colors.syntax.keyword },
             ["@repeat"] = { fg = colors.syntax.keyword },
@@ -207,7 +199,8 @@ in
 
             -- Constants
             ["@constant"] = { fg = colors.main.white },
-            ["@constant.builtin"] = { fg = colors.main.white, italic = true },  -- For Ok, Err, etc.
+            ["@lsp.type.const.rust"] = { fg = colors.syntax.value },
+            ["@constant.builtin"] = { fg = colors.main.white, italic = true },
             ["@constant.macro"] = { fg = colors.main.cyan },
 
             -- Punctuation
@@ -219,12 +212,15 @@ in
             ["@comment"] = { fg = colors.syntax.comments, italic = true },
             ["@comment.documentation"] = { fg = colors.syntax.comments, italic = true },
 
+            -- Other
+            ["@_expr"] = { fg = colors.main.white, bold = true, cterm = { bold = true } },
+
             -- Strings
             ["@string"] = { fg = colors.syntax.string },
             ["@string.regex"] = { fg = colors.main.yellow },
-            ["@string.escape"] = { fg = colors.editor.fg_dark },
+            ["@string.escape"] = { fg = colors.main.cyan },
             ["@string.special"] = { fg = colors.editor.fg_dark },
-            ["@string.special.path"] = { fg = colors.editor.accent },
+            ["@string.special.path"] = { fg = colors.syntax.string },
 
             -- Characters
             ["@character"] = { fg = colors.main.green },
@@ -235,7 +231,7 @@ in
             ["@float"] = { fg = colors.syntax.value },
 
             -- Booleans
-            ["@boolean"] = { fg = colors.syntax.value },
+            ["@boolean"] = { link = "@type.builtin" },
 
             -- Modules
             ["@module"] = { fg = colors.main.white },
@@ -265,9 +261,22 @@ in
 
             -- LSP Semantic tokens
             ["@lsp.type.parameter"] = { fg = colors.main.orange },
-            ["@lsp.type.variable"] = { fg = colors.main.orange },
+            ["@lsp.type.variable"] = { fg = colors.syntax.variable },
             ["@lsp.typemod.variable.local"] = { fg = colors.main.orange },
             ["@lsp.typemod.variable.parameter"] = { fg = colors.main.orange },
+
+            -- More semantics
+            ["Identifier"] = { fg = colors.main.green, italic = true },
+            ["@lsp.type.derive.rust"] = { fg = colors.main.blue },
+            ["@lsp.type.struct.rust"] = { fg = colors.main.yellow },
+            ["@lsp.type.attributeBracket.rust"] = { fg = colors.main.blue },
+            ["@lsp.type.enum.rust"] = { fg = colors.main.yellow },
+            ["@lsp.type.selfTypeKeyword.rust"] = { fg = colors.syntax.keyword },
+            ["@lsp.type.enumMember.rust"] =  { fg = colors.syntax.variable, italic = true },
+            ["@lsp.typemod.parameter.mutable.rust"] = { fg = colors.main.orange, underline = true },
+            ["@lsp.typemod.variable.mutable.rust"] = { fg = colors.main.white, underline = true },
+            ["@lsp.mod.controlFlow.rust"] = { fg = colors.main.purple, italic = true, bold = true },
+            ["@lsp.mod.attribute.rust"] = { fg = colors.main.blue },
           }
         end
       })

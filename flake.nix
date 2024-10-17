@@ -11,7 +11,6 @@
     };
 
     # System Management
-
     nix-on-droid = {
       url = "github:nix-community/nix-on-droid/release-24.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -51,6 +50,7 @@
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixpkgs-firefox-darwin.url = "github:bandithedoge/nixpkgs-firefox-darwin";
     nix-homebrew = {
       url = "github:zhaofengli-wip/nix-homebrew";
     };
@@ -205,6 +205,7 @@
               (final: prev: {
                 nixus = self.packages.${system}.nixus;
               })
+              inputs.nixpkgs-firefox-darwin.overlay
             ]
             ++ lib.optional (lib.isAndroid system) (
               final: prev: {
@@ -549,7 +550,6 @@
             };
 
             "mariner-4" = {
-              # Raspberry Pi 3B+
               hostname = "mariner-4.nixus.net";
               profiles.system = {
                 sshUser = "${user}";
@@ -600,11 +600,7 @@
                 remoteBuild = true;
                 magicRollback = false;
                 sshOpts = commonSshOpts;
-                # Timeout for profile activation confirmation.
-                # This defaults to 30 seconds.
                 confirmTimeout = 300;
-                # Timeout for profile activation.
-                # This defaults to 240 seconds.
                 activationTimeout = 600;
                 path = inputs.deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.curiosity;
               };
