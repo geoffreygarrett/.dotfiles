@@ -23,9 +23,6 @@ let
     }
   '';
 
-  materialSetup = ''
-
-  '';
 in
 {
   programs.nixvim = {
@@ -41,7 +38,7 @@ in
     ];
 
     extraConfigLua = ''
-            ${luaPalette}
+      ${luaPalette}
 
       vim.opt.termguicolors = true
       require('material').setup({
@@ -179,7 +176,7 @@ in
             -- Functions
             ["@function"] = { fg = colors.syntax.fn },
             ["@function.builtin"] = { fg = colors.syntax.fn },
-            ["@function.macro"] = { fg = colors.syntax.fn },
+            -- ["@function.macro"] = { fg = colors.syntax.fn },
             ["@method"] = { fg = colors.syntax.fn },
             ["@constructor"] = { fg = colors.syntax.fn },
 
@@ -201,7 +198,7 @@ in
             ["@constant"] = { fg = colors.main.white },
             ["@lsp.type.const.rust"] = { fg = colors.syntax.value },
             ["@constant.builtin"] = { fg = colors.main.white, italic = true },
-            ["@constant.macro"] = { fg = colors.main.cyan },
+            ["@constant.macro"] = { fg = colors.main.white },
 
             -- Punctuation
             ["@punctuation.delimiter"] = { fg = colors.main.cyan },

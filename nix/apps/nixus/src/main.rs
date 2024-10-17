@@ -193,7 +193,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             cli::cachix::run(args)?;
         }
         Commands::Secrets(args) => {
-            info!("Running Secrets command");
             cli::secrets::run_secrets(args)?;
         }
     }
